@@ -3,9 +3,9 @@
 
 Updates should consist of 3 steps.
 
-1. Create a branch to work on changes `git checkout -b [branch name]`
-2. Add and commit changes (using semantic message format outlined below) `git add [filename]` `git commit -m`
-3. Push changes onto branch `git push origin [branch name]`
+1. Create a branch to work on changes `git checkout -b [branch_name]`
+2. Add and commit changes (using semantic message format outlined below) `git add [filename]` `git commit`
+3. Push changes onto branch `git push origin [branch_name]`
 
 ### Merging Branches
 
@@ -13,9 +13,9 @@ Branches should be merged in order of creation onto the master branch
 
 1. Checkout the master branch `git checkout master`
 2. Fetch remote updates `git fetch --all`
-3. Merge branch into master `git pull origin [branch name]`
+3. Merge branch into master `git pull origin [branch_name]`
 4. Resolve merge conflicts
-5. Add and commit changes `git add [filename]` `git commit -m`
+5. Add and commit changes `git add [filename]` `git commit`
 6. Push changes to master `git push origin master`
 
 ### Semantic Commit Message Format
@@ -30,13 +30,15 @@ Each commit message consists of a header, a body and a footer. The header has a 
 
 Type must be one of the following:
 
-- ***deps***: Changes that add external packages or dependencies\
-- ***build***: Changes that affects the world such as adding animations, models, or UI elements\ 
-- ***ci***: Changes to our CI configuration files and scripts\ 
+- ***deps***: Changes that add external packages or dependencies\ 
+- ***build***: Changes that affect the project build, such as project settings, project version, etc.\ 
+- ***world***: Changes that affect the world, such as adding models, animations, sounds, or particle effects\ 
+- ***ui***: Changes that affect the user interface, such as adding menu's or UI elements\ 
 - ***docs***: Changes affecting documentation, such as the README and TODO files\ 
+- ***asset***: A new asset, such as an imported model, sound, or animation\ 
 - ***feat***: A new feature, such as integrating VR controls, or adding/updating mechanics\ 
 - ***fix***: A bug fix (should include reference to GitHub issue)\ 
-- ***perf***: A change which improves in-game performance\ 
+- ***perf***: A change which improves the performance of some feature\ 
 - ***refactor***: A code change that neither fixes a bug nor adds a feature\ 
 - ***style***: A code change which does not affect its meaning (white-space, formatting, missing semi-colons, etc)\ 
 - ***test***: Adding missing tests or correcting existing tests\
@@ -57,10 +59,13 @@ The subject contains a succinct description of the change:
 
 #### Body
 
-Just as in the subject, use the imperative, present tense: "change" not "changed" nor "changes". The body should include the motivation for the change and contrast this with previous behavior.
+Just as in the subject, use the imperative, present tense: "change" not "changed" nor "changes". The body should include the motivation for the change and contrast this with previous behavior. 
 
 #### Footer
 
-The footer should contain any information about Breaking Changes and is also the place to reference git issues that this commit Closes.
+The footer should contain additional information about the commit, such as breaking changes, references to scrum tasks, and references to git issues and pull requests:
 
-A commit that has a footer BREAKING CHANGE:, or appends a ! after the type/scope, introduces a game breaking change (correlating with MAJOR in semantic versioning).
+- A commit which introduces a game-breaking change, should include BREAKING CHANGE: in the footer, or should append a ! after the type/scope.\ 
+- A commit which updates the status of a scrum task, should include `[task name] [task progress]`, where `[task progress]` is any of `in progress, to test, done`.\ 
+- A commit which updates or closes a git issue or should include `issue #[number]`.\ 
+- A commit which merges a pull request should include `pull request #[number]`.\ 

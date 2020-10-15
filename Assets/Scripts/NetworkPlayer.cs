@@ -20,8 +20,6 @@ public class NetworkPlayer : MonoBehaviour
     private Transform leftHandRig;
     private Transform rightHandRig;
 
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -34,7 +32,7 @@ public class NetworkPlayer : MonoBehaviour
         leftHandRig = rig.transform.Find("Camera Offset/Left Hand Controller");
         rightHandRig = rig.transform.Find("Camera Offset/Right Hand Controller");
 
-        if (photonView.isMine)
+        if (photonView.IsMine)
         {
             foreach (var item in GetComponentsInChildren<Renderer>())
             {

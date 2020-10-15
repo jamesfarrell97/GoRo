@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 
+// Code referenced: https://www.youtube.com/watch?v=DB5bajOMdUQ&t=20s&ab_channel=Valem
+//
+//
+//
 public class HandPresence : MonoBehaviour
 {
     public bool showController = false;

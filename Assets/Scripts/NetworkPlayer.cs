@@ -10,6 +10,7 @@ public class NetworkPlayer : MonoBehaviour
     public Transform head;
     public Transform leftHand;
     public Transform rightHand;
+    public Transform boat;
 
     public Animator leftHandAnimator;
     public Animator rightHandAnimator;
@@ -19,6 +20,7 @@ public class NetworkPlayer : MonoBehaviour
     private Transform headRig;
     private Transform leftHandRig;
     private Transform rightHandRig;
+    private Transform boatRig;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +33,8 @@ public class NetworkPlayer : MonoBehaviour
         headRig = rig.transform.Find("Camera Offset/Main Camera");
         leftHandRig = rig.transform.Find("Camera Offset/Left Hand Controller");
         rightHandRig = rig.transform.Find("Camera Offset/Right Hand Controller");
+
+        boatRig = rig.transform.parent.gameObject.transform;
 
         if (photonView.IsMine)
         {
@@ -49,6 +53,7 @@ public class NetworkPlayer : MonoBehaviour
             MapPosition(head, headRig);
             MapPosition(leftHand, leftHandRig);
             MapPosition(rightHand, rightHandRig);
+            MapPosition(boat, boatRig);
 
             UpdateHandAnimation(InputDevices.GetDeviceAtXRNode(XRNode.LeftHand), leftHandAnimator);
             UpdateHandAnimation(InputDevices.GetDeviceAtXRNode(XRNode.RightHand), rightHandAnimator);

@@ -21,6 +21,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] GameObject roomListItemPrefab;
     [SerializeField] Transform playerListContent;
     [SerializeField] GameObject playerListItemPrefab;
+    [SerializeField] GameObject startGameButton;
 
     void Awake()
     {
@@ -37,6 +38,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Debug.Log("Connected to Master.");
         PhotonNetwork.JoinLobby();
+        PhotonNetwork.AutomaticallySyncScene = true;
     }
 
     public override void OnJoinedLobby()
@@ -46,28 +48,14 @@ public class Launcher : MonoBehaviourPunCallbacks
         Debug.Log("Joined Lobby");
     }
 
-    public override void OnJoinedRoom()
+    public override void OnMasterClientSwitched(Player newMasterClient)
     {
-        MenuManager.Instance.OpenMenu("Room");
-        roomNameText.text = PhotonNetwork.CurrentRoom.Name;
-
-        Player[] players = PhotonNetwork.PlayerList;
-
-        for (int i = 0; i < players.Length;  i++)
-        {
-            Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
-        }
+        startGameButton.SetActive(PhotonNetwork.IsMasterClient);
     }
 
-    public override void OnLeftRoom()
+    public override void OnPlayerEnteredRoom(Player player)
     {
-        MenuManager.Instance.OpenMenu("Title");
-    }
-
-    public override void OnCreateRoomFailed(short returnCode, string message)
-    {
-        errorText.text = "Room creation failed: " + message;
-        MenuManager.Instance.OpenMenu("Error");
+        Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(player);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -79,14 +67,33 @@ public class Launcher : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < roomList.Count; i++)
         {
+            if (roomList[i].RemovedFromList)
+                continue;
+
             Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(roomList[i]);
         }
     }
 
-    public override void OnPlayerEnteredRoom(Player player)
-    {        
-        Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(player);
+
+
+    /*
+     * 
+     * Start Game
+     * 
+     */
+
+    public void StartGame()
+    {
+        PhotonNetwork.LoadLevel(1);
     }
+
+
+
+    /*
+     * 
+     * Create Room
+     *
+     */
 
     public void CreateRoom()
     {
@@ -99,15 +106,63 @@ public class Launcher : MonoBehaviourPunCallbacks
         MenuManager.Instance.OpenMenu("Loading");
     }
 
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        errorText.text = "Room creation failed: " + message;
+        MenuManager.Instance.OpenMenu("Error");
+    }
+
+
+
+    /*
+     * 
+     * Join Room
+     *
+     */
+
+    public void JoinRoom(RoomInfo roomInfo)
+    {
+        Debug.Log("hi");
+        PhotonNetwork.JoinRoom(roomInfo.Name);
+        MenuManager.Instance.OpenMenu("Loading");
+    }
+
+    public override void OnJoinedRoom()
+    {
+        MenuManager.Instance.OpenMenu("Room");
+        roomNameText.text = PhotonNetwork.CurrentRoom.Name;
+
+        Player[] players = PhotonNetwork.PlayerList;
+
+        foreach (Transform child in playerListContent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        for (int i = 0; i < players.Length; i++)
+        {
+            Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
+        }
+
+        startGameButton.SetActive(PhotonNetwork.IsMasterClient);
+    }
+
+
+
+    /*
+     * 
+     * Leave Room
+     *
+     */
+
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
         MenuManager.Instance.OpenMenu("Loading");
     }
 
-    public void JoinRoom(RoomInfo roomInfo)
+    public override void OnLeftRoom()
     {
-        PhotonNetwork.JoinRoom(roomInfo.Name);
-        MenuManager.Instance.OpenMenu("Loading");
+        MenuManager.Instance.OpenMenu("Title");
     }
 }

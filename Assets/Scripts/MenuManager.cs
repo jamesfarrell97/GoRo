@@ -10,12 +10,12 @@ public class MenuManager : MonoBehaviour
 {
     public static MenuManager Instance;
 
+    [SerializeField] Menu[] menus;
+
     void Awake()
     {
         Instance = this;
     }
-
-    [SerializeField] Menu[] menus;
 
     public void OpenMenu(string menuName)
     {
@@ -23,7 +23,7 @@ public class MenuManager : MonoBehaviour
         {
             if (menus[i].menuName == menuName)
             {
-                OpenMenu(menus[i]);
+               menus[i].Open();
             }
             else if (menus[i].open)
             {

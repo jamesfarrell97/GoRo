@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.XR;
+using Photon.Pun;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -10,16 +11,17 @@ using UnityEngine.XR;
 //
 public class BoatController : MonoBehaviour
 {
-    public GameObject leftHand;
-    public GameObject rightHand;
-    public GameObject midLeft;
-    public GameObject midRight;
-    public float boatSpeed = 15f;
-    public float boatTurningSpeed = 1f;
-    public float handSpeedFactor = 5f;
-
-    public XRNode leftInputSource;
-    public XRNode rightInputSource;
+    [SerializeField] GameObject leftHand;
+    [SerializeField] GameObject rightHand;
+    [SerializeField] GameObject midLeft;
+    [SerializeField] GameObject midRight;
+    [SerializeField] float boatSpeed = 15f;
+    [SerializeField] float boatTurningSpeed = 1f;
+    [SerializeField] float handSpeedFactor = 5f;
+    [SerializeField] float triggerPressureThreshold = 0.5f;
+    [SerializeField] float gripPressureThreshold = 0.5f;
+    [SerializeField] XRNode leftInputSource;
+    [SerializeField] XRNode rightInputSource;
 
     private InputDevice leftDevice;
     private InputDevice rightDevice;
@@ -39,11 +41,27 @@ public class BoatController : MonoBehaviour
     private bool leftGrip;
     private bool rightGrip;
 
+    private float leftTriggerPressure;
+    private float rightTriggerPressure;
+    private float leftGripPressure;
+    private float rightGripPressure;
+
     private float handSpeed;
+
+    private PhotonView photonView;
+
+    void Awake()
+    {
+        rigidBody = GetComponent<Rigidbody>();
+        photonView = GetComponent<PhotonView>();
+    }
 
     void Start()
     {
-        rigidBody = GetComponent<Rigidbody>();
+        if (!photonView.IsMine)
+        {
+            Destroy(rigidBody);
+        }
 
         playerPositionPreviousFrame = transform.position;
         leftHandPositionPreviousFrame = leftHand.transform.position;
@@ -52,14 +70,23 @@ public class BoatController : MonoBehaviour
 
     void Update()
     {
+        // Left Oar
         leftDevice = InputDevices.GetDeviceAtXRNode(leftInputSource);
+
+        leftDevice.TryGetFeatureValue(CommonUsages.trigger, out leftTriggerPressure);
+        leftDevice.TryGetFeatureValue(CommonUsages.grip, out leftGripPressure);
+
+        leftTrigger = (leftTriggerPressure >= triggerPressureThreshold);
+        leftGrip = (leftGripPressure >= gripPressureThreshold);
+
+        // Right Oar
         rightDevice = InputDevices.GetDeviceAtXRNode(rightInputSource);
 
-        leftDevice.TryGetFeatureValue(CommonUsages.triggerButton, out leftTrigger);
-        leftDevice.TryGetFeatureValue(CommonUsages.gripButton, out leftGrip);
+        rightDevice.TryGetFeatureValue(CommonUsages.trigger, out rightTriggerPressure);
+        rightDevice.TryGetFeatureValue(CommonUsages.grip, out rightGripPressure);
 
-        rightDevice.TryGetFeatureValue(CommonUsages.triggerButton, out rightTrigger);
-        rightDevice.TryGetFeatureValue(CommonUsages.gripButton, out rightGrip);
+        rightTrigger = (rightTriggerPressure >= triggerPressureThreshold);
+        rightGrip = (rightGripPressure >= gripPressureThreshold);
     }
 
     private void FixedUpdate()

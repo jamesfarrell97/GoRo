@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AchievementDisplay : MonoBehaviour
+public class Boat : MonoBehaviour
 {
     public Transform[] achievementSlots;
 

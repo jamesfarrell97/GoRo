@@ -81,8 +81,6 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
     }
 
-
-
     /*
      * 
      * Start Game
@@ -94,8 +92,6 @@ public class Launcher : MonoBehaviourPunCallbacks
         PhotonNetwork.LoadLevel(1);
     }
 
-
-
     /*
      * 
      * Create Room
@@ -106,11 +102,14 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         if (string.IsNullOrEmpty(roomNameInputField.text))
         {
-            return;
+            PhotonNetwork.CreateRoom("Default");
+            MenuManager.Instance.OpenMenu("Loading");
         }
-
-        PhotonNetwork.CreateRoom(roomNameInputField.text);
-        MenuManager.Instance.OpenMenu("Loading");
+        else
+        {
+            PhotonNetwork.CreateRoom(roomNameInputField.text);
+            MenuManager.Instance.OpenMenu("Loading");
+        }
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
@@ -118,8 +117,6 @@ public class Launcher : MonoBehaviourPunCallbacks
         errorText.text = "Room creation failed: " + message;
         MenuManager.Instance.OpenMenu("Error");
     }
-
-
 
     /*
      * 
@@ -153,8 +150,6 @@ public class Launcher : MonoBehaviourPunCallbacks
 
         startGameButton.SetActive(PhotonNetwork.IsMasterClient);
     }
-
-
 
     /*
      * 

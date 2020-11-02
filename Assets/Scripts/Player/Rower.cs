@@ -14,8 +14,8 @@ public class Rower : MonoBehaviour
     private bool seasick = false;
 
     // Stats
-    private static readonly float KILOMETERS_METER = 50;  // TEST VALUES
-    private static readonly float SECS_MINUTE = 5;         // TEST VALUES
+    private static readonly float KILOMETERS_METER = 50;   // TEST VALUES
+    private static readonly float SECS_MINUTE = 1;         // TEST VALUES
 
     private Vector3 startingPos;
     private float distanceMeters;
@@ -55,11 +55,10 @@ public class Rower : MonoBehaviour
         if (!gettingStarted && distanceMeters / KILOMETERS_METER > 1)
         {
             Debug.Log("Achieved! Getting Started!");
-
-            Transform achievementSlot = boat.GetAchievementSlot();
-            GameObject achievement = PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Achievements", "Getting Started"), achievementSlot.position, achievementSlot.rotation);
             
-            achievement.transform.SetParent(achievementSlot);
+            GameObject achievement = PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Achievements", "Getting Started"), transform.position, transform.rotation);
+
+            photonView.RPC("GitParent", RpcTarget.AllBuffered, new object[] { photonView.ViewID, achievement.GetPhotonView().ViewID });
 
             gettingStarted = true;
         }
@@ -67,14 +66,26 @@ public class Rower : MonoBehaviour
         if (!seasick && timeSecs / SECS_MINUTE > 1)
         {
             Debug.Log("Achieved! Seasick!");
+            
+            GameObject achievement = PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Achievements", "Seasick!"), transform.position, transform.rotation);
 
-            Transform achievementSlot = boat.GetAchievementSlot();
-            GameObject achievement = PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Achievements", "Seasick!"), achievementSlot.position, achievementSlot.rotation);
-
-            achievement.transform.SetParent(achievementSlot);
+            photonView.RPC("GitParent", RpcTarget.AllBuffered, new object[] { photonView.ViewID, achievement.GetPhotonView().ViewID});
 
             seasick = true;
         }
+    }
+
+    [PunRPC]
+    void GitParent(int playerID, int achievermentID)
+    {
+        PhotonView playerView = PhotonView.Find(playerID); 
+        PhotonView achievementView = PhotonView.Find(achievermentID);
+
+        Boat boat = playerView.gameObject.GetComponentInChildren<Boat>();
+        Transform achievementSlot = boat.GetAchievementSlot();
+
+        achievementView.gameObject.transform.SetParent(achievementSlot);
+        achievementView.gameObject.transform.SetPositionAndRotation(achievementSlot.position, achievementSlot.rotation);
     }
 
     private void UpdateDistance()

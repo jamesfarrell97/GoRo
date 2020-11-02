@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 // Code referenced: https://www.youtube.com/watch?v=eL_zHQEju8s&t=529s
 //
@@ -16,15 +17,22 @@ public class Floater : MonoBehaviour
     public float waterDrag = 0.99f;
     public float waterAngularDrag = 0.5f;
 
+    PhotonView photonView;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        photonView = GetComponentInParent<PhotonView>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (!photonView.IsMine)
+        {
+            return;
+        }
+
         rigidBody.AddForceAtPosition(Physics.gravity / floaterCount, transform.position, ForceMode.Acceleration);
 
         float waveHeight = WaveManager.instance.GetWaveHeight(transform.position.x);

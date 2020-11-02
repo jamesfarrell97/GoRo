@@ -91,6 +91,11 @@ public class BoatController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!photonView.IsMine)
+        {
+            return;
+        }
+
         Vector3 forward = rigidBody.transform.forward;
         Vector3 up = rigidBody.transform.up;
 

@@ -25,20 +25,19 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnEnable()
     {
         base.OnEnable();
-        SceneManager.sceneLoaded += OnSCeneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     public override void OnDisable()
     {
         base.OnDisable();
-        SceneManager.sceneLoaded -= OnSCeneLoaded;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void OnSCeneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
         if (scene.buildIndex == 1)
         {
-            Debug.Log("BI: " + scene.buildIndex);
             PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player Manager"), Vector3.zero, Quaternion.identity);
         }
     }

@@ -26,6 +26,7 @@ public class BoatController : MonoBehaviour
     private InputDevice leftDevice;
     private InputDevice rightDevice;
 
+    private BoxCollider boxCollider;
     private Rigidbody rigidBody;
     private Vector3 movement;
 
@@ -52,6 +53,7 @@ public class BoatController : MonoBehaviour
 
     void Awake()
     {
+        boxCollider = GetComponent<BoxCollider>();
         rigidBody = GetComponent<Rigidbody>();
         photonView = GetComponent<PhotonView>();
     }
@@ -88,7 +90,7 @@ public class BoatController : MonoBehaviour
         rightTrigger = (rightTriggerPressure >= triggerPressureThreshold);
         rightGrip = (rightGripPressure >= gripPressureThreshold);
     }
-
+    
     private void FixedUpdate()
     {
         if (!photonView.IsMine)
@@ -168,5 +170,15 @@ public class BoatController : MonoBehaviour
         leftHandPositionPreviousFrame = leftHandPositionThisFrame;
         rightHandPositionPreviousFrame = rightHandPositionThisFrame;
         playerPositionPreviousFrame = playerPositionThisFrame;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("Collision");
+        if (collision.collider.tag.Equals("Obstacle"))
+        {
+            Debug.Log("Collision");
+            FindObjectOfType<AudioManager>().Play("Collision");
+        }    
     }
 }

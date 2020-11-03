@@ -14,8 +14,8 @@ public class Rower : MonoBehaviour
     private bool seasick = false;
 
     // Stats
-    private static readonly float KILOMETERS_METER = 50;   // TEST VALUES
-    private static readonly float SECS_MINUTE = 1;         // TEST VALUES
+    private static readonly float KILOMETERS_METER = 100;    // TEST VALUES
+    private static readonly float SECS_MINUTE = 10;         // TEST VALUES
 
     private Vector3 startingPos;
     private float distanceMeters;

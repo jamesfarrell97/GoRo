@@ -9,19 +9,24 @@ using Photon.Pun;
 //
 //
 //
-public class BoatController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     [SerializeField] GameObject leftHand;
     [SerializeField] GameObject rightHand;
-    [SerializeField] GameObject midLeft;
-    [SerializeField] GameObject midRight;
-    [SerializeField] float boatSpeed = 15f;
+    [SerializeField] GameObject leftTurningPoint;
+    [SerializeField] GameObject rightTurningPoint;
+    [SerializeField] float boatSpeed = 30f;
     [SerializeField] float boatTurningSpeed = 1f;
     [SerializeField] float handSpeedFactor = 5f;
-    [SerializeField] float triggerPressureThreshold = 0.5f;
-    [SerializeField] float gripPressureThreshold = 0.5f;
+
+    [SerializeField] [Range(0f, 1f)] readonly float triggerPressureThreshold = 0.5f;
+    [SerializeField] [Range(0f, 1f)] readonly float gripPressureThreshold = 0.5f;
     [SerializeField] XRNode leftInputSource;
     [SerializeField] XRNode rightInputSource;
+
+    [SerializeField] Boat boat;
+    [SerializeField] AchievementTracker achievementTracker;
+    [SerializeField] Stats stats;
 
     private InputDevice leftDevice;
     private InputDevice rightDevice;
@@ -61,6 +66,7 @@ public class BoatController : MonoBehaviour
     {
         if (!photonView.IsMine)
         {
+            Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rigidBody);
         }
 
@@ -71,7 +77,11 @@ public class BoatController : MonoBehaviour
 
     private void Update()
     {
-        // Left Oar
+        if (!photonView.IsMine) return;
+
+        achievementTracker.TrackAchievements(photonView, stats);
+
+        // Left Oar Input
         leftDevice = InputDevices.GetDeviceAtXRNode(leftInputSource);
 
         leftDevice.TryGetFeatureValue(CommonUsages.trigger, out leftTriggerPressure);
@@ -80,7 +90,7 @@ public class BoatController : MonoBehaviour
         leftTrigger = (leftTriggerPressure >= triggerPressureThreshold);
         leftGrip = (leftGripPressure >= gripPressureThreshold);
 
-        // Right Oar
+        // Right Oar Input
         rightDevice = InputDevices.GetDeviceAtXRNode(rightInputSource);
 
         rightDevice.TryGetFeatureValue(CommonUsages.trigger, out rightTriggerPressure);
@@ -89,13 +99,10 @@ public class BoatController : MonoBehaviour
         rightTrigger = (rightTriggerPressure >= triggerPressureThreshold);
         rightGrip = (rightGripPressure >= gripPressureThreshold);
     }
-    
+
     private void FixedUpdate()
     {
-        if (!photonView.IsMine)
-        {
-            return;
-        }
+        if (!photonView.IsMine) return;
 
         Vector3 forward = rigidBody.transform.forward;
         Vector3 up = rigidBody.transform.up;

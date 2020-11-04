@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 5843673784613970455}
   - component: {fileID: 7313543914207904814}
   - component: {fileID: 8766561935306665370}
-  - component: {fileID: -2249759764039241577}
-  - component: {fileID: -3837467607574136421}
+  - component: {fileID: 7504596522416033381}
+  - component: {fileID: 7229771244260795594}
   m_Layer: 0
-  m_Name: Seasick!
+  m_Name: Row, Row, Row Your Boat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 4856754491095399653}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -60,7 +60,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3471b970f304c924b80ac156a2d804c5, type: 2}
+  - {fileID: 2100000, guid: e90ae49838e46c547941689acbd0de3f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -81,7 +81,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &-2249759764039241577
+--- !u!114 &7504596522416033381
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -100,11 +100,11 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   ObservedComponents:
-  - {fileID: -3837467607574136421}
+  - {fileID: 7229771244260795594}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &-3837467607574136421
+--- !u!114 &7229771244260795594
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

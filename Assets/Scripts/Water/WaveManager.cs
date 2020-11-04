@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 // Code referenced: https://www.youtube.com/watch?v=eL_zHQEju8s&t=529s
@@ -8,23 +9,21 @@ using UnityEngine;
 //
 public class WaveManager : MonoBehaviour
 {
-    public static WaveManager instance;
+    public static WaveManager Instance;
 
-    public float amplitude = 1f;
-    public float length = 2f;
-    public float speed = 1f;
-    public float offset = 0f;
+    [SerializeField] float amplitude = 1f;
+    [SerializeField] float length = 2f;
+    [SerializeField] float speed = 1f;
+    [SerializeField] float offset = 0f;
 
     private void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
         } 
-
-        else if (instance != this)
+        else if (Instance != this)
         {
-            Debug.Log("Instance already exists, destroying object!");
             Destroy(this);
         }
     }

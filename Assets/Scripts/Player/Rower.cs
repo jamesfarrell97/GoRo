@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,14 +7,14 @@ using Photon.Pun;
 
 public class Rower : MonoBehaviour
 {
-    public Boat boat;
+    [SerializeField] Boat boat;
 
     private bool gettingStarted = false;
     private bool seasick = false;
 
     // Stats
     private static readonly float KILOMETERS_METER = 100;    // TEST VALUES
-    private static readonly float SECS_MINUTE = 10;         // TEST VALUES
+    private static readonly float SECS_MINUTE = 10;          // TEST VALUES
 
     private Vector3 startingPos;
     private float distanceMeters;
@@ -23,13 +22,12 @@ public class Rower : MonoBehaviour
 
     private PhotonView photonView;
 
-    void Awake()
+    private void Awake()
     {
         photonView = GetComponent<PhotonView>();
     }
-
-    // Start is called before the first frame update
-    void Start()
+    
+    private void Start()
     {
         if (!photonView.IsMine)
         {
@@ -40,9 +38,8 @@ public class Rower : MonoBehaviour
         distanceMeters = 0;
         timeSecs = 0;
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    private void Update()
     {
         if (!photonView.IsMine)
         {
@@ -76,7 +73,7 @@ public class Rower : MonoBehaviour
     }
 
     [PunRPC]
-    void GitParent(int playerID, int achievermentID)
+    private void GitParent(int playerID, int achievermentID)
     {
         PhotonView playerView = PhotonView.Find(playerID); 
         PhotonView achievementView = PhotonView.Find(achievermentID);

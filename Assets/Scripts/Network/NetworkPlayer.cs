@@ -1,10 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
-using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR;
 using Photon.Pun;
 
+// Code referenced: https://www.youtube.com/watch?v=KHWuTBmT1oI
+//
+//
+//
 public class NetworkPlayer : MonoBehaviour
 {
     public Transform head;
@@ -36,13 +41,6 @@ public class NetworkPlayer : MonoBehaviour
 
         boatRig = rig.transform.parent.gameObject.transform;
 
-        if (photonView.IsMine)
-        {
-            foreach (var item in GetComponentsInChildren<Renderer>())
-            {
-                item.enabled = false;
-            }
-        }
     }
 
     // Update is called once per frame

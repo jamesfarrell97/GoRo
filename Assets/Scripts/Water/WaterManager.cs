@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -17,14 +18,13 @@ public class WaterManager : MonoBehaviour
     {
         meshFilter = GetComponent<MeshFilter>();
     }
-
-    // Update is called once per frame
+    
     private void Update()
     {
         Vector3[] vertices = meshFilter.mesh.vertices;
         for (int i = 0; i < vertices.Length; i++)
         {
-            vertices[i].y = WaveManager.instance.GetWaveHeight(transform.position.x + vertices[i].x);
+            vertices[i].y = WaveManager.Instance.GetWaveHeight(transform.position.x + vertices[i].x);
         }
 
         meshFilter.mesh.vertices = vertices;

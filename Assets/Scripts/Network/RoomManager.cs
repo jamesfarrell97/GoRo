@@ -6,11 +6,15 @@ using Photon.Pun;
 using UnityEngine.SceneManagement;
 using System.IO;
 
+//Code referenced: https://www.youtube.com/watch?v=6qRNBPPojMA
+//
+//
+//
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     public static RoomManager Instance;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance)
         {
@@ -34,12 +38,11 @@ public class RoomManager : MonoBehaviourPunCallbacks
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
         if (scene.buildIndex == 1)
         {
-            PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player Manager"), Vector3.zero, Quaternion.identity);
+            PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player", "Player Manager"), Vector3.zero, Quaternion.identity);
         }
     }
-
 }

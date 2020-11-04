@@ -26,6 +26,7 @@ public class BoatController : MonoBehaviour
     private InputDevice leftDevice;
     private InputDevice rightDevice;
 
+    private PhotonView photonView;
     private BoxCollider boxCollider;
     private Rigidbody rigidBody;
     private Vector3 movement;
@@ -49,16 +50,14 @@ public class BoatController : MonoBehaviour
 
     private float handSpeed;
 
-    private PhotonView photonView;
-
-    void Awake()
+    private void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
         rigidBody = GetComponent<Rigidbody>();
         photonView = GetComponent<PhotonView>();
     }
 
-    void Start()
+    private void Start()
     {
         if (!photonView.IsMine)
         {
@@ -70,7 +69,7 @@ public class BoatController : MonoBehaviour
         rightHandPositionPreviousFrame = rightHand.transform.position;
     }
 
-    void Update()
+    private void Update()
     {
         // Left Oar
         leftDevice = InputDevices.GetDeviceAtXRNode(leftInputSource);
@@ -172,12 +171,10 @@ public class BoatController : MonoBehaviour
         playerPositionPreviousFrame = playerPositionThisFrame;
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Collision");
         if (collision.collider.tag.Equals("Obstacle"))
         {
-            Debug.Log("Collision");
             FindObjectOfType<AudioManager>().Play("Collision");
         }    
     }

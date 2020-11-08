@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class Stats : MonoBehaviour
 {
-    public static readonly float KILOMETERS_METER = 100;    // TEST VALUES
-    public static readonly float SECS_MINUTE = 10;          // TEST VALUES
+    public static readonly float KILOMETERS_METER = 1000;   // TEST VALUES
+    public static readonly float SECS_MINUTE = 60;          // TEST VALUES
 
     private Vector3 position;
     private float metersRowed;

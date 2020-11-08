@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Race : MonoBehaviour
@@ -8,77 +9,111 @@ public class Race : MonoBehaviour
 
     public Rower participant;
 
-    //Amount of players are able to participate in a race session
+    //Amount of players allowed to participate per session
     public int maxAmountParticipants = 5;
 
+    //Time permitted to get into initiated racing session before race begins
+    public float timeToPrepare = 10f;
+
+    //Time permitted for other racers to reach finish line (before ending the race session), once a first place for this race session is assigned
+    public float timeToFinishRace = 20f; 
 
 
-    //Flag stating whether player(s) are in starting positions
-    private bool playersReady = false;
+    private bool raceInitiated = false;
 
-    //Flag to state whether race is occurinng or is available to be started
     private bool raceInProgress = false;
 
-    //Store race participants
-    private Dictionary<Rower, DateTime> participants;
-    //private List<GameObject> participants = new List<GameObject>();
+    private List<Rower> participants;
 
+
+    private float timeRaceInitiated;
+    private float timeRaceStarted;
+    private float timeSecs;
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == participant)
-        {
-            DateTime timeEntered = System.DateTime.Now;
-            participants.Add(participant, timeEntered);
+        
 
-            //Date stamp will exist to control the scenario where more than the max amount of rowers attempt to enter a race session
-            //The first five will be given access
-            //NEED TO: research into how viable this idea is, if rowers enter this trigger at the same time
+        //if (other.gameObject == participant)
+        if (other.CompareTag("Player"))
+        {
+
+            if (participants.Count() == 0)
+            {
+                raceInitiated = true;
+                timeRaceInitiated = Time.time;
+            }
+
+            if(participants.Count() < maxAmountParticipants)
+            {
+                participants.Add(participant);
+            }
+
         }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        participants = new Dictionary<Rower, DateTime>();
+        participants = new List<Rower>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Test");
+        timeSecs = Time.time;
 
-        if (IsRaceInitiated() == true)
+        Debug.Log($"In Game Time: {timeSecs}");
+        Debug.Log($"Time Race Initiated {timeRaceInitiated}");
+        Debug.Log($"Time Race Started {timeRaceStarted}");
+
+        if (raceInitiated == true)
         {
-            InitiateCountDown();
+
+            if (raceInProgress == false)
+            {
+                if (participants.Count() == maxAmountParticipants || (timeSecs - timeRaceInitiated) >= timeToPrepare)
+                {
+                    
+                    StartRace();
+                }
+            }
+            else
+            {
+
+
+
+
+            }
         }
 
     }
 
-    private bool IsRaceInitiated()
+    private void StartRace()
     {
-        if (participants.Count > 0)
-        {
-            return true;
-        }
+        //Bring up barrier
 
-        return false;
+        //Allow participants to move
+
+        //Need to make sure that the floaters are up the whole way before race begins 
+        //OR atleast have the invisible barrier block appear straight away to avoid others entering race area
+        raceInProgress = true;
+        timeRaceStarted = Time.time;
+
+        Debug.Log($"In Game Time: {timeSecs}");
+        Debug.Log($"Time Race Initiated {timeRaceInitiated}");
+        Debug.Log($"Time Race Started {timeRaceStarted}");
     }
-
-    //Initiate Race once player(s) in start position
-    private void InitiateCountDown()
-    {
-        Debug.Log("Race Initiated");
-    }
-
 
     //Reset all datatypes back to their initial state, after a race is finished
     private void DisposeSessionResources()
     {
-        playersReady = false;
         raceInProgress = false;
+        raceInitiated = false;
         participants.Clear();
-
+        timeRaceInitiated = 0;
+        timeRaceStarted = 0;
+        timeSecs = 0;
     }
 
 }

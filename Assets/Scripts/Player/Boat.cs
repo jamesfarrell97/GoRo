@@ -1,15 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 public class Boat : MonoBehaviour
 {
-    public Transform[] achievementSlots;
+    [SerializeField] Transform[] achievementSlots;
 
     private int slotCount;
     private int slotIndex;
 
-    void Start()
+    private void Start()
     {
         slotCount = achievementSlots.Length;
         slotIndex = 0;

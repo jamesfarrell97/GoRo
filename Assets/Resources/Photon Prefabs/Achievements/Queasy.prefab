@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -2249759764039241577}
   - component: {fileID: -3837467607574136421}
   m_Layer: 0
-  m_Name: Seasick!
+  m_Name: Queasy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -60,7 +60,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3471b970f304c924b80ac156a2d804c5, type: 2}
+  - {fileID: 2100000, guid: a08c42832ed26dd4ab3755e60aa50f71, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

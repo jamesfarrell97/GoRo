@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 // Code referenced: https://www.youtube.com/watch?v=zPZK7C5_BQo
@@ -12,7 +13,7 @@ public class MenuManager : MonoBehaviour
 
     [SerializeField] Menu[] menus;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance)
         {

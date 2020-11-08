@@ -9,24 +9,22 @@ using Photon.Pun;
 //
 public class Floater : MonoBehaviour
 {
-    public Rigidbody rigidBody;
-    public float depthBeforeSubmerged = 1f;
-    public float displacementAmount = 3f;
-    public int floaterCount = 1;
+    [SerializeField] Rigidbody rigidBody;
 
-    public float waterDrag = 0.99f;
-    public float waterAngularDrag = 0.5f;
+    [SerializeField] int floaterCount = 1;
+    [SerializeField] float depthBeforeSubmerged = 1f;
+    [SerializeField] float displacementAmount = 3f;
+    [SerializeField] float waterDrag = 0.99f;
+    [SerializeField] float waterAngularDrag = 0.5f;
 
-    PhotonView photonView;
-
-    // Start is called before the first frame update
-    void Start()
+    private PhotonView photonView;
+    
+    private void Start()
     {
         photonView = GetComponentInParent<PhotonView>();
     }
-
-    // Update is called once per frame
-    void FixedUpdate()
+    
+    private void FixedUpdate()
     {
         if (!photonView.IsMine)
         {
@@ -35,7 +33,7 @@ public class Floater : MonoBehaviour
 
         rigidBody.AddForceAtPosition(Physics.gravity / floaterCount, transform.position, ForceMode.Acceleration);
 
-        float waveHeight = WaveManager.instance.GetWaveHeight(transform.position.x);
+        float waveHeight = WaveManager.Instance.GetWaveHeight(transform.position.x);
 
         if (transform.position.y < waveHeight)
         {

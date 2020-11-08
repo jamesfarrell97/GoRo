@@ -9,23 +9,29 @@ using Photon.Pun;
 //
 //
 //
-public class BoatController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     [SerializeField] GameObject leftHand;
     [SerializeField] GameObject rightHand;
-    [SerializeField] GameObject midLeft;
-    [SerializeField] GameObject midRight;
-    [SerializeField] float boatSpeed = 15f;
+    [SerializeField] GameObject leftTurningPoint;
+    [SerializeField] GameObject rightTurningPoint;
+    [SerializeField] float boatSpeed = 30f;
     [SerializeField] float boatTurningSpeed = 1f;
     [SerializeField] float handSpeedFactor = 5f;
-    [SerializeField] float triggerPressureThreshold = 0.5f;
-    [SerializeField] float gripPressureThreshold = 0.5f;
+
+    [SerializeField] [Range(0f, 1f)] readonly float triggerPressureThreshold = 0.5f;
+    [SerializeField] [Range(0f, 1f)] readonly float gripPressureThreshold = 0.5f;
     [SerializeField] XRNode leftInputSource;
     [SerializeField] XRNode rightInputSource;
+
+    [SerializeField] Boat boat;
+    [SerializeField] AchievementTracker achievementTracker;
+    [SerializeField] Stats stats;
 
     private InputDevice leftDevice;
     private InputDevice rightDevice;
 
+    private PhotonView photonView;
     private BoxCollider boxCollider;
     private Rigidbody rigidBody;
     private Vector3 movement;
@@ -49,19 +55,18 @@ public class BoatController : MonoBehaviour
 
     private float handSpeed;
 
-    private PhotonView photonView;
-
-    void Awake()
+    private void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
         rigidBody = GetComponent<Rigidbody>();
         photonView = GetComponent<PhotonView>();
     }
 
-    void Start()
+    private void Start()
     {
         if (!photonView.IsMine)
         {
+            Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rigidBody);
         }
 
@@ -70,9 +75,13 @@ public class BoatController : MonoBehaviour
         rightHandPositionPreviousFrame = rightHand.transform.position;
     }
 
-    void Update()
+    private void Update()
     {
-        // Left Oar
+        if (!photonView.IsMine) return;
+
+        achievementTracker.TrackAchievements(photonView, stats);
+
+        // Left Oar Input
         leftDevice = InputDevices.GetDeviceAtXRNode(leftInputSource);
 
         leftDevice.TryGetFeatureValue(CommonUsages.trigger, out leftTriggerPressure);
@@ -81,7 +90,7 @@ public class BoatController : MonoBehaviour
         leftTrigger = (leftTriggerPressure >= triggerPressureThreshold);
         leftGrip = (leftGripPressure >= gripPressureThreshold);
 
-        // Right Oar
+        // Right Oar Input
         rightDevice = InputDevices.GetDeviceAtXRNode(rightInputSource);
 
         rightDevice.TryGetFeatureValue(CommonUsages.trigger, out rightTriggerPressure);
@@ -90,13 +99,10 @@ public class BoatController : MonoBehaviour
         rightTrigger = (rightTriggerPressure >= triggerPressureThreshold);
         rightGrip = (rightGripPressure >= gripPressureThreshold);
     }
-    
+
     private void FixedUpdate()
     {
-        if (!photonView.IsMine)
-        {
-            return;
-        }
+        if (!photonView.IsMine) return;
 
         Vector3 forward = rigidBody.transform.forward;
         Vector3 up = rigidBody.transform.up;
@@ -172,12 +178,10 @@ public class BoatController : MonoBehaviour
         playerPositionPreviousFrame = playerPositionThisFrame;
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Collision");
         if (collision.collider.tag.Equals("Obstacle"))
         {
-            Debug.Log("Collision");
             FindObjectOfType<AudioManager>().Play("Collision");
         }    
     }

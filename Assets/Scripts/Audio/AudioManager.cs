@@ -9,11 +9,11 @@ using UnityEngine;
 //
 public class AudioManager : MonoBehaviour
 {
-    public Sound[] sounds;
+    [SerializeField] Sound[] sounds;
 
     public static AudioManager instance;
 
-    void Awake()
+    private void Awake()
     {
         if (instance == null)
         {
@@ -27,32 +27,32 @@ public class AudioManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
 
-        foreach (Sound s in sounds)
+        foreach (Sound sound in sounds)
         {
-            s.source = gameObject.AddComponent<AudioSource>();
+            sound.source = gameObject.AddComponent<AudioSource>();
 
-            s.source.clip = s.clip;
-            s.source.volume = s.volume;
-            s.source.pitch = s.pitch;
-            s.source.loop = s.loop;
+            sound.source.clip = sound.clip;
+            sound.source.volume = sound.volume;
+            sound.source.pitch = sound.pitch;
+            sound.source.loop = sound.loop;
         }
     }
 
-    void Start()
+    private void Start()
     {
         Play("Theme");
     }
 
     public void Play(string name)
     {
-        Sound s = Array.Find(sounds, sound => sound.name == name);
+        Sound sound = Array.Find(sounds, s => s.name == name);
 
-        if (s == null)
+        if (sound == null)
         {
             Debug.Log("Sound: " + name + " not found!");
             return;
         }
 
-        s.source.Play();
+        sound.source.Play();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -9,23 +10,22 @@ using UnityEngine.XR;
 //
 public class HandPresence : MonoBehaviour
 {
-    public bool showController = false;
-    public InputDeviceCharacteristics controllerCharacteristics;
-    public List<GameObject> controllerPrefabs;
-    public GameObject handModelPrefab;
+    [SerializeField] bool showController = false;
+    [SerializeField] InputDeviceCharacteristics controllerCharacteristics;
+    [SerializeField] List<GameObject> controllerPrefabs;
+    [SerializeField] GameObject handModelPrefab;
     
     private InputDevice targetDevice;
     private GameObject spawnedController;
     private GameObject spawnedHandModel;
     private Animator handAnimator;
-
-    // Start is called before the first frame update
-    void Start()
+    
+    private void Start()
     {
         TryInitialize();
     }
 
-    void TryInitialize()
+    private void TryInitialize()
     {
         List<InputDevice> devices = new List<InputDevice>();
 
@@ -54,7 +54,7 @@ public class HandPresence : MonoBehaviour
         }
     }
 
-    void UpdateHandAnimation()
+    private void UpdateHandAnimation()
     {
         if(targetDevice.TryGetFeatureValue(CommonUsages.trigger, out float triggerValue))
         {
@@ -74,9 +74,8 @@ public class HandPresence : MonoBehaviour
             handAnimator.SetFloat("Grip", 0);
         }
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    private void Update()
     {
         if(!targetDevice.isValid)
         {
@@ -88,6 +87,7 @@ public class HandPresence : MonoBehaviour
             {
                 if(spawnedHandModel)
                     spawnedHandModel.SetActive(false);
+
                 if(spawnedController)
                     spawnedController.SetActive(true);
             }
@@ -95,8 +95,10 @@ public class HandPresence : MonoBehaviour
             {
                 if (spawnedHandModel)
                     spawnedHandModel.SetActive(true);
+
                 if (spawnedController)
                     spawnedController.SetActive(false);
+
                 UpdateHandAnimation();
             }
         }

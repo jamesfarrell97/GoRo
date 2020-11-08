@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Obstacle
+  - Race
+  - FinishRace
   layers:
   - Default
   - TransparentFX

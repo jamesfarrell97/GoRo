@@ -39,12 +39,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2014790985916815286}
+  - component: {fileID: 3808148005375761875}
   - component: {fileID: 523918723204894109}
   - component: {fileID: 4594179007817972638}
+  - component: {fileID: 4666216803250500573}
+  - component: {fileID: 1045731108965254691}
   - component: {fileID: 7215795736207073313}
   - component: {fileID: 908214620446855712}
-  - component: {fileID: 1045731108965254691}
-  - component: {fileID: 4666216803250500573}
   m_Layer: 0
   m_Name: Player Controller
   m_TagString: Untagged
@@ -68,6 +69,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &3808148005375761875
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775505140984949812}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &523918723204894109
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -103,11 +117,50 @@ MonoBehaviour:
   boatSpeed: 30
   boatTurningSpeed: 1
   handSpeedFactor: 5
+  triggerPressureThreshold: 0.5
+  gripPressureThreshold: 0.5
   leftInputSource: 4
   rightInputSource: 5
   boat: {fileID: 7777275153511830189}
-  achievementTracker: {fileID: 4666216803250500573}
-  stats: {fileID: 1045731108965254691}
+--- !u!114 &4666216803250500573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775505140984949812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 883fdf79a5e771d46b394cadef387638, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distance1: {fileID: 4856754491095399653, guid: 1b87d22ded9e2574ba3e495345aa2210,
+    type: 3}
+  distance2: {fileID: 4856754491095399653, guid: 5ec18afb2fca14f4495ca852ebcbe3dd,
+    type: 3}
+  distance3: {fileID: 4856754491095399653, guid: d3a73aa08dd8681478e045f7b7982be8,
+    type: 3}
+  distance1Target: 100
+  distance2Target: 500
+  distance3Target: 1000
+  time1: {fileID: 4856754491095399653, guid: 8ed5f24267206ea49b7259393057f49a, type: 3}
+  time2: {fileID: 4856754491095399653, guid: ae888820455c7cc4a95ba89fb1ad2b3b, type: 3}
+  time3: {fileID: 4856754491095399653, guid: be6e6cb0083122e48b773562db9d1732, type: 3}
+  time1_Target: 1
+  time2_Target: 5
+  time3_Target: 10
+--- !u!114 &1045731108965254691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775505140984949812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44595d27f0a50bd42ad0da1a498a1c3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7215795736207073313
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,45 +199,6 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
---- !u!114 &1045731108965254691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 775505140984949812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44595d27f0a50bd42ad0da1a498a1c3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4666216803250500573
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 775505140984949812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 883fdf79a5e771d46b394cadef387638, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  distance1: {fileID: 4856754491095399653, guid: 1b87d22ded9e2574ba3e495345aa2210,
-    type: 3}
-  distance2: {fileID: 4856754491095399653, guid: 5ec18afb2fca14f4495ca852ebcbe3dd,
-    type: 3}
-  distance3: {fileID: 4856754491095399653, guid: d3a73aa08dd8681478e045f7b7982be8,
-    type: 3}
-  distance1Target: 100
-  distance2Target: 500
-  distance3Target: 1000
-  time1: {fileID: 4856754491095399653, guid: 8ed5f24267206ea49b7259393057f49a, type: 3}
-  time2: {fileID: 4856754491095399653, guid: ae888820455c7cc4a95ba89fb1ad2b3b, type: 3}
-  time3: {fileID: 4856754491095399653, guid: be6e6cb0083122e48b773562db9d1732, type: 3}
-  time1_Target: 1
-  time2_Target: 5
-  time3_Target: 10
 --- !u!1 &1705192992056287986
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,7 +281,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 523918723204894109}
-  floaterCount: 4
+  floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
   waterDrag: 2
@@ -316,7 +330,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 523918723204894109}
-  floaterCount: 4
+  floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
   waterDrag: 2
@@ -649,7 +663,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 523918723204894109}
-  floaterCount: 4
+  floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
   waterDrag: 2
@@ -892,7 +906,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 523918723204894109}
-  floaterCount: 4
+  floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
   waterDrag: 2
@@ -1065,7 +1079,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 523918723204894109}
-  floaterCount: 4
+  floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
   waterDrag: 2
@@ -1114,7 +1128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 523918723204894109}
-  floaterCount: 4
+  floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
   waterDrag: 2
@@ -1193,7 +1207,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 523918723204894109}
-  floaterCount: 4
+  floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
   waterDrag: 2
@@ -1438,7 +1452,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 523918723204894109}
-  floaterCount: 4
+  floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
   waterDrag: 2

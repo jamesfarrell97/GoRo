@@ -19,14 +19,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float boatTurningSpeed = 1f;
     [SerializeField] float handSpeedFactor = 5f;
 
-    [SerializeField] [Range(0f, 1f)] readonly float triggerPressureThreshold = 0.5f;
-    [SerializeField] [Range(0f, 1f)] readonly float gripPressureThreshold = 0.5f;
+    [SerializeField] [Range(0f, 1f)] float triggerPressureThreshold = 0.5f;
+    [SerializeField] [Range(0f, 1f)] float gripPressureThreshold = 0.5f;
     [SerializeField] XRNode leftInputSource;
     [SerializeField] XRNode rightInputSource;
 
     [SerializeField] Boat boat;
-    [SerializeField] AchievementTracker achievementTracker;
-    [SerializeField] Stats stats;
 
     private InputDevice leftDevice;
     private InputDevice rightDevice;
@@ -55,11 +53,16 @@ public class PlayerController : MonoBehaviour
 
     private float handSpeed;
 
+    private AchievementTracker achievementTracker;
+    private Stats stats;
+
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
         rigidBody = GetComponent<Rigidbody>();
         photonView = GetComponent<PhotonView>();
+        achievementTracker = GetComponent<AchievementTracker>();
+        stats = GetComponent<Stats>();
     }
 
     private void Start()
@@ -156,7 +159,6 @@ public class PlayerController : MonoBehaviour
             // Turn Right
             else if (leftGrip && leftTrigger)
             {
-
                 rigidBody.AddTorque(-up * (-handSpeed * handSpeedFactor) * boatTurningSpeed);
             }
 

@@ -33,24 +33,59 @@ public class Launcher : MonoBehaviourPunCallbacks
 
         DontDestroyOnLoad(gameObject);
         Instance = this;
+
+        CheckConnection();
     }
 
     private void Start()
     {
+        MenuManager.Instance.OpenMenu("Title");
+    }
+
+    public void Singleplayer()
+    {
+        PhotonNetwork.OfflineMode = true;
+
+        CreateRoom();
+        StartGame();
+    }
+
+    public void Multiplayer()
+    {
+        CheckConnection();
+
+        if (PhotonNetwork.OfflineMode)
+        {
+            errorText.text = "Cannot connect to network";
+            MenuManager.Instance.OpenMenu("Error");
+            return;
+        }
+
+        PhotonNetwork.OfflineMode = false;
+
         Debug.Log("Connected to Server.");
+        MenuManager.Instance.OpenMenu("Loading");
         PhotonNetwork.ConnectUsingSettings();
+    }
+
+    public void CheckConnection()
+    {
+        PhotonNetwork.OfflineMode = Application.internetReachability.Equals(NetworkReachability.NotReachable);
     }
 
     public override void OnConnectedToMaster()
     {
         Debug.Log("Connected to Master.");
-        PhotonNetwork.JoinLobby();
+
+        if (PhotonNetwork.OfflineMode) return;
+
         PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.JoinLobby();
     }
 
     public override void OnJoinedLobby()
     {
-        MenuManager.Instance.OpenMenu("Title");
+        MenuManager.Instance.OpenMenu("Multiplayer");
         PhotonNetwork.NickName = "Player" + Random.Range(0, 1000).ToString("0000");
         Debug.Log("Joined Lobby");
     }

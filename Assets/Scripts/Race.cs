@@ -8,6 +8,8 @@ public class Race : MonoBehaviour
 {
 
     public Rower participant;
+    private RaceFinishLine finshLine;
+    private RaceFinish finishLineDetails;
 
     //Amount of players allowed to participate per session
     public int maxAmountParticipants = 5;
@@ -23,6 +25,8 @@ public class Race : MonoBehaviour
 
     private bool raceInProgress = false;
 
+    private bool raceComplete = false;
+
     private List<Rower> participants;
 
 
@@ -34,7 +38,6 @@ public class Race : MonoBehaviour
     {
         
 
-        //if (other.gameObject == participant)
         if (other.CompareTag("Player"))
         {
 
@@ -46,22 +49,27 @@ public class Race : MonoBehaviour
 
             if(participants.Count() < maxAmountParticipants)
             {
-                participants.Add(participant);
+                participants.Add(participant); // !!!Have proper way to define the particluar rower that has triggered the box collider
             }
 
         }
     }
 
-    // Start is called before the first frame update
+    void Awake()
+    {
+        finishLine = GameObject.FindWithTag("FinishRace");
+    }
+
     void Start()
     {
         participants = new List<Rower>();
+        //finishLineDetails = finishLine.GetComponent<RaceFinish>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        timeSecs = Time.time;
+        timeSecs = Time.timeSinceLevelLoad;
 
         Debug.Log($"In Game Time: {timeSecs}");
         Debug.Log($"Time Race Initiated {timeRaceInitiated}");
@@ -80,13 +88,24 @@ public class Race : MonoBehaviour
             }
             else
             {
-
-
+                HasFinishLineBeenCrossed();
+                EndRace();
 
 
             }
         }
 
+    }
+
+    private void HasFinishLineBeenCrossed()
+    {
+        if(finshLine.finishLineReached == true)
+        {          
+            if((timeSecs - finishLine.timeFirstRowerPassed) >= timeToFinishRace)
+            {
+                raceComplete = true;
+            }
+        }
     }
 
     private void StartRace()
@@ -98,11 +117,29 @@ public class Race : MonoBehaviour
         //Need to make sure that the floaters are up the whole way before race begins 
         //OR atleast have the invisible barrier block appear straight away to avoid others entering race area
         raceInProgress = true;
-        timeRaceStarted = Time.time;
+        timeRaceStarted = Time.timeSinceLevelLoad;
 
         Debug.Log($"In Game Time: {timeSecs}");
         Debug.Log($"Time Race Initiated {timeRaceInitiated}");
         Debug.Log($"Time Race Started {timeRaceStarted}");
+    }
+
+    private void EndRace()
+    {
+        if(raceComplete == true)
+        {
+            //Bring buoys down
+            //Remove invisible barrier block
+            //Reset Race class to await for new session prompt
+            //      Have another boxCollider covering entire race area,
+            //      Only reset everything once players are no longer in race area
+            //      To avoid re-activating the race trigger
+            // OR have a cooldown period before the race can be activated again 
+            //      (but still need to make sure no one is located within the race area)
+
+
+
+        }
     }
 
     //Reset all datatypes back to their initial state, after a race is finished

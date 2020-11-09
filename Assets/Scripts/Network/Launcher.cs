@@ -24,6 +24,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] GameObject playerListItemPrefab;
     [SerializeField] GameObject startGameButton;
 
+    private int buildIndex;
+
     private void Awake()
     {
         if (Instance)
@@ -46,6 +48,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     public void Singleplayer()
     {
         PhotonNetwork.OfflineMode = true;
+        buildIndex = 1;
 
         CreateRoom();
         StartGame();
@@ -63,6 +66,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.OfflineMode = false;
+        buildIndex = 2;
 
         Debug.Log("Connected to Server.");
         MenuManager.Instance.OpenMenu("Loading");
@@ -119,7 +123,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        PhotonNetwork.LoadLevel(1);
+        PhotonNetwork.LoadLevel(buildIndex);
     }
 
     public void CreateRoom()

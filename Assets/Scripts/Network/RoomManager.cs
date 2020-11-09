@@ -42,6 +42,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         if (scene.buildIndex == 1)
         {
+            PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Managers", "Race Manager"), new Vector3(0, 0, -100), Quaternion.identity);
+            PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Managers", "Audio Manager"), Vector3.zero, Quaternion.identity);
             PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player", "Player Manager"), Vector3.zero, Quaternion.identity);
         }
     }

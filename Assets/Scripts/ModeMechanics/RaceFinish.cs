@@ -1,53 +1,54 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
+using TMPro;
 
 public class RaceFinish : MonoBehaviour
 {
     #region Public Variables
-    [HideInInspector] public int amtParticipantsFinished = 0;
+    [HideInInspector] public int participantsAtFinishCount = 0;
     [HideInInspector] public bool finishLineReached = false;
     [HideInInspector] public float timeFirstRowerPassed;
     [HideInInspector] public bool resetFinishLine;
-    [SerializeField] Text notificationText;
+    [SerializeField] TMP_Text startText;
+    [SerializeField] TMP_Text endText;
     #endregion Public Variables
 
     #region Private Variables
-    private Dictionary<GameObject, float> participantsAtFinish;
-    private GameObject participant;
-    private int rankCounter = 1;
+    private Dictionary<PlayerController, float> participantsAtFinish;
+    private PlayerController participant;
     private float timeSecs;
     #endregion Private Variables
 
-
     void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Player"))
+        if(other.CompareTag("Boat Tip"))
         {
-            participant = other.gameObject;
+            participant = other.GetComponentInParent<PlayerController>();
 
             if (participantsAtFinish.Count == 0)
             {
                 timeFirstRowerPassed = Time.timeSinceLevelLoad;
                 finishLineReached = true;
-            
             }
 
+            if (!participantsAtFinish.ContainsKey(participant))
+            {
+                participantsAtFinish.Add(participant, Time.timeSinceLevelLoad); // !!!Have proper way to define the particluar rower that has triggered the box collider
+                participantsAtFinishCount = participantsAtFinish.Count;
+            }
 
-            participantsAtFinish.Add(participant, Time.timeSinceLevelLoad); // !!!Have proper way to define the particluar rower that has triggered the box collider
-            amtParticipantsFinished = participantsAtFinish.Count;
-            DeclareWinner(participant, rankCounter);
-
-            rankCounter++;
+            DeclareWinner(participant);
         }
     }
 
     void Start()
     {
-        participantsAtFinish = new Dictionary<GameObject, float>();
+        participantsAtFinish = new Dictionary<PlayerController, float>();
     }
 
     void Update()
@@ -60,9 +61,10 @@ public class RaceFinish : MonoBehaviour
         }
     }
 
-    private void DeclareWinner(GameObject participant, int rank)
+    private void DeclareWinner(PlayerController participant)
     {
-        StartCoroutine(sendNotification($"Rank: {rank} won by {participant}", 2));
+        string playerName = participant.GetComponent<PhotonView>().name;
+        StartCoroutine(sendNotification($"Race won by: {playerName}", 5));
         //Send user their achievement to store in stats
     }
 
@@ -72,15 +74,17 @@ public class RaceFinish : MonoBehaviour
         finishLineReached = false;
         resetFinishLine = false;
         timeFirstRowerPassed = 0;
-        amtParticipantsFinished = 0;   
+        participantsAtFinishCount = 0;   
         timeSecs = 0;
     }
 
     //UI Output Code Reference: https://www.youtube.com/watch?v=9MsPWhqQRxo
     IEnumerator sendNotification(string text, int time)
     {
-        notificationText.text = text;
+        startText.text = text;
+        endText.text = text;
         yield return new WaitForSeconds(time);
-        notificationText.text = String.Empty;
+        startText.text = String.Empty;
+        endText.text = String.Empty;
     }
 }

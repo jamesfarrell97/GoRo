@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 908214620446855712}
   m_Layer: 0
   m_Name: Player Controller
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -60,7 +60,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 775505140984949812}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -68,7 +68,7 @@ Transform:
   - {fileID: 7120762322336620127}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!65 &3808148005375761875
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -115,7 +115,7 @@ MonoBehaviour:
   leftTurningPoint: {fileID: 8186642707721235285}
   rightTurningPoint: {fileID: 8640931541337992198}
   boatSpeed: 30
-  boatTurningSpeed: 1
+  boatTurningSpeed: 0.5
   handSpeedFactor: 5
   triggerPressureThreshold: 0.5
   gripPressureThreshold: 0.5
@@ -1093,10 +1093,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7316184107319842972}
+  - component: {fileID: 519470708646194935}
   - component: {fileID: 7026625363898831429}
   m_Layer: 0
   m_Name: Front Tip
-  m_TagString: Untagged
+  m_TagString: Boat Tip
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1115,6 +1116,19 @@ Transform:
   m_Father: {fileID: 6440158238571553137}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &519470708646194935
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8036745837951357509}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7026625363898831429
 MonoBehaviour:
   m_ObjectHideFlags: 0

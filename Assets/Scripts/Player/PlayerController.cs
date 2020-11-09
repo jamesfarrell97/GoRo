@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour
     private float rightGripPressure;
 
     private float handSpeed;
+    private bool allowedMove = true;
 
     private AchievementTracker achievementTracker;
     private Stats stats;
@@ -105,7 +106,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!photonView.IsMine) return;
+        if (!photonView.IsMine || !allowedMove) return;
 
         Vector3 forward = rigidBody.transform.forward;
         Vector3 up = rigidBody.transform.up;
@@ -186,5 +187,15 @@ public class PlayerController : MonoBehaviour
         {
             FindObjectOfType<AudioManager>().Play("Collision");
         }    
+    }
+
+    public void PauseMovement()
+    {
+        this.allowedMove = false;
+    }
+
+    public void ContinueMovement()
+    {
+        this.allowedMove = true;
     }
 }

@@ -99,7 +99,7 @@ public class AchievementTracker : MonoBehaviour
     {
         if (time1_Flag) return;
 
-        if (secondsRowing > time1_Target)
+        if (secondsRowing / Stats.SECS_MINUTE > time1_Target)
         {
             ActivateAchievement(photonView, time1.name);
             time1_Flag = true;
@@ -110,7 +110,7 @@ public class AchievementTracker : MonoBehaviour
     {
         if (time2_Flag) return;
 
-        if (secondsRowing > time2_Target)
+        if (secondsRowing / Stats.SECS_MINUTE > time2_Target)
         {
             ActivateAchievement(photonView, time2.name);
             time2_Flag = true;
@@ -121,7 +121,7 @@ public class AchievementTracker : MonoBehaviour
     {
         if (time3_Flag) return;
 
-        if (secondsRowing > time3_Target)
+        if (secondsRowing / Stats.SECS_MINUTE > time3_Target)
         {
             ActivateAchievement(photonView, time3.name);
             time3_Flag = true;

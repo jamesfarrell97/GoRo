@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+//using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Race : MonoBehaviour
 {
@@ -11,9 +12,10 @@ public class Race : MonoBehaviour
     //Amount of players allowed to participate per session
     [SerializeField] int maxAmountParticipants = 5;
     //Time permitted to get into initiated racing session before race begins
-    [SerializeField] float timeToPrepare = 10f;
+    [SerializeField] float timeToPrepare = 2f;
     //Time permitted for other racers to reach finish line (before ending the race session), once a first place for this race session is assigned
-    [SerializeField] float timeToFinishRace = 20f;
+    [SerializeField] float timeToFinishRace = 3f;
+    [SerializeField] Text notificationText;
     #endregion Public Variables
 
     #region Private Variables
@@ -32,13 +34,13 @@ public class Race : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            
             participant = other.gameObject;
 
             if (participants.Count() == 0)
             {
                 raceInitiated = true;
                 timeRaceInitiated = Time.time;
+                StartCoroutine(sendNotification("Get Ready!", 2));
             }
 
             if(participants.Count() < maxAmountParticipants)
@@ -94,10 +96,12 @@ public class Race : MonoBehaviour
 
     private void StartRace()
     {
+        StartCoroutine(sendNotification("Start!", 2));
+        
         //Bring up barrier
 
         //Allow participants to move
-        
+
         //Need to make sure that the floaters are up the whole way before race begins 
         //OR atleast have the invisible barrier block appear straight away to avoid others entering race area
         raceInProgress = true;
@@ -108,6 +112,8 @@ public class Race : MonoBehaviour
     {
         if(raceComplete == true)
         {
+            StartCoroutine(sendNotification("Race Complete", 2));
+            
             //Bring buoys down
             //Remove invisible barrier block
             //Reset Race class to await for new session prompt
@@ -131,6 +137,14 @@ public class Race : MonoBehaviour
         timeRaceInitiated = 0;
         timeRaceStarted = 0;
         timeSecs = 0;
+    }
+
+    //UI Output Code Reference: https://www.youtube.com/watch?v=9MsPWhqQRxo
+    IEnumerator sendNotification(string text, int time)
+    {
+        notificationText.text = text;
+        yield return new WaitForSeconds(time);
+        notificationText.text = String.Empty;
     }
 
 }

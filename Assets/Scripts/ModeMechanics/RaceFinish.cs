@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RaceFinish : MonoBehaviour
 {
@@ -10,6 +12,7 @@ public class RaceFinish : MonoBehaviour
     [HideInInspector] public bool finishLineReached = false;
     [HideInInspector] public float timeFirstRowerPassed;
     [HideInInspector] public bool resetFinishLine;
+    [SerializeField] Text notificationText;
     #endregion Public Variables
 
     #region Private Variables
@@ -29,7 +32,8 @@ public class RaceFinish : MonoBehaviour
             if (participantsAtFinish.Count == 0)
             {
                 timeFirstRowerPassed = Time.timeSinceLevelLoad;
-                finishLineReached = true;              
+                finishLineReached = true;
+            
             }
 
 
@@ -58,7 +62,7 @@ public class RaceFinish : MonoBehaviour
 
     private void DeclareWinner(GameObject participant, int rank)
     {
-        //Print winner out into UI
+        StartCoroutine(sendNotification($"Rank: {rank} won by {participant}", 2));
         //Send user their achievement to store in stats
     }
 
@@ -70,5 +74,13 @@ public class RaceFinish : MonoBehaviour
         timeFirstRowerPassed = 0;
         amtParticipantsFinished = 0;   
         timeSecs = 0;
+    }
+
+    //UI Output Code Reference: https://www.youtube.com/watch?v=9MsPWhqQRxo
+    IEnumerator sendNotification(string text, int time)
+    {
+        notificationText.text = text;
+        yield return new WaitForSeconds(time);
+        notificationText.text = String.Empty;
     }
 }

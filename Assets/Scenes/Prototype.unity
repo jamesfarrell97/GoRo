@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -97,7 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: ca5b259e78215ed49bd7d0e848a5d7de,
+    type: 2}
   m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
@@ -404,11 +405,40 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 255393023, guid: 80d9bac1b20cccc4aa04eeac7ed564ce, type: 3}
+      propertyPath: m_MaterialTemplate
+      value: 
+      objectReference: {fileID: 2100000, guid: c72c47fc78eb89b49baea986376aec4a, type: 2}
+    - target: {fileID: 1717080710, guid: 80d9bac1b20cccc4aa04eeac7ed564ce, type: 3}
+      propertyPath: m_MaterialTemplate
+      value: 
+      objectReference: {fileID: 2100000, guid: c72c47fc78eb89b49baea986376aec4a, type: 2}
+    - target: {fileID: 8969356330218755554, guid: 80d9bac1b20cccc4aa04eeac7ed564ce,
+        type: 3}
+      propertyPath: m_MaterialTemplate
+      value: 
+      objectReference: {fileID: 2100000, guid: c72c47fc78eb89b49baea986376aec4a, type: 2}
+    - target: {fileID: 8969356330517581924, guid: 80d9bac1b20cccc4aa04eeac7ed564ce,
+        type: 3}
+      propertyPath: m_MaterialTemplate
+      value: 
+      objectReference: {fileID: 2100000, guid: c72c47fc78eb89b49baea986376aec4a, type: 2}
     - target: {fileID: 8969356330602879218, guid: 80d9bac1b20cccc4aa04eeac7ed564ce,
         type: 3}
       propertyPath: m_TerrainData
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 15600000, guid: 9802dc4bc314e8a4eb7f7754b5f2fd87,
+        type: 2}
+    - target: {fileID: 8969356330778543953, guid: 80d9bac1b20cccc4aa04eeac7ed564ce,
+        type: 3}
+      propertyPath: m_MaterialTemplate
+      value: 
+      objectReference: {fileID: 2100000, guid: c72c47fc78eb89b49baea986376aec4a, type: 2}
+    - target: {fileID: 8969356331028971452, guid: 80d9bac1b20cccc4aa04eeac7ed564ce,
+        type: 3}
+      propertyPath: m_MaterialTemplate
+      value: 
+      objectReference: {fileID: 2100000, guid: c72c47fc78eb89b49baea986376aec4a, type: 2}
     - target: {fileID: 8969356331183532231, guid: 80d9bac1b20cccc4aa04eeac7ed564ce,
         type: 3}
       propertyPath: m_LocalPosition.x

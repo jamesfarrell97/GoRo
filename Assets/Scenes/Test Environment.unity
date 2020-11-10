@@ -1655,10 +1655,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b580c87846f7f0c43b2fb182f5b5ef32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  amplitude: 0.5
-  length: 50
-  speed: 0.5
-  offset: 147.33026
+  amplitude: 0
+  length: 1
+  speed: 0
+  offset: 0
 --- !u!23 &886478641
 MeshRenderer:
   m_ObjectHideFlags: 0

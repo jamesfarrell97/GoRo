@@ -129,9 +129,10 @@ public class PlayerController : MonoBehaviour
             transform.position.z * forward.z
         );
 
-        float playerDistancedMoved = Vector3.Distance(playerPositionThisFrame, playerPositionPreviousFrame);
+
         float leftHandDistancedMoved = Vector3.Distance(leftHandPositionThisFrame, leftHandPositionPreviousFrame);
         float rightHandDistancedMoved = Vector3.Distance(rightHandPositionThisFrame, rightHandPositionPreviousFrame);
+        float playerDistancedMoved = Vector3.Distance(playerPositionThisFrame, playerPositionPreviousFrame);
 
         handSpeed = ((leftHandDistancedMoved - playerDistancedMoved) + (rightHandDistancedMoved - playerDistancedMoved));
 
@@ -160,6 +161,7 @@ public class PlayerController : MonoBehaviour
             // Turn Right
             else if (leftGrip && leftTrigger)
             {
+
                 rigidBody.AddTorque(-up * (-handSpeed * handSpeedFactor) * boatTurningSpeed);
             }
 

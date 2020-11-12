@@ -114,7 +114,7 @@ MonoBehaviour:
   rightHand: {fileID: 7719735039026486752}
   leftTurningPoint: {fileID: 8186642707721235285}
   rightTurningPoint: {fileID: 8640931541337992198}
-  boatSpeed: 30
+  boatSpeed: 90
   boatTurningSpeed: 0.5
   handSpeedFactor: 5
   triggerPressureThreshold: 0.5

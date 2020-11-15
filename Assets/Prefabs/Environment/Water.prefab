@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8202013637618431619}
   - component: {fileID: 8202013637618431616}
   - component: {fileID: 8202013637618431617}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,7 +27,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8202013637618431623}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 100, y: 1, z: 100}
   m_Children: []
@@ -93,9 +93,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b580c87846f7f0c43b2fb182f5b5ef32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  amplitude: 3
-  length: 2
-  speed: 1
+  amplitude: 0.2
+  length: 150
+  speed: 0.1
   offset: 0
 --- !u!114 &8202013637618431617
 MonoBehaviour:

@@ -51,7 +51,8 @@ public class PlayerController : MonoBehaviour
     private float leftGripPressure;
     private float rightGripPressure;
 
-    private float handSpeed;
+    private float leftHandSpeed;
+    private float rightHandSpeed;
     private bool allowedMove = true;
 
     private AchievementTracker achievementTracker;
@@ -73,6 +74,10 @@ public class PlayerController : MonoBehaviour
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rigidBody);
         }
+
+        //playerPositionPreviousFrame = transform.localPosition;
+        //leftHandPositionPreviousFrame = leftHand.transform.localPosition;
+        //rightHandPositionPreviousFrame = rightHand.transform.localPosition;
 
         playerPositionPreviousFrame = transform.position;
         leftHandPositionPreviousFrame = leftHand.transform.position;
@@ -129,52 +134,69 @@ public class PlayerController : MonoBehaviour
             transform.position.z * forward.z
         );
 
-
         float leftHandDistancedMoved = Vector3.Distance(leftHandPositionThisFrame, leftHandPositionPreviousFrame);
         float rightHandDistancedMoved = Vector3.Distance(rightHandPositionThisFrame, rightHandPositionPreviousFrame);
         float playerDistancedMoved = Vector3.Distance(playerPositionThisFrame, playerPositionPreviousFrame);
 
-        handSpeed = ((leftHandDistancedMoved - playerDistancedMoved) + (rightHandDistancedMoved - playerDistancedMoved));
+        //leftHandPositionThisFrame = leftHand.transform.localPosition;
+        //rightHandPositionThisFrame = rightHand.transform.localPosition;
+        //playerPositionThisFrame = transform.localPosition;
+
+        //float leftHandDistancedMoved = leftHandPositionThisFrame.z - leftHandPositionPreviousFrame.z;
+        //float rightHandDistancedMoved = rightHandPositionThisFrame.z - rightHandPositionPreviousFrame.z;
+        //float playerDistancedMoved = playerPositionThisFrame.z - playerPositionPreviousFrame.z;
+
+        leftHandSpeed = (leftHandDistancedMoved - playerDistancedMoved) + (rightHandDistancedMoved - playerDistancedMoved);
+
+        //leftHandSpeed = (leftHandDistancedMoved - playerDistancedMoved);
+        //rightHandSpeed = (rightHandDistancedMoved - playerDistancedMoved);
 
         if (Time.timeSinceLevelLoad > 1f)
         {
+            Vector3 leftForcePosition = leftTurningPoint.transform.position;
+            Vector3 rightForcePosition = rightTurningPoint.transform.position;
+
             // Move Forwards
             if (leftGrip && rightGrip && leftTrigger && rightTrigger)
             {
-                rigidBody.AddForce(forward * (-handSpeed * handSpeedFactor) * boatSpeed);
+                rigidBody.AddForce(forward * (-leftHandSpeed * handSpeedFactor) * boatSpeed);
+                //rigidBody.AddForceAtPosition(forward * (-leftHandSpeed * handSpeedFactor) * boatSpeed, leftTurningPoint.transform.position);
+                //rigidBody.AddForceAtPosition(forward * (-rightHandSpeed * handSpeedFactor) * boatSpeed, rightTurningPoint.transform.position);
             }
 
             // Move Towards Right
             else if (leftGrip && rightGrip && leftTrigger)
             {
-                rigidBody.AddTorque(up * (-handSpeed * handSpeedFactor) * boatTurningSpeed);
-                rigidBody.AddForce(forward * (-handSpeed * handSpeedFactor) * boatSpeed);
+                rigidBody.AddTorque(up * (-leftHandSpeed * handSpeedFactor) * boatTurningSpeed);
+                rigidBody.AddForce(forward * (-leftHandSpeed * handSpeedFactor) * boatSpeed);
             }
 
             // Move Towards Left
             else if (leftGrip && rightGrip && rightTrigger)
             {
-                rigidBody.AddTorque(-up * (-handSpeed * handSpeedFactor) * boatTurningSpeed);
-                rigidBody.AddForce(forward * (-handSpeed * handSpeedFactor) * boatSpeed);
+                rigidBody.AddTorque(-up * (-leftHandSpeed * handSpeedFactor) * boatTurningSpeed);
+                rigidBody.AddForce(forward * (-leftHandSpeed * handSpeedFactor) * boatSpeed);
             }
 
             // Turn Right
             else if (leftGrip && leftTrigger)
             {
 
-                rigidBody.AddTorque(-up * (-handSpeed * handSpeedFactor) * boatTurningSpeed);
+                rigidBody.AddTorque(-up * (-leftHandSpeed * handSpeedFactor) * boatTurningSpeed);
             }
 
             // Turn Left
             else if (rightGrip && rightTrigger)
             {
-                rigidBody.AddTorque(up * (-handSpeed * handSpeedFactor) * boatTurningSpeed);
+                rigidBody.AddTorque(up * (-leftHandSpeed * handSpeedFactor) * boatTurningSpeed);
             }
 
             // Move Backwards
             else if (leftGrip && rightGrip)
             {
-                rigidBody.AddForce(forward * (handSpeed * handSpeedFactor) * boatSpeed);
+                rigidBody.AddForce(forward * (leftHandSpeed * handSpeedFactor) * boatSpeed);
+                //rigidBody.AddForceAtPosition(forward * (leftHandSpeed * handSpeedFactor) * boatSpeed, leftTurningPoint.transform.position);
+                //rigidBody.AddForceAtPosition(forward * (rightHandSpeed * handSpeedFactor) * boatSpeed, rightTurningPoint.transform.position);
             }
         }
 

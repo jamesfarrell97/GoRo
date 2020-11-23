@@ -1,0 +1,774 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>InTheHand.BluetoothLE</name>
+    </assembly>
+    <members>
+        <!-- Badly formed XML comment ignored for member "T:InTheHand.Bluetooth.Bluetooth" -->
+        <member name="M:InTheHand.Bluetooth.Bluetooth.GetAvailabilityAsync">
+            <summary>
+            Returns true if Bluetooth is physically available and user has given the app permission.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.Bluetooth.RequestDeviceAsync(InTheHand.Bluetooth.RequestDeviceOptions)">
+            <summary>
+            Performs a device lookup and prompts the user for permission if required.
+            </summary>
+            <param name="options"></param>
+            <returns>A BluetoothDevice or null if unsuccessful.</returns>
+        </member>
+        <member name="E:InTheHand.Bluetooth.Bluetooth.AvailabilityChanged">
+            <summary>
+            Bluetooth availability has changed, for example by disabling the radio or revoking user permission.
+            </summary>
+        </member>
+        <member name="E:InTheHand.Bluetooth.BluetoothDevice.GattServerDisconnected">
+            <summary>
+            Fired when an active GATT connection is lost.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.BluetoothDevice.RequiresAncs">
+            <summary>
+            Specifies whether to request Apple Notification Center Services to allow access to notifications from the remote device when connecting.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.BluetoothLEScanFilter.Services">
+            <summary>
+            List of service UUIDs which a device must expose to match the filter.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.BluetoothLEScanFilter.Name">
+            <summary>
+            If present requires a device to exactly match the supplied name.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.BluetoothLEScanFilter.NamePrefix">
+            <summary>
+            If present requires a device name to start with the supplied prefix.
+            </summary>
+        </member>
+        <member name="T:InTheHand.Bluetooth.BluetoothUtiAttribute">
+            <summary>
+            Attribute to attach a Uniform Type Identifier to a Bluetooth UUID.
+            </summary>
+            <remarks>
+            Usage on a class indicates a namespace such as org.bluetooth.characteristic and on a field represents the individual name.</remarks>
+        </member>
+        <member name="P:InTheHand.Bluetooth.BluetoothUtiAttribute.Uti">
+            <summary>
+            Uniform Type Identifier e.g. 'org.bluetooth.service.generic_access'.
+            </summary>
+        </member>
+        <member name="T:InTheHand.Bluetooth.BluetoothUuid">
+            <summary>
+            Represents a Bluetooth UUID. Can be expressed as a Guid or a short ID for documented Bluetooth SIG definitions.
+            </summary>
+            <summary>
+            Provides conversion support for CBUUID.
+            </summary>
+        </member>
+        <member name="M:InTheHand.Bluetooth.BluetoothUuid.op_Equality(InTheHand.Bluetooth.BluetoothUuid,InTheHand.Bluetooth.BluetoothUuid)">
+            <summary>
+            Returns true if both Uuids are equal.
+            </summary>
+            <param name="uuid1"></param>
+            <param name="uuid2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.BluetoothUuid.op_Equality(InTheHand.Bluetooth.BluetoothUuid,System.Guid)">
+            <summary>
+            Returns true if both Uuids are equal.
+            </summary>
+            <param name="uuid1"></param>
+            <param name="uuid2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.BluetoothUuid.op_Inequality(InTheHand.Bluetooth.BluetoothUuid,InTheHand.Bluetooth.BluetoothUuid)">
+            <summary>
+            Returns true if both Uuids are unequal.
+            </summary>
+            <param name="uuid1"></param>
+            <param name="uuid2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.BluetoothUuid.op_Inequality(InTheHand.Bluetooth.BluetoothUuid,System.Guid)">
+            <summary>
+            Returns true if both Uuids are unequal.
+            </summary>
+            <param name="uuid1"></param>
+            <param name="uuid2"></param>
+            <returns></returns>
+        </member>
+        <member name="P:InTheHand.Bluetooth.BluetoothUuid.Value">
+            <summary>
+            The full underlying value as a <see cref="T:System.Guid"/>.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.BluetoothUuid.Empty">
+            <summary>
+            A default Uuid containing a zero Guid.
+            </summary>
+            <value>This is not a valid value so be careful passing this to any native function.</value>
+        </member>
+        <member name="M:InTheHand.Bluetooth.BluetoothUuid.FromShortId(System.UInt16)">
+            <summary>
+            Returns the bluetooth device UUID from a short ID.
+            </summary>
+            <param name="shortId">The short ID.</param>
+            <returns>Returns the UUID.</returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.BluetoothUuid.TryGetShortId(System.Guid)">
+            <summary>
+            Attempts to get the short Bluetooth ID from a UUID.
+            </summary>
+            <param name="uuid">The UUID.</param>
+            <returns>Returns the short ID.</returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.BluetoothUuid.FromId(System.String)">
+            <summary>
+            Returns the Uuid for a given Bluetooth SIG name.
+            Names must beging with the "org.bluetooth" prefix.
+            </summary>
+            <param name="uuidName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:InTheHand.Bluetooth.ClientCharacteristicDescriptorValue">
+            <summary>
+            Indicates the state of the Client Characteristic Configuration descriptor.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.ClientCharacteristicDescriptorValue.None">
+            <summary>
+            Neither notification nor indications are enabled.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.ClientCharacteristicDescriptorValue.Notify">
+            <summary>
+            Characteristic notifications are enabled.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.ClientCharacteristicDescriptorValue.Indicate">
+            <summary>
+            Characteristic indications are enabled.
+            </summary>
+        </member>
+        <member name="T:InTheHand.Bluetooth.GattCharacteristic">
+            <summary>
+            Represents a GATT Characteristic, which is a basic data element that provides further information about a peripheral’s service.
+            </summary>
+            <remarks>Equivalent to <b>BluetoothRemoteGATTCharacteristic</b> in WebBluetooth.</remarks>
+        </member>
+        <member name="P:InTheHand.Bluetooth.GattCharacteristic.Service">
+            <summary>
+            The GATT service this characteristic belongs to.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.GattCharacteristic.Uuid">
+            <summary>
+            The UUID of the characteristic.
+            </summary>
+            <seealso cref="T:InTheHand.Bluetooth.BluetoothUuid"/>
+        </member>
+        <member name="P:InTheHand.Bluetooth.GattCharacteristic.Properties">
+            <summary>
+            The properties of this characteristic.
+            </summary>
+            <seealso cref="T:InTheHand.Bluetooth.GattCharacteristicProperties"/>
+        </member>
+        <member name="P:InTheHand.Bluetooth.GattCharacteristic.UserDescription">
+            <summary>
+            Get the user friendly description for this GattCharacteristic, if the User Description <see cref="T:InTheHand.Bluetooth.GattDescriptor">Descriptor</see> is present, otherwise this will be an empty string.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.GattCharacteristic.Value">
+            <summary>
+            The currently cached characteristic value. 
+            This value gets updated when the value of the characteristic is read or updated via a notification or indication.
+            </summary>
+        </member>
+        <member name="M:InTheHand.Bluetooth.GattCharacteristic.ReadValueAsync">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.GattCharacteristic.WriteValueWithResponseAsync(System.Byte[])">
+            <summary>
+            Performs a Characteristic Value write to a Bluetooth LE device.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.GattCharacteristic.WriteValueWithoutResponseAsync(System.Byte[])">
+            <summary>
+            
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="E:InTheHand.Bluetooth.GattCharacteristic.CharacteristicValueChanged">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:InTheHand.Bluetooth.GattCharacteristicProperties">
+            <summary>
+            Specifies the values for the GATT characteristic properties as well as the GATT Extended Characteristic Properties Descriptor.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.None">
+            <summary>
+            The characteristic doesn’t have any properties that apply.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.Broadcast">
+            <summary>
+            The characteristic supports broadcasting
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.Read">
+            <summary>
+            The characteristic is readable
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.WriteWithoutResponse">
+            <summary>
+            The characteristic supports Write Without Response
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.Write">
+            <summary>
+            The characteristic is writable
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.Notify">
+            <summary>
+            The characteristic is notifiable
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.Indicate">
+            <summary>
+            The characteristic is indicatable
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.AuthenticatedSignedWrites">
+            <summary>
+            The characteristic supports signed writes
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.ExtendedProperties">
+            <summary>
+            The ExtendedProperties Descriptor is present
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.ReliableWrites">
+            <summary>
+            The characteristic supports reliable writes
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicProperties.WriteableAuxiliaries">
+            <summary>
+            The characteristic has writable auxiliaries
+            </summary>
+        </member>
+        <member name="T:InTheHand.Bluetooth.GattCharacteristicUuids">
+            <summary>
+            Provides characteristic UUIDs for common GATT characteristics.
+            </summary>
+            <remarks>To view a list of all Bluetooth SIG-defined characteristic UUIDs, see <a href="https://www.bluetooth.com/specifications/gatt/characteristics">Bluetooth SIG-defined Characteristic UUIDs</a>.</remarks>
+        </member>
+        <member name="M:InTheHand.Bluetooth.GattCharacteristicUuids.FromBluetoothUti(System.String)">
+            <summary>
+            Returns the Uuid for a characteristic given the Uniform Type Identifier.
+            </summary>
+            <param name="bluetoothUti">Uniform Type Identifier of the characteristic e.g. aerobic_heart_rate_lower_limit</param>
+            <returns>The characteristic Uuid on success else Guid.Empty.</returns>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.AerobicHeartRateLowerLimit">
+            <summary>
+            Lower limit of the heart rate where the user enhances his endurance while exercising.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.AlertCategoryId">
+            <summary>
+            Gets the Bluetooth SIG-defined Alert Category ID characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.AlertCategoryIdBitMask">
+            <summary>
+            Gets the Bluetooth SIG-Defined Alert Category ID Bit Mask characteristic UUID
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.AlertLevel">
+            <summary>
+            Gets the Bluetooth SIG-defined Alert Level characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.AlertNotificationControlPoint">
+            <summary>
+            Gets the Bluetooth SIG-defined Alert Notification Control Point characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.AlertStatus">
+            <summary>
+            Gets the Bluetooth SIG-defined Alert Status characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.BatteryLevel">
+            <summary>
+            Gets the Bluetooth SIG-defined Battery Level characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.BatteryLevelState">
+            <summary>
+            Gets the Bluetooth SIG-defined Battery Level State characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.BatteryPowerState">
+            <summary>
+            Gets the Bluetooth SIG-defined Battery Level State characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.BloodPressureFeature">
+            <summary>
+            Gets the Bluetooth SIG-defined Blood Pressure Feature characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.BloodPressureMeasurement">
+            <summary>
+            Gets the Bluetooth SIG-defined Blood Pressure Measurement Characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.BodySensorLocation">
+            <summary>
+            Gets the Bluetooth SIG-defined Body Sensor Location characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.BootKeyboardInputReport">
+            <summary>
+            Gets the Bluetooth SIG-defined Boot Keyboard Input Report characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.BootKeyboardOutputReport">
+            <summary>
+            Gets the Bluetooth SIG-defined Boot Keyboard Output Report characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.BootMouseInputReport">
+            <summary>
+            Gets the Bluetooth SIG-defined Boot Mouse Input Report characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.CscFeature">
+            <summary>
+            Gets the Bluetooth SIG-defined CSC Feature characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.CscMeasurement">
+            <summary>
+            Gets the Bluetooth SIG-defined CSC Measurement characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.CurrentTime">
+            <summary>
+            Gets the Bluetooth SIG-defined Current Time characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.CyclingPowerControlPoint">
+            <summary>
+            Gets the Bluetooth SIG-defined Cycling Power Control Point characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.CyclingPowerFeature">
+            <summary>
+            Gets the Bluetooth SIG-defined Cycling Power Feature characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.CyclingPowerMeasurement">
+            <summary>
+            Gets the Bluetooth SIG-defined Cycling Power Measurement characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.CyclingPowerVector">
+            <summary>
+            Gets the Bluetooth SIG-defined Cycling Power Vector characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.DateOfBirth">
+            <summary>
+            Gets the Bluetooth SIG-defined Date of Birth characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.DateTime">
+            <summary>
+            Gets the Bluetooth SIG-defined Date Time characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.DayDateTime">
+            <summary>
+            Gets the Bluetooth SIG-defined Day Date Time characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.DayOfWeek">
+            <summary>
+            Gets the Bluetooth SIG-defined Day Of Week characteristic UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattCharacteristicUuids.DstOffset">
+            <summary>
+            Gets the Bluetooth SIG-defined DST Offset characteristic UUID.
+            </summary>
+        </member>
+        <member name="T:InTheHand.Bluetooth.GattDescriptor">
+            <summary>
+            Represents a GATT Descriptor, which provides further information about a <see cref="T:InTheHand.Bluetooth.GattCharacteristic"/>’s value.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.GattDescriptor.Characteristic">
+            <summary>
+            The GATT characteristic this descriptor belongs to.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.GattDescriptor.Uuid">
+            <summary>
+            The UUID of the characteristic descriptor.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.GattDescriptor.Value">
+            <summary>
+            The currently cached descriptor value. 
+            This value gets updated when the value of the descriptor is read.
+            </summary>
+        </member>
+        <member name="M:InTheHand.Bluetooth.GattDescriptor.ReadValueAsync">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.GattDescriptor.WriteValueAsync(System.Byte[])">
+            <summary>
+            
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="T:InTheHand.Bluetooth.GattDescriptorUuids">
+            <summary>
+            Represents an enumeration of the most well known Descriptor UUID values.
+            </summary>
+        </member>
+        <member name="M:InTheHand.Bluetooth.GattDescriptorUuids.FromBluetoothUti(System.String)">
+            <summary>
+            Returns the Uuid for a descriptor given the Uniform Type Identifier.
+            </summary>
+            <param name="bluetoothUti">Uniform Type Identifier of the service e.g. org.bluetooth.descriptor.gatt.characteristic_aggregate_format</param>
+            <returns>The descriptor Uuid on success else an empty <see cref="T:InTheHand.Bluetooth.BluetoothUuid"/>.</returns>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattDescriptorUuids.CharacteristicAggregateFormat">
+            <summary>
+            Gets the Bluetooth SIG-defined Characteristic Aggregate Format descriptor UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattDescriptorUuids.CharacteristicExtendedProperties">
+            <summary>
+            Gets the Bluetooth SIG-defined Characteristic Extended Properties descriptor UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattDescriptorUuids.CharacteristicPresentationFormat">
+            <summary>
+            Gets the Bluetooth SIG-defined Characteristic Presentation Format descriptor UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattDescriptorUuids.CharacteristicUserDescription">
+            <summary>
+            Gets the Bluetooth SIG-defined Characteristic User Description descriptor UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattDescriptorUuids.ClientCharacteristicConfiguration">
+            <summary>
+            Gets the Bluetooth SIG-defined Client Characteristic Configuration descriptor UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattDescriptorUuids.EnvironmentalSensingConfiguration">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattDescriptorUuids.ServerCharacteristicConfiguration">
+            <summary>
+            Gets the Bluetooth SIG-defined Server Characteristic Configuration descriptor UUID.
+            </summary>
+        </member>
+        <member name="T:InTheHand.Bluetooth.GattServiceUuids">
+            <summary>
+            Provides service UUIDs for common GATT services.
+            </summary>
+            <remarks>To view a list of all Bluetooth SIG-defined service UUIDs, see <a href="https://www.bluetooth.com/specifications/gatt/services">Bluetooth SIG-defined Service UUIDs</a>.</remarks>
+        </member>
+        <member name="M:InTheHand.Bluetooth.GattServiceUuids.FromBluetoothUti(System.String)">
+            <summary>
+            Returns the Uuid for a service given the Uniform Type Identifier.
+            </summary>
+            <param name="bluetoothUti">Uniform Type Identifier of the service e.g. org.bluetooth.service.generic_access</param>
+            <returns>The service Uuid on success else Guid.Empty.</returns>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.GenericAccess">
+            <summary>
+            Gets the Bluetooth SIG-defined UUID for the Generic Access Service.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.AlertNotification">
+            <summary>
+            Gets the Bluetooth SIG-defined Alert Notification Service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.AutomationIO">
+            <summary>
+            The Automation IO service is used to expose the analog inputs/outputs and digital input/outputs of a generic IO module (IOM).
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.Battery">
+            <summary>
+            The Battery Service exposes the state of a battery within a device. 
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.BinarySensor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.BloodPressure">
+            <summary>
+            The Blood Pressure Service exposes blood pressure and other data related to a blood pressure monitor.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.BodyComposition">
+            <summary>
+            Gets the Bluetooth SIG-defined Body Composition service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.BondManagement">
+            <summary>
+            Gets the Bluetooth SIG-defined Bond Management service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.ContinuousGlucoseMonitoring">
+            <summary>
+            Gets the Bluetooth SIG-defined Continuous Glucose Monitoring service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.CurrentTime">
+            <summary>
+            Gets the Bluetooth SIG-defined Current Time service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.CyclingPower">
+            <summary>
+            Gets the Bluetooth SIG-defined Cycling Power service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.CyclingSpeedAndCadence">
+            <summary>
+            Gets the Bluetooth SIG-defined Cycling Speed and Cadence Service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.DeviceInformation">
+            <summary>
+            Gets the Bluetooth SIG-defined Device Information service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.EnvironmentalSensing">
+            <summary>
+            Gets the Bluetooth SIG-defined Environmental Sensing service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.FitnessMachine">
+            <summary>
+            Gets the Bluetooth SIG-defined Fitness Machine service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.GenericAttribute">
+            <summary>
+            Gets the Bluetooth SIG-defined UUID for the Generic Attribute Service.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.Glucose">
+            <summary>
+            Gets the Bluetooth SIG-defined Glucose Service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.HealthThermometer">
+            <summary>
+            Gets the Bluetooth SIG-defined Health Thermometer Service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.HeartRate">
+            <summary>
+            Gets the Bluetooth SIG-defined Heart Rate Service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.HttpProxy">
+            <summary>
+            Gets the Bluetooth SIG-defined HTTP Proxy Service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.HumanInterfaceDevice">
+            <summary>
+            Gets the Bluetooth SIG-defined Human Interface Device service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.ImmediateAlert">
+            <summary>
+            Gets the Bluetooth SIG-defined Immediate Alert service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.IndoorPositioning">
+            <summary>
+            Gets the Bluetooth SIG-defined Indoor Positioning service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.InsulinDelivery">
+            <summary>
+            Gets the Bluetooth SIG-defined Insulin Delivery service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.InternetProtocolSupport">
+            <summary>
+            Gets the Bluetooth SIG-defined Internet Protocol Support service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.LinkLoss">
+            <summary>
+            Gets the Bluetooth SIG-defined Link Loss service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.LocationAndNavigation">
+            <summary>
+            Gets the Bluetooth SIG-defined Location and Navigation service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.MeshProvisioning">
+            <summary>
+            Gets the Bluetooth SIG-defined Mesh Provisioning service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.MeshProxy">
+            <summary>
+            Gets the Bluetooth SIG-defined Mesh Proxy service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.NextDstChange">
+            <summary>
+            Gets the Bluetooth SIG-defined Next DST Change service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.ObjectTransfer">
+            <summary>
+            Gets the Bluetooth SIG-defined Object Transfer service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.PhoneAlertStatus">
+            <summary>
+            Gets the Bluetooth SIG-defined Phone Alert Status service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.PulseOximeter">
+            <summary>
+            Gets the Bluetooth SIG-defined Pulse Oximeter service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.ReconnectionConfiguration">
+            <summary>
+            Gets the Bluetooth SIG-defined Reconnection Configuration service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.ReferenceTimeUpdate">
+            <summary>
+            Gets the Bluetooth SIG-defined Reference Time Update service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.RunningSpeedAndCadence">
+            <summary>
+            Gets the Bluetooth SIG-defined Running Speed and Cadence Service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.ScanParameters">
+            <summary>
+            Gets the Bluetooth SIG-defined Scan Parameters service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.TransportDiscovery">
+            <summary>
+            Gets the Bluetooth SIG-defined Transport Discovery service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.TxPower">
+            <summary>
+            Gets the Bluetooth SIG-defined Tx Power service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.UserData">
+            <summary>
+            Gets the Bluetooth SIG-defined User Data service UUID.
+            </summary>
+        </member>
+        <member name="F:InTheHand.Bluetooth.GattServiceUuids.WeightScale">
+            <summary>
+            Gets the Bluetooth SIG-defined Weight Scale service UUID.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.RemoteGattServer.Device">
+            <summary>
+            Gets the parent remote device.
+            </summary>
+        </member>
+        <member name="P:InTheHand.Bluetooth.RemoteGattServer.IsConnected">
+            <summary>
+            Gets a value indicating if there is an active connection with the remote GATT server.
+            </summary>
+            <value>True if connected, else False.</value>
+        </member>
+        <member name="M:InTheHand.Bluetooth.RemoteGattServer.ConnectAsync">
+            <summary>
+            Open a connection to the remote GATT server.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.RemoteGattServer.Disconnect">
+            <summary>
+            Disconnects the remote GATT server.
+            </summary>
+            <remarks>Some platforms do not have an explicit Disconnect and will keep the connection open until there are no references to associated services and characteristics.</remarks>
+        </member>
+        <member name="M:InTheHand.Bluetooth.RemoteGattServer.GetPrimaryServiceAsync(InTheHand.Bluetooth.BluetoothUuid)">
+            <summary>
+            Returns the primary service matching the specified UUID.
+            </summary>
+            <param name="service">The requested service or null if not present.</param>
+            <returns></returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.RemoteGattServer.GetPrimaryServicesAsync(System.Nullable{InTheHand.Bluetooth.BluetoothUuid})">
+            <summary>
+            Returns primary services, optionally filtering to the supplied UUID.
+            </summary>
+            <param name="service">Optional service UUID.</param>
+            <returns>A list of matching primary services.</returns>
+        </member>
+        <member name="M:InTheHand.Bluetooth.RemoteGattServer.ReadRssi">
+            <summary>
+            Requests the Received Signal Strength Indication (RSSI) from the remote device.
+            </summary>
+            <returns>RSSI or Zero if unavailable.</returns>
+        </member>
+        <member name="P:InTheHand.Bluetooth.RemoteGattServer.PreferredPhy">
+            <summary>
+            Sets the preferred Physical Layer (PHY) if supported.
+            </summary>
+            <remarks>Currently only supported on Android.</remarks>
+            <param name="phy"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

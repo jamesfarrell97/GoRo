@@ -42,7 +42,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        MenuManager.Instance.OpenMenu("Title");
+        MenuManager.Instance.OpenMenu("Main");
     }
 
     public void Singleplayer()
@@ -60,7 +60,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.OfflineMode)
         {
-            errorText.text = "Cannot connect to network";
+            errorText.text = "Cannot connect to network.";
             MenuManager.Instance.OpenMenu("Error");
             return;
         }

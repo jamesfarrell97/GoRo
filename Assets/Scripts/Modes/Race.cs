@@ -1,12 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-//using System.Diagnostics;
-using System.Linq;
-using TMPro;
+
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.XR.Interaction.Toolkit;
+using TMPro;
 
 public class Race : MonoBehaviour
 {
@@ -45,7 +43,7 @@ public class Race : MonoBehaviour
             {
                 raceInitiated = true;
                 timeRaceInitiated = Time.time;
-                StartCoroutine(sendNotification("Get Ready!", 2));
+                StartCoroutine(SendNotification("Get Ready!", 2));
             }
 
             if(participants.Count() < maxAmountParticipants && !participants.Contains(participant))
@@ -107,12 +105,12 @@ public class Race : MonoBehaviour
 
     private void StartRace()
     {
-        StartCoroutine(sendNotification("Start!", 2));
+        StartCoroutine(SendNotification("Start!", 2));
 
         //Allow participants to move
         foreach (var participant in participants)
         {
-            participant.ContinueMovement();
+            participant.ResumeMovement();
         }
 
         //Need to make sure that the floaters are up the whole way before race begins 
@@ -125,7 +123,7 @@ public class Race : MonoBehaviour
     {
         if(raceComplete == true)
         {
-            StartCoroutine(sendNotification("Race Complete", 2));
+            StartCoroutine(SendNotification("Race Complete", 2));
             
             //Bring buoys down
             //Remove invisible barrier block
@@ -153,7 +151,7 @@ public class Race : MonoBehaviour
     }
 
     //UI Output Code Reference: https://www.youtube.com/watch?v=9MsPWhqQRxo
-    IEnumerator sendNotification(string text, int time)
+    IEnumerator SendNotification(string text, int time)
     {
         startText.text = text;
         endText.text = text;

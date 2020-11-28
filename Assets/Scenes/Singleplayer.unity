@@ -2655,12 +2655,12 @@ PrefabInstance:
     - target: {fileID: 8202013637618431616, guid: 2133d5b32797fec44a39d2f2038fc6fb,
         type: 3}
       propertyPath: speed
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8202013637618431616, guid: 2133d5b32797fec44a39d2f2038fc6fb,
         type: 3}
       propertyPath: amplitude
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8202013637618431622, guid: 2133d5b32797fec44a39d2f2038fc6fb,
         type: 3}

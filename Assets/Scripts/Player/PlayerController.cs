@@ -22,6 +22,12 @@ public class PlayerController : MonoBehaviour
     private Stats stats;
 
     private bool allowedMove = true;
+    private bool moveForward;
+    private bool moveBack;
+    private bool moveLeft;
+    private bool moveRight;
+    private bool rotateLeft;
+    private bool rotateRight;
 
     private void Awake()
     {
@@ -74,7 +80,101 @@ public class PlayerController : MonoBehaviour
         {
             rigidBody.AddTorque(-transform.up * boatTurningSpeed);
         }
+
+#if UNITY_EDITOR
+        if (moveForward)
+        {
+            rigidBody.AddForce(transform.forward * boatSpeed);
+        }
+
+        if (moveBack)
+        {
+            rigidBody.AddForce(-transform.forward * boatSpeed);
+        }
+
+        if (moveLeft)
+        {
+            rigidBody.AddForce(-transform.right * boatSpeed);
+        }
+
+        if (moveRight)
+        {
+            rigidBody.AddForce(transform.right * boatSpeed);
+        }
+
+        if (rotateLeft)
+        {
+            rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        }
+
+        if (rotateRight)
+        {
+            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        }
+#endif
     }
+
+#if UNITY_EDITOR
+    public void MoveForward()
+    {
+        moveForward = true;
+    }
+
+    public void MoveBack()
+    {
+        moveBack = true;
+    }
+
+    public void MoveLeft()
+    {
+        moveLeft = true;
+    }
+
+    public void MoveRight()
+    {
+        moveRight = true;
+    }
+
+    public void RotateLeft()
+    {
+        rotateLeft = true;
+    }
+
+    public void RotateRight()
+    {
+        rotateRight = true;
+    }
+
+    public void StopMoveForward()
+    {
+        moveForward = false;
+    }
+
+    public void StopMoveBack()
+    {
+        moveBack = false;
+    }
+
+    public void StopMoveLeft()
+    {
+        moveLeft = false;
+    }
+
+    public void StopMoveRight()
+    {
+        moveRight = false;
+    }
+
+    public void StopRotateLeft()
+    {
+        rotateLeft = false;
+    }
+
+    public void StopRotateRight()
+    {
+        rotateRight = false;
+    }
+#endif
 
     private void OnCollisionEnter(Collision collision)
     {

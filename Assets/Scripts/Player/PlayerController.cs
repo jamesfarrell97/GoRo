@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-using UnityEngine;
-using UnityEngine.XR;
+﻿using UnityEngine;
 using Photon.Pun;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
@@ -11,57 +7,33 @@ using Photon.Pun;
 //
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] GameObject leftHand;
-    [SerializeField] GameObject rightHand;
-    [SerializeField] GameObject leftTurningPoint;
-    [SerializeField] GameObject rightTurningPoint;
+    [SerializeField] Boat boat;
     [SerializeField] float boatSpeed = 30f;
     [SerializeField] float boatTurningSpeed = 1f;
-    [SerializeField] float handSpeedFactor = 5f;
 
-    [SerializeField] [Range(0f, 1f)] float triggerPressureThreshold = 0.5f;
-    [SerializeField] [Range(0f, 1f)] float gripPressureThreshold = 0.5f;
-    [SerializeField] XRNode leftInputSource;
-    [SerializeField] XRNode rightInputSource;
+    [SerializeField] GameObject leftTurningPoint;
+    [SerializeField] GameObject rightTurningPoint;
 
-    [SerializeField] Boat boat;
-
-    private InputDevice leftDevice;
-    private InputDevice rightDevice;
-
-    private PhotonView photonView;
     private BoxCollider boxCollider;
     private Rigidbody rigidBody;
-    private Vector3 movement;
 
-    private Vector3 leftHandPositionPreviousFrame;
-    private Vector3 rightHandPositionPreviousFrame;
-    private Vector3 playerPositionPreviousFrame;
-    private Vector3 leftHandPositionThisFrame;
-    private Vector3 rightHandPositionThisFrame;
-    private Vector3 playerPositionThisFrame;
-
-    private bool leftTrigger;
-    private bool rightTrigger;
-    private bool leftGrip;
-    private bool rightGrip;
-
-    private float leftTriggerPressure;
-    private float rightTriggerPressure;
-    private float leftGripPressure;
-    private float rightGripPressure;
-
-    private float leftHandSpeed;
-    private float rightHandSpeed;
-    private bool allowedMove = true;
-
+    private PhotonView photonView;
     private AchievementTracker achievementTracker;
     private Stats stats;
+
+    private bool allowedMove = true;
+    private bool moveForward;
+    private bool moveBack;
+    private bool moveLeft;
+    private bool moveRight;
+    private bool rotateLeft;
+    private bool rotateRight;
 
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
         rigidBody = GetComponent<Rigidbody>();
+
         photonView = GetComponent<PhotonView>();
         achievementTracker = GetComponent<AchievementTracker>();
         stats = GetComponent<Stats>();
@@ -69,19 +41,10 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        if (!photonView.IsMine)
-        {
-            Destroy(GetComponentInChildren<Camera>().gameObject);
-            Destroy(rigidBody);
-        }
+        if (photonView.IsMine) return;
 
-        //playerPositionPreviousFrame = transform.localPosition;
-        //leftHandPositionPreviousFrame = leftHand.transform.localPosition;
-        //rightHandPositionPreviousFrame = rightHand.transform.localPosition;
-
-        playerPositionPreviousFrame = transform.position;
-        leftHandPositionPreviousFrame = leftHand.transform.position;
-        rightHandPositionPreviousFrame = rightHand.transform.position;
+        Destroy(GetComponentInChildren<Camera>().gameObject);
+        Destroy(rigidBody);
     }
 
     private void Update()
@@ -90,120 +53,128 @@ public class PlayerController : MonoBehaviour
 
         achievementTracker.TrackAchievements(photonView, stats);
 
-        // Left Oar Input
-        leftDevice = InputDevices.GetDeviceAtXRNode(leftInputSource);
+        if (!allowedMove) return;
 
-        leftDevice.TryGetFeatureValue(CommonUsages.trigger, out leftTriggerPressure);
-        leftDevice.TryGetFeatureValue(CommonUsages.grip, out leftGripPressure);
-
-        leftTrigger = (leftTriggerPressure >= triggerPressureThreshold);
-        leftGrip = (leftGripPressure >= gripPressureThreshold);
-
-        // Right Oar Input
-        rightDevice = InputDevices.GetDeviceAtXRNode(rightInputSource);
-
-        rightDevice.TryGetFeatureValue(CommonUsages.trigger, out rightTriggerPressure);
-        rightDevice.TryGetFeatureValue(CommonUsages.grip, out rightGripPressure);
-
-        rightTrigger = (rightTriggerPressure >= triggerPressureThreshold);
-        rightGrip = (rightGripPressure >= gripPressureThreshold);
-    }
-
-    private void FixedUpdate()
-    {
-        if (!photonView.IsMine || !allowedMove) return;
-
-        Vector3 forward = rigidBody.transform.forward;
-        Vector3 up = rigidBody.transform.up;
-
-        leftHandPositionThisFrame = new Vector3(
-            leftHand.transform.position.x * forward.x,
-            leftHand.transform.position.y * forward.y,
-            leftHand.transform.position.z * forward.z
-        );
-
-        rightHandPositionThisFrame = new Vector3(
-            rightHand.transform.position.x * forward.x,
-            rightHand.transform.position.y * forward.y,
-            rightHand.transform.position.z * forward.z
-        );
-
-        playerPositionThisFrame = new Vector3(
-            transform.position.x * forward.x,
-            transform.position.y * forward.y,
-            transform.position.z * forward.z
-        );
-
-        float leftHandDistancedMoved = Vector3.Distance(leftHandPositionThisFrame, leftHandPositionPreviousFrame);
-        float rightHandDistancedMoved = Vector3.Distance(rightHandPositionThisFrame, rightHandPositionPreviousFrame);
-        float playerDistancedMoved = Vector3.Distance(playerPositionThisFrame, playerPositionPreviousFrame);
-
-        //leftHandPositionThisFrame = leftHand.transform.localPosition;
-        //rightHandPositionThisFrame = rightHand.transform.localPosition;
-        //playerPositionThisFrame = transform.localPosition;
-
-        //float leftHandDistancedMoved = leftHandPositionThisFrame.z - leftHandPositionPreviousFrame.z;
-        //float rightHandDistancedMoved = rightHandPositionThisFrame.z - rightHandPositionPreviousFrame.z;
-        //float playerDistancedMoved = playerPositionThisFrame.z - playerPositionPreviousFrame.z;
-
-        leftHandSpeed = (leftHandDistancedMoved - playerDistancedMoved) + (rightHandDistancedMoved - playerDistancedMoved);
-
-        //leftHandSpeed = (leftHandDistancedMoved - playerDistancedMoved);
-        //rightHandSpeed = (rightHandDistancedMoved - playerDistancedMoved);
-
-        if (Time.timeSinceLevelLoad > 1f)
+        if (Input.GetKey(KeyCode.W))
         {
-            Vector3 leftForcePosition = leftTurningPoint.transform.position;
-            Vector3 rightForcePosition = rightTurningPoint.transform.position;
-
-            // Move Forwards
-            if (leftGrip && rightGrip && leftTrigger && rightTrigger)
-            {
-                rigidBody.AddForce(forward * (-leftHandSpeed * handSpeedFactor) * boatSpeed);
-                //rigidBody.AddForceAtPosition(forward * (-leftHandSpeed * handSpeedFactor) * boatSpeed, leftTurningPoint.transform.position);
-                //rigidBody.AddForceAtPosition(forward * (-rightHandSpeed * handSpeedFactor) * boatSpeed, rightTurningPoint.transform.position);
-            }
-
-            // Move Towards Right
-            else if (leftGrip && rightGrip && leftTrigger)
-            {
-                rigidBody.AddTorque(up * (-leftHandSpeed * handSpeedFactor) * boatTurningSpeed);
-                rigidBody.AddForce(forward * (-leftHandSpeed * handSpeedFactor) * boatSpeed);
-            }
-
-            // Move Towards Left
-            else if (leftGrip && rightGrip && rightTrigger)
-            {
-                rigidBody.AddTorque(-up * (-leftHandSpeed * handSpeedFactor) * boatTurningSpeed);
-                rigidBody.AddForce(forward * (-leftHandSpeed * handSpeedFactor) * boatSpeed);
-            }
-
-            // Turn Right
-            else if (leftGrip && leftTrigger)
-            {
-
-                rigidBody.AddTorque(-up * (-leftHandSpeed * handSpeedFactor) * boatTurningSpeed);
-            }
-
-            // Turn Left
-            else if (rightGrip && rightTrigger)
-            {
-                rigidBody.AddTorque(up * (-leftHandSpeed * handSpeedFactor) * boatTurningSpeed);
-            }
-
-            // Move Backwards
-            else if (leftGrip && rightGrip)
-            {
-                rigidBody.AddForce(forward * (leftHandSpeed * handSpeedFactor) * boatSpeed);
-                //rigidBody.AddForceAtPosition(forward * (leftHandSpeed * handSpeedFactor) * boatSpeed, leftTurningPoint.transform.position);
-                //rigidBody.AddForceAtPosition(forward * (rightHandSpeed * handSpeedFactor) * boatSpeed, rightTurningPoint.transform.position);
-            }
+            rigidBody.AddForce(transform.forward * boatSpeed);
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            rigidBody.AddForce(-transform.forward * boatSpeed);
+        }
+        else if (Input.GetKey(KeyCode.A))
+        {
+            rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
         }
 
-        leftHandPositionPreviousFrame = leftHandPositionThisFrame;
-        rightHandPositionPreviousFrame = rightHandPositionThisFrame;
-        playerPositionPreviousFrame = playerPositionThisFrame;
+        if (Input.GetKey(KeyCode.Q))
+        {
+            rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        }
+        else if (Input.GetKey(KeyCode.E))
+        {
+            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        }
+
+#if UNITY_EDITOR
+        if (moveForward)
+        {
+            rigidBody.AddForce(transform.forward * boatSpeed);
+        }
+
+        if (moveBack)
+        {
+            rigidBody.AddForce(-transform.forward * boatSpeed);
+        }
+
+        if (moveLeft)
+        {
+            rigidBody.AddForce(-transform.right * boatSpeed);
+        }
+
+        if (moveRight)
+        {
+            rigidBody.AddForce(transform.right * boatSpeed);
+        }
+
+        if (rotateLeft)
+        {
+            rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        }
+
+        if (rotateRight)
+        {
+            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        }
+#endif
     }
+
+#if UNITY_EDITOR
+    public void MoveForward()
+    {
+        moveForward = true;
+    }
+
+    public void MoveBack()
+    {
+        moveBack = true;
+    }
+
+    public void MoveLeft()
+    {
+        moveLeft = true;
+    }
+
+    public void MoveRight()
+    {
+        moveRight = true;
+    }
+
+    public void RotateLeft()
+    {
+        rotateLeft = true;
+    }
+
+    public void RotateRight()
+    {
+        rotateRight = true;
+    }
+
+    public void StopMoveForward()
+    {
+        moveForward = false;
+    }
+
+    public void StopMoveBack()
+    {
+        moveBack = false;
+    }
+
+    public void StopMoveLeft()
+    {
+        moveLeft = false;
+    }
+
+    public void StopMoveRight()
+    {
+        moveRight = false;
+    }
+
+    public void StopRotateLeft()
+    {
+        rotateLeft = false;
+    }
+
+    public void StopRotateRight()
+    {
+        rotateRight = false;
+    }
+#endif
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -218,7 +189,7 @@ public class PlayerController : MonoBehaviour
         this.allowedMove = false;
     }
 
-    public void ContinueMovement()
+    public void ResumeMovement()
     {
         this.allowedMove = true;
     }

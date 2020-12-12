@@ -104,7 +104,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(player);
     }
-
+    
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         foreach (Transform transform in roomListContent)

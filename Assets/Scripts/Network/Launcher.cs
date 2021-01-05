@@ -42,7 +42,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        MenuManager.Instance.OpenMenu("Main");
+        MenuManager.Instance.OpenMenu("Connect");
     }
 
     public void Singleplayer()
@@ -71,6 +71,11 @@ public class Launcher : MonoBehaviourPunCallbacks
         Debug.Log("Connected to Server.");
         MenuManager.Instance.OpenMenu("Loading");
         PhotonNetwork.ConnectUsingSettings();
+    }
+
+    public void ConnectedToPerformanceMonitor()
+    {
+        MenuManager.Instance.OpenMenu("Main");
     }
 
     public void CheckConnection()
@@ -180,6 +185,6 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnLeftRoom()
     {
-        MenuManager.Instance.OpenMenu("Title");
+        MenuManager.Instance.OpenMenu("Main");
     }
 }

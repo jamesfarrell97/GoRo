@@ -1,17 +1,20 @@
 ﻿public class DeviceObject
 {
-	public string Address;
 	public string Name;
+	public string Address;
+	public string Status;
 
 	public DeviceObject ()
 	{
-		Address = "";
 		Name = "";
+		Address = "";
+        Status = "";
 	}
 
-	public DeviceObject (string address, string name)
+	public DeviceObject (string address, string name, string status = "Disconnected")
 	{
-		Address = address;
 		Name = name;
+		Address = address;
+        Status = status;
 	}
 }

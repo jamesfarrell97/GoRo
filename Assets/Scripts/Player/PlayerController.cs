@@ -22,12 +22,12 @@ public class PlayerController : MonoBehaviour
     private Stats stats;
 
     private bool allowedMove = true;
-    private bool moveForward;
-    private bool moveBack;
-    private bool moveLeft;
-    private bool moveRight;
-    private bool rotateLeft;
-    private bool rotateRight;
+    private bool moveForward = false;
+    private bool moveBack = false;
+    private bool moveLeft = false;
+    private bool moveRight = false;
+    private bool rotateLeft = false;
+    private bool rotateRight = false;
 
     private void Awake()
     {
@@ -80,8 +80,7 @@ public class PlayerController : MonoBehaviour
         {
             rigidBody.AddTorque(-transform.up * boatTurningSpeed);
         }
-
-#if UNITY_EDITOR
+        
         if (moveForward)
         {
             rigidBody.AddForce(transform.forward * boatSpeed);
@@ -111,10 +110,8 @@ public class PlayerController : MonoBehaviour
         {
             rigidBody.AddTorque(-transform.up * boatTurningSpeed);
         }
-#endif
     }
 
-#if UNITY_EDITOR
     public void MoveForward()
     {
         moveForward = true;
@@ -174,7 +171,6 @@ public class PlayerController : MonoBehaviour
     {
         rotateRight = false;
     }
-#endif
 
     private void OnCollisionEnter(Collision collision)
     {

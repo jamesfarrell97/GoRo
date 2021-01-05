@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using TMPro;
+using System;
 
 public class DeviceListItem : MonoBehaviour
 {
@@ -10,29 +11,39 @@ public class DeviceListItem : MonoBehaviour
     public TMP_Text DeviceName;
     public TMP_Text DeviceAddress;
     public TMP_Text DeviceStatus;
+    public bool Connected;
 
-    private Blue Blue;
+    private PMCommunication PMCommunication;
 
     public void SetUp(DeviceObject device)
     {
-        Blue = FindObjectOfType<Blue>();
+        PMCommunication = FindObjectOfType<PMCommunication>();
 
         DeviceID = DeviceListItemID;
 
         DeviceName.text = device.Name;
         DeviceAddress.text = device.Address;
+        DeviceStatus.text = device.Status;
+
+        Connected = false;
 
         DeviceListItemID++; 
     }
 
-    public void OnButtonClick(DeviceListItem deviceListItem)
+    public void OnConnectClick(DeviceListItem deviceListItem)
     {
-        Blue.OnButtonClick(deviceListItem);
+        PMCommunication.OnConnectClick(deviceListItem);
     }
 
-    public void OnSubscribeClick(DeviceListItem deviceListItem)
+    public void Connect()
     {
-        Blue.OnSubscribeClick(deviceListItem);
+        DeviceStatus.text = "Connected";
+        Connected = true;
     }
 
+    public void Disconnect()
+    {
+        DeviceStatus.text = "Disconnected";
+        Connected = false;
+    }
 }

@@ -42,7 +42,14 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        MenuManager.Instance.OpenMenu("Connect");
+        if (Application.isEditor)
+        {
+            MenuManager.Instance.OpenMenu("Menu");
+        }
+        else
+        {
+            MenuManager.Instance.OpenMenu("Connect");
+        }
     }
 
     public void Singleplayer()

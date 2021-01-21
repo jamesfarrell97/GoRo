@@ -1,0 +1,156 @@
+### CATARTSYS ENTERTAINMENT ###
+### LARGE WATER SHADER - FREE ASSET ###
+## GRAPH INCLUDED
+## URP v7.3.1
+
+# Developped by Catartsys Entertainment for your (but mainly our) needs. #
+
+You can use this asset freely for any purpose and any project. Please be nice and mention us when using our assets.
+
+This shader is mainly destined to anybody in the need of a large scale water surface (like an ocean or a lake).
+
+It was developped with these ideas in mind :
+-be a valid shader for extremely large surfaces of calm water
+-be fully URP-compatible (can be use on absolutely any platform)
+-be jammers-friendly with a water surface working out of the box
+
+BEWARE:
+NO REFUND. LOL.
+
+## ATTENTION TO USERS:
+This shader is NOT a polished and professional version of a water shader. 
+It has flaws and you can't expect it to do everything. That's why it's free.
+It can however be modified to this extent, provided you understand how the Shader Graph works.
+The shader is provided AS IS, and you can edit it at will.
+As with any free asset, please don't try to make profit by simply selling it back.
+
+If you want to report bugs or absent features, please do. 
+But don't expect a free asset to be followed much. You will probably save yourself some time by implementing features yourself.
+
+!!! CAREFUL !!!
+## IF THE WATER IS WHITE AT IMPORT:
+You need to use the "LargeWater_URP-HighQuality" setting file provided as your URP project settings (Edit -> Project Settings -> Quality -> Rendering).
+For clearer explanation about what happenened : your URP settings need the "Depth Texture" and "Opaque Texture" ticks ON for the water to behave properly as the shader uses depth for its foam.
+
+## DIRECTIONS:
+The package already includes a "LargeWater_Grid_instances" prefab that you can use out of the box.
+It is simply 50x50 instanced Unity planes to provide a workable geometry.
+
+IF this is not enough or too much for you : we provided a simple script "LargeWater_Grids_instanciator". 
+ ->Put this on an empty, change the values, drag&drop the material, press start and store it as prefab.
+!Beware! as this script is very simple and, used wrongly, can generate so many planes that you will crash.
+The material is already set to work and has already good default values.
+
+
+## PARAMETERS:
+
+-> Water Color 1
+
+Color of the water directly under the camera
+
+-> Water Color 2
+
+Color of the water at the horizon far away
+
+-> Water Noisy Coloring Scale 1
+
+Scale of the darkening noise of the "Water Color 1" you can use to break pattern and simulate a close underwater relief.
+
+-> Water Noisy Coloring Scale 1
+
+Scale of the darkening noise of the "Water Color 2" you can use to break pattern and simulate a close underwater relief.
+
+-> Water Noisy Coloring STR
+
+Strength of the darkening noises you can use for the water colors.
+
+-> Smoothness
+
+Obviously the ability of water to reflect light.
+
+-> Perlin Normals
+-> Perlin Normals Tiles
+-> Perlin Normals STR
+
+Normal texture used for close-up look of water. 
+It moves in two opposite directions and you can set its tiling and strength.
+
+-> Worley Normals
+-> Worley Normals Tiles
+-> Worley Normals STR
+
+Normal texture used for close-up look of water. It uses worley normals (but you can replace it with anything).
+Worley is a kind of voronoi noise. It adds to the pattern breaking of it all.
+It moves in two opposite directions and you can set its tiling and strength.
+
+-> Normals Pan Speed
+
+Sets the speed movement of perlin and worley normals
+
+-> Normals Scrambler Tile
+-> Normals Scrambler Strength
+
+The perlin normals texture is re-used at a very large scale to break the repetitive patterns
+
+-> Moving Normals Scrambler Strength
+-> Moving Normal Scrambler Speed
+-> Moving Normals Scrambler Distance effect
+
+The perlin normals texture is re-used at a very large scale a second time to break the repetitive patterns, and is moving in the same direction as waves.
+It gives motions to the water from afar. 
+The "distance effect" allows to control at what distance from the point of view the effect starts.
+
+-> Normal Spots Tiles
+-> Normal Spots Ratio
+-> Normal Spots STR
+-> Normal Spots Smoothness STR
+
+Uses a procedural noise map inside the graph to flatten the normals at randoms areas.
+This is supposed to be a very light effect as it is supposed to mimic a real-life effect seen on large water surfaces.
+Default values should be already enough, though you might want to tweak the tiles and ratio.
+
+-> Waves Color STR
+
+Darken waves to give a depth effect.
+
+-> Waves Tile
+-> Waves Length
+-> Waves Orientation
+-> Waves Generator Scale
+-> Waves Speed
+
+All the values needede to control the waves behavior.
+
+-> Waves Normals STR
+
+An auto-generated normal map to give bump effet to waves. It can be used alone or in combination with the "Waves Height"
+
+-> Waves Height
+
+A noise map is used to create a visible geometrical elevation. 
+Needs quite the number of polygons to work properly and is better for a close-up look.
+
+-> Foam Texture
+-> Foam Tiling
+-> Foam Distance
+-> Foam STR
+
+All you need to give a foam effect when intersecting with and opaque surface.
+Attention, this effect doesn't work when using a transparency shader.
+
+-> Distort Under Surface Blend Strength
+-> Distort Under Surface Distance
+-> Distort Under Surface STR
+-> Distort Under Surface Dist To Camera
+
+All the controls you need to give a refraction effect underwater. 
+The "Dist To Camera" allows to control at what distance from the point of view the effect starts. 
+This is to prevent far away artifacts.
+
+-> Reflection STR
+-> Reflection Normal STR
+
+Allows to control the reflection given by the closest Reflection Probe.
+The reflections are NOT realtime as "Screen Space Reflections" are not allowed in URP at the moment.
+
+

@@ -44,7 +44,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         if (Application.isEditor)
         {
-            MenuManager.Instance.OpenMenu("Menu");
+            MenuManager.Instance.OpenMenu("Main");
         }
         else
         {

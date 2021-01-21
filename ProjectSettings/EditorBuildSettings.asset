@@ -5,19 +5,24 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Main Menu.unity
     guid: eddce53d5a6c5d34c88d2c0182656d45
+  - enabled: 1
+    path: Assets/Scenes/Environment.unity
+    guid: bb9477956dff48741a63153ffcf13365
   - enabled: 0
     path: Assets/Scenes/Singleplayer.unity
     guid: da447a0add76c89448fa3aa17dbada49
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Multiplayer.unity
     guid: 4973b10347376954ea4dc72b8f0f6c97
   - enabled: 0
     path: Assets/Scenes/Bluetooth Test.unity
     guid: 837091c9af0c9294fbe6507a3c0ba17e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/TestEnv.unity
     guid: 14fb5acf90f7f12488d69b97ef4cf8e0
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 3f119a19757f84dac85ee298b9dd65d3,
+      type: 2}

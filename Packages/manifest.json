@@ -1,10 +1,8 @@
 {
   "dependencies": {
-    "com.unity.collab-proxy": "1.2.16",
-    "com.unity.ide.rider": "1.1.4",
+    "com.unity.addressables": "1.16.15",
     "com.unity.ide.vscode": "1.2.3",
     "com.unity.render-pipelines.universal": "7.3.1",
-    "com.unity.test-framework": "1.1.18",
     "com.unity.textmeshpro": "2.1.1",
     "com.unity.timeline": "1.2.17",
     "com.unity.ugui": "1.0.0",
@@ -39,5 +37,15 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.dbrizov",
+        "net.peeweek"
+      ]
+    }
+  ]
 }

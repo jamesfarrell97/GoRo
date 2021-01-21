@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ad544ee67a064d3eb407c8c47c67b8d, type: 3}
   m_Name: WaterSettingsData
   m_EditorClassIdentifier: 
-  waterGeomType: 1
+  waterGeomType: 0
   refType: 2
   planarSettings:
-    m_ResolutionMultiplier: 3
+    m_ResolutionMultiplier: 2
     m_ClipPlaneOffset: 0.24
     m_ReflectLayers:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 3847
     m_Shadows: 0
   cubemapRefType: {fileID: 8900000, guid: 97b307d339af74760a04adfbe9544b9b, type: 3}
   isInfinite: 0

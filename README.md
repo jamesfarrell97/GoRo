@@ -13,5 +13,5 @@ Notes and other additional information relevant to this project's development
 
 ### References
 
-- This README.md is heavily inspired by a README from a project that James worked on while taking part in a work placement.
+- CONTRIBUTING.md is heavily inspired by a README.md from a project that James worked on while taking part in a work placement.
 - The environment assets in this repository are taken directly from the BoatAttack repository by Unity-Technologies.

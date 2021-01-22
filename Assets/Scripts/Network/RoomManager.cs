@@ -44,6 +44,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Managers", "Audio Manager"), Vector3.zero, Quaternion.identity);
             PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player", "Player Manager"), Vector3.zero, Quaternion.identity);
+
+            FindObjectOfType<AudioManager>().Stop("Theme");
+            FindObjectOfType<AudioManager>().Play("BackgroundLoop");
         }
 
         if (scene.buildIndex == 2)

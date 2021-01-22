@@ -1,7 +1,6 @@
 ﻿using System;
-
-using UnityEngine.Audio;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // Code referenced: https://www.youtube.com/watch?v=6OT43pvUyfY
 //
@@ -25,6 +24,8 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
+        DontDestroyOnLoad(gameObject);
+
         foreach (Sound sound in sounds)
         {
             sound.source = gameObject.AddComponent<AudioSource>();
@@ -38,7 +39,10 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        Play("Theme");
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            Play("Theme");
+        }
     }
 
     public void Play(string name)
@@ -52,5 +56,18 @@ public class AudioManager : MonoBehaviour
         }
 
         sound.source.Play();
+    }
+
+    public void Stop(string name)
+    {
+        Sound sound = Array.Find(sounds, s => s.name == name);
+
+        if (sound == null)
+        {
+            Debug.Log("Sound: " + name + " not found!");
+            return;
+        }
+
+        sound.source.Stop();
     }
 }

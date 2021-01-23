@@ -9,6 +9,7 @@ public class Oar : MonoBehaviour
     [SerializeField] Transform pivotPoint;
 
     private Vector3 offset;
+    private bool playCollisionSound;
 
     private void Start()
     {
@@ -18,10 +19,42 @@ public class Oar : MonoBehaviour
     private void FixedUpdate()
     {
         transform.LookAt(trackedObject);
-
-        Vector3 currentRotation = transform.rotation.eulerAngles;
-        Vector3 trackedRotation = trackedObject.rotation.eulerAngles;
-
+        
+        transform.Rotate(new Vector3(0, 0, trackedObject.localEulerAngles.x));
         transform.position = pivotPoint.position;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.tag.Equals("Water") && playCollisionSound)
+        {
+            FindObjectOfType<AudioManager>().Play("Rowing" + Random.Range(1,5));
+            playCollisionSound = false;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.collider.tag.Equals("Water"))
+        {
+            playCollisionSound = true;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag.Equals("Water") && playCollisionSound)
+        {
+            FindObjectOfType<AudioManager>().Play("Rowing" + Random.Range(1, 5));
+            playCollisionSound = false;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag.Equals("Water"))
+        {
+            playCollisionSound = true;
+        }
     }
 }

@@ -8,6 +8,7 @@ TagManager:
   - Race
   - FinishRace
   - Boat Tip
+  - Water
   layers:
   - Default
   - TransparentFX

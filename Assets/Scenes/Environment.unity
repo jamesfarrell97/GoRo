@@ -2764,6 +2764,41 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 241103687}
   m_PrefabAsset: {fileID: 0}
+--- !u!84 &245539348
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WaterDepthMap
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  serializedVersion: 3
+  m_Width: 1024
+  m_Height: 1024
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthFormat: 2
+  m_ColorFormat: 142
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
 --- !u!1001 &273430640
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5120,41 +5155,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 84342590}
   m_PrefabAsset: {fileID: 0}
---- !u!84 &549161829
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: WaterDepthMap
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  serializedVersion: 3
-  m_Width: 1024
-  m_Height: 1024
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthFormat: 2
-  m_ColorFormat: 142
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
 --- !u!1001 &551336714
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14837,10 +14837,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: Water
       objectReference: {fileID: 0}
+    - target: {fileID: 2530155155517684902, guid: 7fd10175b87b35746af112a206003d89,
+        type: 3}
+      propertyPath: m_TagString
+      value: Water
+      objectReference: {fileID: 0}
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
       propertyPath: _waves.Array.size
-      value: 8
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
@@ -14855,12 +14860,12 @@ PrefabInstance:
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
       propertyPath: _waves.Array.data[0].wavelength
-      value: 3.5032969
+      value: 2.919414
       objectReference: {fileID: 0}
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
       propertyPath: _waves.Array.data[1].amplitude
-      value: 0.051915158
+      value: 0.06229819
       objectReference: {fileID: 0}
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
@@ -14875,7 +14880,7 @@ PrefabInstance:
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
       propertyPath: _waves.Array.data[2].amplitude
-      value: 0.08979507
+      value: 0.119726755
       objectReference: {fileID: 0}
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
@@ -14885,12 +14890,12 @@ PrefabInstance:
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
       propertyPath: _waves.Array.data[2].wavelength
-      value: 5.1465273
+      value: 5.718364
       objectReference: {fileID: 0}
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
       propertyPath: _waves.Array.data[3].amplitude
-      value: 0.0793334
+      value: 0.11333343
       objectReference: {fileID: 0}
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
@@ -14900,7 +14905,7 @@ PrefabInstance:
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
       propertyPath: _waves.Array.data[3].wavelength
-      value: 6.3970137
+      value: 7.6154923
       objectReference: {fileID: 0}
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
@@ -14966,13 +14971,18 @@ PrefabInstance:
         type: 3}
       propertyPath: _depthTex
       value: 
-      objectReference: {fileID: 549161829}
+      objectReference: {fileID: 0}
     - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
       propertyPath: surfaceData
       value: 
       objectReference: {fileID: 11400000, guid: 9e1c83d2d3fac4b94b91c7b3a80ce964,
         type: 2}
+    - target: {fileID: 3852657888318150645, guid: 7fd10175b87b35746af112a206003d89,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8512011864833064937, guid: 7fd10175b87b35746af112a206003d89,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -15046,6 +15056,25 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1571060890}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1571060892 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2530155155517684902, guid: 7fd10175b87b35746af112a206003d89,
+    type: 3}
+  m_PrefabInstance: {fileID: 1571060890}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &1571060893
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1571060892}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2000, y: 1, z: 2000}
+  m_Center: {x: 0, y: -0.75, z: 0}
 --- !u!1001 &1571839092
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -85,3 +85,33 @@ MonoBehaviour:
     pitch: 1
     source: {fileID: 0}
     loop: 1
+  - name: Rowing1
+    clip: {fileID: 8300000, guid: cc0e556a5c1ee594289bcddbe8f7aa50, type: 3}
+    volume: 0.35
+    pitch: 1
+    source: {fileID: 0}
+    loop: 0
+  - name: Rowing2
+    clip: {fileID: 8300000, guid: 020009c5e1a9f93499ec4b0e321f1902, type: 3}
+    volume: 0.35
+    pitch: 1.15
+    source: {fileID: 0}
+    loop: 0
+  - name: Rowing3
+    clip: {fileID: 8300000, guid: 1e59d4bffe32e4f409410599511db8e4, type: 3}
+    volume: 0.35
+    pitch: 0.95
+    source: {fileID: 0}
+    loop: 0
+  - name: Rowing4
+    clip: {fileID: 8300000, guid: 2d98f4fb2fdbc8942b9847e62e6165bc, type: 3}
+    volume: 0.35
+    pitch: 0.9
+    source: {fileID: 0}
+    loop: 0
+  - name: Rowing5
+    clip: {fileID: 8300000, guid: 96954c720b361ba42a0e3c7364eb6635, type: 3}
+    volume: 0.35
+    pitch: 1.1
+    source: {fileID: 0}
+    loop: 0

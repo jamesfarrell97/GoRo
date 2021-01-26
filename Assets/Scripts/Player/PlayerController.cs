@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject leftTurningPoint;
     [SerializeField] GameObject rightTurningPoint;
 
+    [SerializeField] Animator[] rowingAnimators;
+
     private BoxCollider boxCollider;
     private Rigidbody rigidBody;
 
@@ -109,6 +111,18 @@ public class PlayerController : MonoBehaviour
         if (rotateRight)
         {
             rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        }
+
+        foreach (Animator animator in rowingAnimators)
+        {
+            if (rigidBody.velocity.magnitude > 1)
+            {
+                animator.SetBool("Play", true);
+            }
+            else
+            {
+                animator.SetBool("Play", false);
+            }
         }
     }
 

@@ -49,6 +49,10 @@ public class PlayerController : MonoBehaviour
         Destroy(rigidBody);
     }
 
+    float currentDistance = 0;
+    float previousDistance = 0;
+    float rowingVelocity = 0;
+
     private void Update()
     {
         if (!photonView.IsMine) return;
@@ -56,6 +60,22 @@ public class PlayerController : MonoBehaviour
         achievementTracker.TrackAchievements(photonView, stats);
 
         if (!allowedMove) return;
+
+        // RowingData[3] == DistanceLo
+        // RowingData[4] == DistanceMid
+        // RowingData[5] == DistanceHigh
+
+        // RowingData[11] == Total WorkDistanceLo
+        // RowingData[12] == Total WorkDistanceMid
+        // RowingData[13] == Total WorkDistanceHigh
+
+        //currentDistance = PMCommunication.RowingData[3];
+
+        //float velocity = currentDistance - previousDistance / Time.deltaTime;
+
+        //rigidBody.AddForce(-transform.forward * boatSpeed * rowingVelocity);
+
+        //previousDistance = currentDistance;
 
         if (Input.GetKey(KeyCode.W))
         {

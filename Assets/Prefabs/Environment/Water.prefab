@@ -10,12 +10,13 @@ GameObject:
   m_Component:
   - component: {fileID: 8512011864833064937}
   - component: {fileID: 3852657888318150645}
+  - component: {fileID: 1571060893}
   m_Layer: 4
   m_Name: Water
-  m_TagString: Untagged
+  m_TagString: Water
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 64
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &8512011864833064937
 Transform:
@@ -24,9 +25,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2530155155517684902}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -47,58 +48,30 @@ MonoBehaviour:
   _depthTex: {fileID: 0}
   bakedDepthTex: {fileID: 0}
   _waves:
-  - amplitude: 0.22704089
+  - amplitude: 0.050453532
     direction: -88.46054
     wavelength: 2.919414
     origin:
       x: 0
       y: 0
     onmiDir: 0
-  - amplitude: 0.2336182
+  - amplitude: 0.06229819
     direction: -264.46985
-    wavelength: 3.8296328
+    wavelength: 4.595559
     origin:
       x: 0
       y: 0
     onmiDir: 0
-  - amplitude: 0.40407777
+  - amplitude: 0.119726755
     direction: -248.35088
-    wavelength: 4.2887726
+    wavelength: 5.718364
     origin:
       x: 0
       y: 0
     onmiDir: 0
-  - amplitude: 0.3570003
+  - amplitude: 0.11333343
     direction: -134.96402
-    wavelength: 5.330845
-    origin:
-      x: 0
-      y: 0
-    onmiDir: 0
-  - amplitude: 0.50889087
-    direction: -224.16226
-    wavelength: 6.2237782
-    origin:
-      x: 0
-      y: 0
-    onmiDir: 0
-  - amplitude: 0.5514862
-    direction: -180.3995
-    wavelength: 6.997999
-    origin:
-      x: 0
-      y: 0
-    onmiDir: 0
-  - amplitude: 0.45657623
-    direction: -264.3355
-    wavelength: 5.834793
-    origin:
-      x: 0
-      y: 0
-    onmiDir: 0
-  - amplitude: 0.7236925
-    direction: -142.20044
-    wavelength: 8.133936
+    wavelength: 7.6154923
     origin:
       x: 0
       y: 0
@@ -106,3 +79,16 @@ MonoBehaviour:
   settingsData: {fileID: 11400000, guid: 51d5286b580b54b69a91da9e3338548f, type: 2}
   surfaceData: {fileID: 11400000, guid: 9e1c83d2d3fac4b94b91c7b3a80ce964, type: 2}
   resources: {fileID: 11400000, guid: 40615c805d6e84ce7800418367985fe1, type: 2}
+--- !u!65 &1571060893
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2530155155517684902}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2000, y: 1, z: 2000}
+  m_Center: {x: 0, y: -0.75, z: 0}

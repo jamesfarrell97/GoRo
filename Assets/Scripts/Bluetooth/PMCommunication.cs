@@ -10,14 +10,21 @@ public static class PMDictionary
 {
     public static string DeviceUUID = "ce060000-43e5-11e4-916c-0800200c9a66";
 
+    public static string DeviceInfoService = "ce060010-43e5-11e4-916c-0800200c9a66";
+    public static string SerialNumberStringCharacteristic = "ce060012-43e5-11e4-916c-0800200c9a66";
+    public static string HardwareRevisionStringCharacteristic = "ce060013-43e5-11e4-916c-0800200c9a66";
+    public static string FirmwareRevisionStringCharacteristic = "ce060014-43e5-11e4-916c-0800200c9a66";
+
     public static string RowingServiceUUID = "ce060030-43e5-11e4-916c-0800200c9a66";
     public static string GeneralRowingStatusCharacteristicUUID = "ce060031-43e5-11e4-916c-0800200c9a66";
     public static string GeneralRowingAdditionalStatusCharacteristicUUID = "ce060032-43e5-11e4-916c-0800200c9a66";
-    public static string GeneralRowingStrokeDataCharacteristicUUID = "ce060080-43e5-11e4-916c-0800200c9a66";
+    public static string GeneralRowingStrokeDataCharacteristicUUID = "ce060035-43e5-11e4-916c-0800200c9a66";
+    public static string MultiplexedInformationCharacteristic = "ce060080-43e5-11e4-916c-0800200c9a66";
 
     public static string C2PMControlServiceUUID = "ce060020-43e5-11e4-916c-0800200c9a66";
     public static string C2PMReceiveCharacteristic = "ce060021-43e5-11e4-916c-0800200c9a66";
     public static string C2PMTransmitCharacteristic = "ce060022-43e5-11e4-916c-0800200c9a66";
+
 }
 
 public class PMCommunication : MonoBehaviour
@@ -200,15 +207,20 @@ public class PMCommunication : MonoBehaviour
             if (IsEqual(serviceUUID, PMDictionary.C2PMControlServiceUUID))
             {
                 StatusMessage = "Found Service UUID";
-                SetState(States.Write, 1f);
+                SetState(States.RequestMTU, 1f);
             }
 
         }, null);
     }
 
+    bool connected = false;
+
     private void Connected()
     {
         Launcher.Instance.ConnectedToPerformanceMonitor();
+
+        //SetState(States.Write, 1f);
+        //connected = true;
     }
 
     private void RequestMTU()
@@ -218,23 +230,51 @@ public class PMCommunication : MonoBehaviour
         BluetoothLEHardwareInterface.RequestMtu(DeviceAddress, 247, (address, newMTU) => {
 
             StatusMessage = "MTU set to " + newMTU.ToString();
-            SetState(States.Write, 1f);
+            SetState(States.Subscribe, 1f);
         });
     }
+
 
     private void WriteCharacteristic()
     {
         StatusMessage = "Writing characteristic...";
 
-        byte[] data = CSAFECommand.Write(new string[] { "CSAFE_GETVERSION_CMD" }).ToArray();
+        //byte[] data = CSAFECommand.Write(new string[] { "CSAFE_GETVERSION_CMD" }).ToArray();
+
+        byte[] data = CSAFECommand.Write(new string[] { "CSAFE_GETHORIZONTAL_CMD" }).ToArray();
+
+        //byte[] data = new byte[] { 0x01, 0xF1, 0x7F, 0x03, 0x57, 0x01, 0x00, 0x2A, 0xF2,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        //                0x00, 0x00 };
 
         BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data, data.Length, true, (characteristicUUID1) => {
 
             BluetoothLEHardwareInterface.Log("Write Succeeded");
 
-            StatusMessage = "Reading characteristics...";
+            StatusMessage = "Write Succeeded";
 
-            SetState(States.Read, 3f);
+            SetState(States.Write, 1f);
+
+            //if (!connected)
+            //{
+            //    SetState(States.Connected, 3f);
+            //} 
+            //else
+            //{
+            //    SetState(States.Write, 1f);
+            //}
         });
     } 
 
@@ -256,21 +296,66 @@ public class PMCommunication : MonoBehaviour
     {
         StatusMessage = "Subscribe characteristics...";
 
-        BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMTransmitCharacteristic, (x) => {
+        BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMTransmitCharacteristic, (action1) =>
+        {
+            // Inspection Breakpoint
+            var a1 = action1;
 
-            SetState(States.Subscribe, 1f);
-
-        }, (characteristicUUID, rawBytes) => {
-
-                BluetoothLEHardwareInterface.Log("Read Succeeded");
-
-                var x = CSAFECommand.Read(rawBytes);
+            BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.RowingServiceUUID, PMDictionary.MultiplexedInformationCharacteristic, (action2) =>
+            {
+                // Inspection Breakpoint
+                var a2 = action2;
 
                 SetState(States.Write, 1f);
-            }
-        );
 
-        SetState(States.Subscribe, 1f);
+                //BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.DeviceInfoService, PMDictionary.SerialNumberStringCharacteristic, (action3) =>
+                //{
+                //    // Breakpoint
+                //    var a3 = action3;
+
+                //    BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.DeviceInfoService, PMDictionary.HardwareRevisionStringCharacteristic, (action4) =>
+                //    {
+                //        // Breakpoint
+                //        var a4 = action4;
+
+                //        BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.DeviceInfoService, PMDictionary.FirmwareRevisionStringCharacteristic, (action5) =>
+                //        {
+                //            // Breakpoint
+                //            var a5 = action5;
+
+                //            SetState(States.Write, 3f);
+
+                //        }, (characteristicUUID, rawBytes) =>
+                //        {
+                //            // Breakpoint
+                //            var a = rawBytes;
+                //        });
+
+                //    }, (characteristicUUID, rawBytes) =>
+                //    {
+                //        // Breakpoint
+                //        var a = rawBytes;
+                //    });
+
+                //}, (characteristicUUID, rawBytes) =>
+                //{
+                //    // Breakpoint
+                //    var a = rawBytes;
+                //});
+
+            }, (characteristicUUID, rawBytes) =>
+            {
+                // Inspection Breakpoint
+                var a = CSAFECommand.Read(rawBytes);
+            });
+
+        }, (characteristicUUID, rawBytes) =>
+        {
+            // Inspection Breakpoint
+            var a = CSAFECommand.Read(rawBytes);
+
+            //SetState(States.Connected, 1f);
+        });
     }
 
     private void Disconnect()

@@ -277,12 +277,12 @@ public class BluetoothDeviceScript : MonoBehaviour
 		}
 	}
 
-	public void OnBluetoothData (string base64Data)
+	public void OnBluetoothData(string base64Data)
 	{
 		OnBluetoothData ("", "", base64Data);
 	}
 
-	public void OnBluetoothData (string deviceAddress, string characteristic, string base64Data)
+	public void OnBluetoothData(string deviceAddress, string characteristic, string base64Data)
 	{
 		if (base64Data != null)
 		{
@@ -336,7 +336,7 @@ public class BluetoothDeviceScript : MonoBehaviour
 		}
 	}
 
-	public void OnPeripheralData (string characteristic, string base64Data)
+	public void OnPeripheralData(string characteristic, string base64Data)
 	{
 		if (base64Data != null)
 		{

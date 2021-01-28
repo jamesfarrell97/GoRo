@@ -807,19 +807,12 @@ public class BluetoothLEHardwareInterface
 
 	public static void UnSubscribeCharacteristic(string name, string service, string characteristic, Action<string> action)
 	{
-
-        Debug.LogError("E10");
-
 #if !UNITY_EDITOR_OSX || !EXPERIMENTAL_MACOS_EDITOR
         if (!Application.isEditor)
 		{
 #endif
-            Debug.LogError("E11");
-
             if (bluetoothDeviceScript != null)
             {
-                Debug.LogError("E12");
-
                 name = name.ToUpper ();
 				service = service.ToUpper ();
 				characteristic = characteristic.ToUpper ();
@@ -836,18 +829,12 @@ public class BluetoothLEHardwareInterface
                 if (!bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicWithDeviceAddressAction.ContainsKey (name))
 					bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicWithDeviceAddressAction[name] = new Dictionary<string, Action<string, string>>();
 				bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicWithDeviceAddressAction[name][FullUUID (characteristic).ToLower ()] = null;
-
-                Debug.LogError("E13");
-
+                
                 if (!bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicAction.ContainsKey (name))
 					bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicAction[name] = new Dictionary<string, Action<string>> ();
 				bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicAction[name][FullUUID (characteristic).ToLower ()] = action;
-
-                Debug.LogError("E14");
 #endif
             }
-
-            Debug.LogError("E15");
 
 #if EXPERIMENTAL_MACOS_EDITOR && (UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX)
         OSXBluetoothLEUnSubscribeCharacteristic (name, service, characteristic);
@@ -858,8 +845,6 @@ public class BluetoothLEHardwareInterface
 				_android.Call("androidUnsubscribeCharacteristic", name, service, characteristic);
 #endif
 #if !UNITY_EDITOR_OSX || !EXPERIMENTAL_MACOS_EDITOR
-
-            Debug.LogError("E16");
         }
 #endif
     }

@@ -9,8 +9,8 @@ using System.Text;
 //
 public static class CSAFEDictionary
 {
-    public static readonly byte StandardFrameStartFlag = 0xF0;
-    public static readonly byte ExtendedFrameStartFlag = 0xF1;
+    public static readonly byte ExtendedFrameStartFlag = 0xF0;
+    public static readonly byte StandardFrameStartFlag = 0xF1;
     public static readonly byte StopFrameFlag = 0xF2;
     public static readonly byte ByteStuffingFlag = 0xF3;
 
@@ -177,6 +177,46 @@ public static class CSAFEDictionary
 
 public static class CSAFECommand
 {
+    public static byte[] IntToBytes(int integer, int numBytes)
+    {
+        if (integer < 0 || integer > Math.Pow(2, 8 * numBytes))
+        {
+            Console.WriteLine("Integer is outside of the allowable range");
+        }
+
+        byte[] b = new byte[numBytes];
+
+        for (int i = 0; i < numBytes; i++) {
+            b[i] = Convert.ToByte((integer >> (8 * i)) * 0xFF);
+        }
+
+        return b;
+    }
+
+    public static string BytesToASCII(byte[] rawBytes)
+    {
+        string s = "";
+
+        foreach (byte b in rawBytes)
+        {
+            s += Convert.ToChar(b);
+        }
+
+        return s;
+    }
+
+    public static int BytesToInt(byte[] rawBytes)
+    {
+        int integer = 0;
+
+        for (int i = 0; i < rawBytes.Length; i++)
+        {
+            integer = rawBytes[i] << (8 * i) | integer;
+        }
+
+        return integer;
+    }
+
     public static List<byte> Write(string[] arguments)
     {
         int i = 0;
@@ -203,8 +243,8 @@ public static class CSAFECommand
                 {
                     i++;
                     int intValue = int.Parse(arguments[i]);
-                    byte value = Convert.ToByte(intValue);
-                    command.Add(value);
+                    byte[] value = IntToBytes(intValue, bytes);
+                    command.AddRange(value);
                 }
 
                 // Data byte count
@@ -380,8 +420,9 @@ public static class CSAFECommand
         // Create empty message (primary goal)
         List<byte> message = new List<byte>();
 
+        // Status not coming through at current !!
         // Create empty response status
-        byte status;
+        // byte status;
 
         // Create byte iterator
         int j = 0;
@@ -389,24 +430,35 @@ public static class CSAFECommand
         // Create stop flag found flag
         bool stopFound = false;
 
+        // report id not coming through at current !!
         // transmission[0] = report id
         // transmission[1] = start flag
+        //
+        // updated transmission as follows:
+        // transmission[1] = start flag
+        //
 
         // Retrieve start flag
-        byte startFlag = tranmission[1];
+        byte startFlag = tranmission[0];
 
-        // Check start flag - update byte iterator
+        // Check start flag - update byte iterator accordingly
         if (startFlag == CSAFEDictionary.StandardFrameStartFlag)
         {
-            j = 2;
+            j = 1;
         }
 
         else if (startFlag == CSAFEDictionary.ExtendedFrameStartFlag)
         {
+            // report id not coming through at current !!
             // transmission[2] = ? destination
             // transmission[3] = ? source
+            //
+            // updated transmission as follows:
+            // transmission[1] = ? destination
+            // transmission[2] = ? source
+            //
 
-            j = 4;
+            j = 3;
         }
 
         else
@@ -443,16 +495,16 @@ public static class CSAFECommand
         message = CheckMessage(message);
 
         // Retrieve reponse status (pop first byte)
-        status = message[0]; message.RemoveAt(0);
+        // status = message[0]; message.RemoveAt(0);
 
         // Create response
         Dictionary<string, List<string>> response = new Dictionary<string, List<string>> {
-            {
-                "CSAFE_GETSTATUS_CMD",
-                new List<string> {
-                    status.ToString()
-                }
-            }
+            //{
+            //    "CSAFE_GETSTATUS_CMD",
+            //    new List<string> {
+            //        status.ToString()
+            //    }
+            //}
         };
 
         // Prime wrapper variables
@@ -512,10 +564,22 @@ public static class CSAFECommand
                 // Starting at current index, ranging to k + commandByteCount
                 byte[] rawBytes = message.GetRange(k, Math.Abs(commandByteCount)).ToArray();
 
+                // Prime variable
+                string value;
+                
                 // Convert command bytes to string
-                string value = (commandByteCount >= 0)
-                    ? Convert.ToInt32(rawBytes).ToString()
-                    : Encoding.ASCII.GetString(rawBytes);
+                if (commandByteCount >= 0)
+                {
+                    value = BytesToInt(rawBytes).ToString();
+                }
+                else
+                {
+                    value = BytesToASCII(rawBytes);
+                }
+
+                //string value = (commandByteCount >= 0)
+                //    ? Convert.ToInt32(rawBytes).ToString()
+                //    : Encoding.ASCII.GetString(rawBytes);
 
                 // Append values to result list
                 result.Add(value);
@@ -541,7 +605,7 @@ public static class CSAFECommand
         while (i < message.Count)
         {
             // Byte unstuffing
-            if (message[1] == CSAFEDictionary.ByteStuffingFlag)
+            if (message[i] == CSAFEDictionary.ByteStuffingFlag)
             {
                 byte stuffValue = message[i + 1]; message.RemoveAt(i + 1);
                 message[i] = Convert.ToByte(0xF0 | stuffValue);
@@ -552,7 +616,6 @@ public static class CSAFECommand
 
             // Update iterator
             i++;
-
         }
 
         // Check checksum

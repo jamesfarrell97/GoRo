@@ -632,22 +632,14 @@ public class BluetoothLEHardwareInterface
 	public static void DisconnectPeripheral (string name, Action<string> action)
 	{
 #if !UNITY_EDITOR_OSX || !EXPERIMENTAL_MACOS_EDITOR
-
-        Debug.LogError("E00");
-
+        
         if (!Application.isEditor)
 		{
 #endif
-            Debug.LogError("E01");
-
 			if (bluetoothDeviceScript != null)
             {
 				bluetoothDeviceScript.DisconnectedPeripheralAction = action;
-
-                Debug.LogError("E02");
             }
-
-            Debug.LogError("E03");
 
 #if EXPERIMENTAL_MACOS_EDITOR && (UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX)
 			OSXBluetoothLEDisconnectPeripheral (name);
@@ -657,16 +649,10 @@ public class BluetoothLEHardwareInterface
             if (_android != null)
             {
 				_android.Call ("androidBluetoothDisconnectPeripheral", name);
-
-                Debug.LogError("E04");
             }
-
-            Debug.LogError("E05");
 #endif
 #if !UNITY_EDITOR_OSX || !EXPERIMENTAL_MACOS_EDITOR
         }
-
-        Debug.LogError("E06");
 #endif
     }
 
@@ -716,7 +702,7 @@ public class BluetoothLEHardwareInterface
 			_iOSBluetoothLEWriteCharacteristic (name, service, characteristic, data, length, withResponse);
 #elif UNITY_ANDROID
         if (_android != null)
-				_android.Call ("androidWriteCharacteristic", name, service, characteristic, data, length, withResponse);
+				_android.Call("androidWriteCharacteristic", name, service, characteristic, data, length, withResponse);
 #endif
 #if !UNITY_EDITOR_OSX || !EXPERIMENTAL_MACOS_EDITOR
         }
@@ -821,19 +807,12 @@ public class BluetoothLEHardwareInterface
 
 	public static void UnSubscribeCharacteristic(string name, string service, string characteristic, Action<string> action)
 	{
-
-        Debug.LogError("E10");
-
 #if !UNITY_EDITOR_OSX || !EXPERIMENTAL_MACOS_EDITOR
         if (!Application.isEditor)
 		{
 #endif
-            Debug.LogError("E11");
-
             if (bluetoothDeviceScript != null)
             {
-                Debug.LogError("E12");
-
                 name = name.ToUpper ();
 				service = service.ToUpper ();
 				characteristic = characteristic.ToUpper ();
@@ -850,18 +829,12 @@ public class BluetoothLEHardwareInterface
                 if (!bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicWithDeviceAddressAction.ContainsKey (name))
 					bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicWithDeviceAddressAction[name] = new Dictionary<string, Action<string, string>>();
 				bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicWithDeviceAddressAction[name][FullUUID (characteristic).ToLower ()] = null;
-
-                Debug.LogError("E13");
-
+                
                 if (!bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicAction.ContainsKey (name))
 					bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicAction[name] = new Dictionary<string, Action<string>> ();
 				bluetoothDeviceScript.DidUpdateNotificationStateForCharacteristicAction[name][FullUUID (characteristic).ToLower ()] = action;
-
-                Debug.LogError("E14");
 #endif
             }
-
-            Debug.LogError("E15");
 
 #if EXPERIMENTAL_MACOS_EDITOR && (UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX)
         OSXBluetoothLEUnSubscribeCharacteristic (name, service, characteristic);
@@ -872,8 +845,6 @@ public class BluetoothLEHardwareInterface
 				_android.Call("androidUnsubscribeCharacteristic", name, service, characteristic);
 #endif
 #if !UNITY_EDITOR_OSX || !EXPERIMENTAL_MACOS_EDITOR
-
-            Debug.LogError("E16");
         }
 #endif
     }

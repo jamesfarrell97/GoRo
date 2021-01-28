@@ -49,6 +49,10 @@ public class PlayerController : MonoBehaviour
         Destroy(rigidBody);
     }
 
+    float currentDistance = 0;
+    float previousDistance = 0;
+    float rowingVelocity = 0;
+
     private void Update()
     {
         if (!photonView.IsMine) return;
@@ -57,61 +61,79 @@ public class PlayerController : MonoBehaviour
 
         if (!allowedMove) return;
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            rigidBody.AddForce(transform.forward * boatSpeed);
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            rigidBody.AddForce(-transform.forward * boatSpeed);
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        }
+        // RowingData[3] == DistanceLo
+        // RowingData[4] == DistanceMid
+        // RowingData[5] == DistanceHigh
 
-        if (Input.GetKey(KeyCode.Q))
-        {
-            rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        }
-        else if (Input.GetKey(KeyCode.E))
-        {
-            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        }
+        // RowingData[11] == Total WorkDistanceLo
+        // RowingData[12] == Total WorkDistanceMid
+        // RowingData[13] == Total WorkDistanceHigh
+
+        //currentDistance = PMCommunication.RowingData[3];
+
+        currentDistance = currentDistance + 5;
+
+        float velocity = currentDistance - previousDistance / Time.deltaTime;
+
+        rigidBody.AddForce(-transform.forward * boatSpeed * rowingVelocity);
+
+        previousDistance = currentDistance;
+
+        //if (Input.GetKey(KeyCode.W))
+        //{
+        //    rigidBody.AddForce(transform.forward * boatSpeed);
+        //}
+        //else if (Input.GetKey(KeyCode.S))
+        //{
+        //    rigidBody.AddForce(-transform.forward * boatSpeed);
+        //}
+        //else if (Input.GetKey(KeyCode.A))
+        //{
+        //    rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        //}
+        //else if (Input.GetKey(KeyCode.D))
+        //{
+        //    rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        //}
+
+        //if (Input.GetKey(KeyCode.Q))
+        //{
+        //    rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        //}
+        //else if (Input.GetKey(KeyCode.E))
+        //{
+        //    rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        //}
         
-        if (moveForward)
-        {
-            rigidBody.AddForce(transform.forward * boatSpeed);
-        }
+        //if (moveForward)
+        //{
+        //    rigidBody.AddForce(transform.forward * boatSpeed);
+        //}
 
-        if (moveBack)
-        {
-            rigidBody.AddForce(-transform.forward * boatSpeed);
-        }
+        //if (moveBack)
+        //{
+        //    rigidBody.AddForce(-transform.forward * boatSpeed);
+        //}
 
-        if (moveLeft)
-        {
-            rigidBody.AddForce(-transform.right * boatSpeed);
-        }
+        //if (moveLeft)
+        //{
+        //    rigidBody.AddForce(-transform.right * boatSpeed);
+        //}
 
-        if (moveRight)
-        {
-            rigidBody.AddForce(transform.right * boatSpeed);
-        }
+        //if (moveRight)
+        //{
+        //    rigidBody.AddForce(transform.right * boatSpeed);
+        //}
 
-        if (rotateLeft)
-        {
-            rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        }
+        //if (rotateLeft)
+        //{
+        //    rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        //}
 
-        if (rotateRight)
-        {
-            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        }
+        //if (rotateRight)
+        //{
+        //    rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        //}
 
         foreach (Animator animator in rowingAnimators)
         {

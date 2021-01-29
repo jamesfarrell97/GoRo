@@ -15,7 +15,7 @@ public class Stats : MonoBehaviour
     // TODO: EXTRACT INTO APPDATA SETTINGS FILE
     public static readonly int[] SplitDistances = { 100, 500, 1000, 1500, 5000 };
     public static readonly float KILOMETERS_METER = 1000;
-    public static readonly float SECS_MINUTE = 60;
+    public static readonly float SECS_MINUTE = 5;
 
     private int SplitIterator = 0;
 

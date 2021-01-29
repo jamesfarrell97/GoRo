@@ -16,13 +16,13 @@ public class Boat : MonoBehaviour
         slotIndex = 0;
     }
 
+    public bool IsSlotAvailable()
+    {
+        return (slotIndex != slotCount);
+    }
+
     public Transform GetAchievementSlot()
     {
-        if (slotIndex == slotCount)
-        {
-            slotIndex = 0;
-        }
-
         // Index updates after variable (slotIndex) is returned
         return achievementSlots[slotIndex++];
     }

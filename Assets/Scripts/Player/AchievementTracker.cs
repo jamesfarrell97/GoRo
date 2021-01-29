@@ -170,7 +170,12 @@ public class AchievementTracker : MonoBehaviour
         PhotonView PlayerView = PhotonView.Find(playerID);
         PhotonView AchievementView = PhotonView.Find(achievermentID);
 
-        Transform achievementSlot = PlayerView.gameObject.GetComponentInChildren<Boat>().GetAchievementSlot();
+        Boat PlayerBoat = PlayerView.gameObject.GetComponentInChildren<Boat>();
+
+        // Is there a slot available?
+        if (!PlayerBoat.IsSlotAvailable()) return;
+
+        Transform achievementSlot = PlayerBoat.GetAchievementSlot();
 
         AchievementView.gameObject.transform.SetPositionAndRotation(achievementSlot.position, achievementSlot.rotation);
         AchievementView.gameObject.transform.SetParent(achievementSlot);

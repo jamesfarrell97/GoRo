@@ -29,6 +29,120 @@ MonoBehaviour:
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
+  - m_GUID: 40ae9b94adc630a47b90c3ac42336e71
+    m_Address: Assets/Materials/Player/Achievements/Light Grey.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 3795802c57b8b0947becc8a35a90d269
+    m_Address: Assets/Materials/Player/Achievements/Black.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 0f8377e2e68c90c4bbc3479a107c1fdf
+    m_Address: Assets/Materials/Player/Achievements/Grey.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 737b3f3e6ef492f4e89829a8acb5bab1
+    m_Address: Assets/Materials/Player/Achievements/White.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: ece0bc8f41009f34a9b80cd7b80280fc
+    m_Address: Assets/Materials/Player/Achievements/Silver.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 558d23693c69dbf40b04a1cd9adc2a4b
+    m_Address: Assets/Materials/Player/Achievements/Gold.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 3471b970f304c924b80ac156a2d804c5
+    m_Address: Assets/Materials/Player/Achievements/Green.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 94dee6e61cc59414fb128ff5f0d78e2c
+    m_Address: Assets/Materials/Player/Achievements/Bronze.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: e90ae49838e46c547941689acbd0de3f
+    m_Address: Assets/Materials/Player/Achievements/Blue.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: a08c42832ed26dd4ab3755e60aa50f71
+    m_Address: Assets/Materials/Player/Achievements/Cyan.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 6732aea2281e8474ba1332fbc34ac715
+    m_Address: Assets/Materials/Player/Achievements/Orange.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 7967013490187aa4ba7d7b0a6fa2e0be
+    m_Address: Assets/Materials/Player/Achievements/Purple.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: c670f3a34844c0a4d94549702bc42b66
+    m_Address: Assets/Materials/Player/Achievements/Yellow.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: a02c0fd7d6949a64686a18ee4cfbc06b
+    m_Address: Assets/Materials/Player/Boat/White.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 5596414ece8e460448283097471c075d
+    m_Address: Assets/Materials/Player/Boat/Red.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 85323f3d05dacbc4fa58bc5eb22e05de
+    m_Address: Assets/Materials/Player/Boat/Steel.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: b02a97007412fab40a5592272b2759a5
+    m_Address: Assets/Materials/Player/Boat/Black.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 6111f0161c5885a419501b04f03e3e8c
+    m_Address: Assets/Materials/Player/Boat/Red Plastic.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 3b7593afd8ac32f46bd8ad1ddd488fc2
+    m_Address: Assets/Materials/Player/Boat/White Plastic.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 46fc3d082b08c4dacacae72d7016c235, type: 2}
   m_SchemaSet:

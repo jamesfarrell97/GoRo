@@ -167,12 +167,12 @@ public class AchievementTracker : MonoBehaviour
     [PunRPC]
     private void PlaceAchievement(int playerID, int achievermentID)
     {
-        PhotonView PV = PhotonView.Find(playerID);
-        PhotonView AV = PhotonView.Find(achievermentID);
+        PhotonView PlayerView = PhotonView.Find(playerID);
+        PhotonView AchievementView = PhotonView.Find(achievermentID);
 
-        Transform achievementSlot = PV.gameObject.GetComponentInChildren<Boat>().GetAchievementSlot();
+        Transform achievementSlot = PlayerView.gameObject.GetComponentInChildren<Boat>().GetAchievementSlot();
 
-        AV.gameObject.transform.SetPositionAndRotation(achievementSlot.position, achievementSlot.rotation);
-        AV.gameObject.transform.SetParent(achievementSlot);
+        AchievementView.gameObject.transform.SetPositionAndRotation(achievementSlot.position, achievementSlot.rotation);
+        AchievementView.gameObject.transform.SetParent(achievementSlot);
     }
 }

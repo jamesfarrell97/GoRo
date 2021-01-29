@@ -230,7 +230,7 @@ public class PMCommunication : MonoBehaviour
         BluetoothLEHardwareInterface.RequestMtu(DeviceAddress, 247, (address, newMTU) => {
 
             StatusMessage = "MTU set to " + newMTU.ToString();
-            SetState(States.Subscribe, 1f);
+            SetState(States.Read, 1f);
         });
     }
 
@@ -265,7 +265,7 @@ public class PMCommunication : MonoBehaviour
 
             StatusMessage = "Write Succeeded";
 
-            SetState(States.Write, 1f);
+            SetState(States.Connected, 1f);
 
             //if (!connected)
             //{
@@ -282,13 +282,22 @@ public class PMCommunication : MonoBehaviour
     {
         StatusMessage = "Reading characteristics...";
 
-        BluetoothLEHardwareInterface.ReadCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMTransmitCharacteristic, (characteristicUUID, rawBytes) => {
+        BluetoothLEHardwareInterface.ReadCharacteristic(DeviceAddress, PMDictionary.RowingServiceUUID, PMDictionary.GeneralRowingStatusCharacteristicUUID, (characteristicUUID, rawBytes) => {
 
             BluetoothLEHardwareInterface.Log("Read Succeeded");
 
+            string s = "";
+
+            foreach (byte b in rawBytes)
+            {
+                s += Convert.ToInt32(b).ToString() + ", ";
+            }
+
+            StatusMessage = "{" + s + "}";
+
             RowingData = rawBytes;
 
-            SetState(States.Write, 3f);
+            SetState(States.Connected, 3f);
         });
     }
 

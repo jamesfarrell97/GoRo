@@ -76,12 +76,12 @@ public class Stats : MonoBehaviour
 
     private void UpdateStats()
     {
-        // TODO: PULL VALUES FROM CONCEPT2
-        //
-        // MetersRowed = PMCommunication.RowingData[1];
-        // StrokePower = PMCommunication.RowingData[2];
-        // StrokesPerMin = PMCommunication.RowingData[3];
-        // DriveLength = PMCommunication.RowingData[4];
+        MetersRowed   = BluetoothManager.RowingStatusData[3] * 10;      // Distance Lo
+        SecondsRowing = BluetoothManager.RowingStatusData[0] * 100;     // Elapsed Time Lo
+
+        StrokePower   = BluetoothManager.RowingStatusData[16];          // Average Power Lo
+        StrokesPerMin = BluetoothManager.RowingStatusData1[5];          // Stroke Rate
+        DriveLength   = BluetoothManager.StrokeData[6];                 // Drive Length
     }
 
     private void ResetStats()

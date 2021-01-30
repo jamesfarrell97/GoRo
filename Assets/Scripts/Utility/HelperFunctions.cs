@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
 
-public class HelperFunctions : MonoBehaviour
+public static class HelperFunctions
 {
     public static int[] SecondsToHMS(int seconds)
     {
@@ -9,5 +9,13 @@ public class HelperFunctions : MonoBehaviour
         int h = m / 60;
 
         return new int[] { h, m, s };
+    }
+
+    // Code referenced: https://www.codegrepper.com/code-examples/csharp/c%23+get+array+subarray
+    public static T[] SubArray<T>(this T[] array, int offset, int length)
+    {
+        T[] result = new T[length];
+        Array.Copy(array, offset, result, 0, length);
+        return result;
     }
 }

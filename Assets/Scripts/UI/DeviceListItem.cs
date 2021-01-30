@@ -13,11 +13,11 @@ public class DeviceListItem : MonoBehaviour
     public TMP_Text DeviceStatus;
     public bool Connected;
 
-    private PMCommunication PMCommunication;
+    private BluetoothManager BluetoothManager;
 
     public void SetUp(DeviceObject device)
     {
-        PMCommunication = FindObjectOfType<PMCommunication>();
+        BluetoothManager = FindObjectOfType<BluetoothManager>();
 
         DeviceID = DeviceListItemID;
 
@@ -32,7 +32,7 @@ public class DeviceListItem : MonoBehaviour
 
     public void OnConnectClick(DeviceListItem deviceListItem)
     {
-        PMCommunication.OnConnectClick(deviceListItem);
+        BluetoothManager.OnConnectClick(deviceListItem);
     }
 
     public void Connect()

@@ -31,6 +31,14 @@ public class PlayerController : MonoBehaviour
     private bool rotateLeft = false;
     private bool rotateRight = false;
 
+    private float currDist = 0;
+    private float prevDist = 0;
+    private float currTime = 0;
+    private float prevTime = 0;
+    private float deltDist = 0;
+    private float deltTime = 0;
+    private float velocity = 0;
+
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
@@ -49,10 +57,6 @@ public class PlayerController : MonoBehaviour
         Destroy(rigidBody);
     }
 
-    float currentDistance = 0;
-    float previousDistance = 0;
-    float rowingVelocity = 0;
-
     private void Update()
     {
         if (!photonView.IsMine) return;
@@ -61,83 +65,81 @@ public class PlayerController : MonoBehaviour
 
         if (!allowedMove) return;
 
-        // RowingData[3] == DistanceLo
-        // RowingData[4] == DistanceMid
-        // RowingData[5] == DistanceHigh
+        // RowingStatusData[0] == TimeLo
+        // RowingStatusData[3] == DistanceLo
 
-        // RowingData[11] == Total WorkDistanceLo
-        // RowingData[12] == Total WorkDistanceMid
-        // RowingData[13] == Total WorkDistanceHigh
+        currDist = BluetoothManager.RowingStatusData[3] * 10;   // Convert to meters
+        currTime = BluetoothManager.RowingStatusData[0] * 100;  // Convert to seconds
 
-        //currentDistance = PMCommunication.RowingData[3];
+        deltDist = currDist - prevDist;
+        deltTime = currTime - prevTime;
 
-        //currentDistance = currentDistance + 0.001f;
+        velocity = deltDist / deltTime;
 
-        //float velocity = currentDistance - previousDistance / Time.deltaTime;
+        rigidBody.AddForce(-transform.forward * boatSpeed * Mathf.Abs(velocity / 100));
 
-        //rigidBody.AddForce(-transform.forward * boatSpeed * Mathf.Abs(velocity / 1000));
+        prevDist = currDist;
+        prevTime = currTime;
 
-        //previousDistance = currentDistance;
+        //if (Input.GetKey(KeyCode.W))
+        //{
+        //    rigidBody.AddForce(transform.forward * boatSpeed);
+        //}
+        //else if (Input.GetKey(KeyCode.S))
+        //{
+        //    rigidBody.AddForce(-transform.forward * boatSpeed);
+        //}
+        //else if (Input.GetKey(KeyCode.A))
+        //{
+        //    rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        //}
+        //else if (Input.GetKey(KeyCode.D))
+        //{
+        //    rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        //}
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            rigidBody.AddForce(transform.forward * boatSpeed);
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            rigidBody.AddForce(-transform.forward * boatSpeed);
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        }
+        //if (Input.GetKey(KeyCode.Q))
+        //{
+        //    rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        //}
+        //else if (Input.GetKey(KeyCode.E))
+        //{
+        //    rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        //}
 
-        if (Input.GetKey(KeyCode.Q))
-        {
-            rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        }
-        else if (Input.GetKey(KeyCode.E))
-        {
-            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        }
+        //if (moveForward)
+        //{
+        //    rigidBody.AddForce(transform.forward * boatSpeed);
+        //}
 
-        if (moveForward)
-        {
-            rigidBody.AddForce(transform.forward * boatSpeed);
-        }
+        //if (moveBack)
+        //{
+        //    rigidBody.AddForce(-transform.forward * boatSpeed);
+        //}
 
-        if (moveBack)
-        {
-            rigidBody.AddForce(-transform.forward * boatSpeed);
-        }
+        //if (moveLeft)
+        //{
+        //    rigidBody.AddForce(-transform.right * boatSpeed);
+        //}
 
-        if (moveLeft)
-        {
-            rigidBody.AddForce(-transform.right * boatSpeed);
-        }
+        //if (moveRight)
+        //{
+        //    rigidBody.AddForce(transform.right * boatSpeed);
+        //}
 
-        if (moveRight)
-        {
-            rigidBody.AddForce(transform.right * boatSpeed);
-        }
+        //if (rotateLeft)
+        //{
+        //    rigidBody.AddTorque(transform.up * boatTurningSpeed);
+        //}
 
-        if (rotateLeft)
-        {
-            rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        }
-
-        if (rotateRight)
-        {
-            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        }
+        //if (rotateRight)
+        //{
+        //    rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+        //}
 
         foreach (Animator animator in rowingAnimators)
         {
-            if (rigidBody.velocity.magnitude > 1)
+            if (deltDist > 0)
             {
                 animator.SetBool("Play", true);
             }

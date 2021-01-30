@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
+using System;
 
-using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
-using System;
-using System.Text;
 
-public static class PMDictionary
+public class PMDictionary
 {
     public static string DeviceUUID = "ce060000-43e5-11e4-916c-0800200c9a66";
 
@@ -24,10 +22,9 @@ public static class PMDictionary
     public static string C2PMControlServiceUUID = "ce060020-43e5-11e4-916c-0800200c9a66";
     public static string C2PMReceiveCharacteristic = "ce060021-43e5-11e4-916c-0800200c9a66";
     public static string C2PMTransmitCharacteristic = "ce060022-43e5-11e4-916c-0800200c9a66";
-
 }
 
-public class PMCommunication : MonoBehaviour
+public class BluetoothManager : MonoBehaviour
 {
     [SerializeField] Transform DeviceListContent;
     [SerializeField] GameObject DeviceListItemPrefab;
@@ -38,9 +35,9 @@ public class PMCommunication : MonoBehaviour
     
     private float Timeout = 0f;
 
-    public static byte[] RowingData { get; private set; }
+    public static Dictionary<string, byte[]> RowingData { get; private set; }
 
-    public TMP_Text StatusText;
+    [SerializeField] TMP_Text StatusText;
     private string StatusMessage
     {
         set
@@ -50,7 +47,7 @@ public class PMCommunication : MonoBehaviour
         }
     }
 
-    public TMP_Text ErrorText;
+    [SerializeField] TMP_Text ErrorText;
     private string ErrorMessage
     {
         set
@@ -60,13 +57,13 @@ public class PMCommunication : MonoBehaviour
         }
     }
 
-    enum States
+    private enum States
     {
         None,
         Scan,
         ScanRSSI,
         Connect,
-        Connected,
+        Subscribed,
         RequestMTU,
         Notify,
         Write,
@@ -78,39 +75,78 @@ public class PMCommunication : MonoBehaviour
 
     private States State;
 
+    public static BluetoothManager instance;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }
+
     private void Start()
     {
         ResetDevices();
         Initialize();
     }
 
-    private void Initialize()
+    private void Update()
     {
-        BluetoothLEHardwareInterface.Initialize(true, false, () => {
+        if (Timeout > 0f)
+        {
+            Timeout -= Time.deltaTime;
 
-            SetState(States.Scan, 0.1f);
+            if (Timeout <= 0f)
+            {
+                Timeout = 0f;
 
-        }, (error) => {
+                switch (State)
+                {
+                    case States.None:
+                        break;
 
-            ErrorMessage = "Initialize Error: " + error;
-        });
-    }
+                    case States.Subscribed:
+                        Subscribed();
+                        break;
 
-    private void ScanForPM()
-    {
-        FoundDeviceListScript.DeviceAddressList = new List<DeviceObject>();
+                    case States.Scan:
+                        ScanForPM();
+                        break;
 
-        string[] Concept2UUID = new string[] { PMDictionary.DeviceUUID };
+                    case States.Connect:
+                        Connect();
+                        break;
 
-        BluetoothLEHardwareInterface.ScanForPeripheralsWithServices(Concept2UUID, (address, name) => {
+                    case States.RequestMTU:
+                        RequestMTU();
+                        break;
 
-            DeviceObject dObj = new DeviceObject(address, name);
+                    case States.Write:
+                        WriteCharacteristic();
+                        break;
 
-            FoundDeviceListScript.DeviceAddressList.Add(dObj);
+                    case States.Read:
+                        ReadCharacteristic();
+                        break;
 
-            UpdateDeviceList(dObj);
+                    case States.Subscribe:
+                        SubscribeCharacteristic();
+                        break;
 
-        }, null);
+                    case States.Disconnect:
+                        Disconnect();
+                        break;
+                }
+            }
+        }
     }
 
     public void OnConnectClick(DeviceListItem deviceListItem)
@@ -141,55 +177,38 @@ public class PMCommunication : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void Initialize()
     {
-        if (Timeout > 0f)
-        {
-            Timeout -= Time.deltaTime;
+        BluetoothLEHardwareInterface.Initialize(true, false, () => {
 
-            if (Timeout <= 0f)
-            {
-                Timeout = 0f;
+            SetState(States.Scan, 0.1f);
 
-                switch (State)
-                {
-                    case States.None:
-                        break;
+        }, (error) => {
 
-                    case States.Connected:
-                        Connected();
-                        break;
+            ErrorMessage = "Initialize Error: " + error;
+        });
+    }
 
-                    case States.Scan:
-                        ScanForPM();
-                        break;
+    private void Subscribed()
+    {
+        Launcher.Instance.ConnectedToPerformanceMonitor();
+    }
 
-                    case States.Connect:
-                        Connect();
-                        break;
-                        
-                    case States.RequestMTU:
-                        RequestMTU();
-                        break;
+    private void ScanForPM()
+    {
+        FoundDeviceListScript.DeviceAddressList = new List<DeviceObject>();
 
-                    case States.Write:
-                        WriteCharacteristic();
-                        break;
+        string[] Concept2UUID = new string[] { PMDictionary.DeviceUUID };
 
-                    case States.Read:
-                        ReadCharacteristic();
-                        break;
+        BluetoothLEHardwareInterface.ScanForPeripheralsWithServices(Concept2UUID, (address, name) => {
 
-                    case States.Subscribe:
-                        SubscribeCharacteristic();
-                        break;
+            DeviceObject dObj = new DeviceObject(address, name);
 
-                    case States.Disconnect:
-                        Disconnect();
-                        break;
-                }
-            }
-        }
+            FoundDeviceListScript.DeviceAddressList.Add(dObj);
+
+            UpdateDeviceList(dObj);
+
+        }, null);
     }
 
     private void Connect()
@@ -212,17 +231,7 @@ public class PMCommunication : MonoBehaviour
 
         }, null);
     }
-
-    bool connected = false;
-
-    private void Connected()
-    {
-        Launcher.Instance.ConnectedToPerformanceMonitor();
-
-        //SetState(States.Write, 1f);
-        //connected = true;
-    }
-
+    
     private void RequestMTU()
     {
         StatusMessage = "Requesting MTU";
@@ -234,30 +243,11 @@ public class PMCommunication : MonoBehaviour
         });
     }
 
-
     private void WriteCharacteristic()
     {
         StatusMessage = "Writing characteristic...";
 
-        //byte[] data = CSAFECommand.Write(new string[] { "CSAFE_GETVERSION_CMD" }).ToArray();
-
-        byte[] data = CSAFECommand.Write(new string[] { "CSAFE_GETHORIZONTAL_CMD" }).ToArray();
-
-        //byte[] data = new byte[] { 0x01, 0xF1, 0x7F, 0x03, 0x57, 0x01, 0x00, 0x2A, 0xF2,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        //                0x00, 0x00 };
+        byte[] data = CSAFECommand.Write(new string[] { "CSAFE_STATUS_CMD" }).ToArray();
 
         BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data, data.Length, true, (characteristicUUID1) => {
 
@@ -265,16 +255,7 @@ public class PMCommunication : MonoBehaviour
 
             StatusMessage = "Write Succeeded";
 
-            SetState(States.Connected, 1f);
-
-            //if (!connected)
-            //{
-            //    SetState(States.Connected, 3f);
-            //} 
-            //else
-            //{
-            //    SetState(States.Write, 1f);
-            //}
+            SetState(States.Write, 1f);
         });
     } 
 
@@ -286,20 +267,11 @@ public class PMCommunication : MonoBehaviour
 
             BluetoothLEHardwareInterface.Log("Read Succeeded");
 
-            string s = "";
-
-            foreach (byte b in rawBytes)
-            {
-                s += Convert.ToInt32(b).ToString() + ", ";
-            }
-
-            StatusMessage = "{" + s + "}";
-
-            RowingData = rawBytes;
-
-            SetState(States.Connected, 3f);
+            SetState(States.Read, 1f);
         });
     }
+
+    private List<string> MultiplexedCharacteristics = new List<string>(){ "31", "32", "33", "35", "36", "37", "38", "39", "3A", "3B", "3C" };
 
     private void SubscribeCharacteristic()
     {
@@ -307,63 +279,31 @@ public class PMCommunication : MonoBehaviour
 
         BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMTransmitCharacteristic, (action1) =>
         {
-            // Inspection Breakpoint
-            var a1 = action1;
-
             BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.RowingServiceUUID, PMDictionary.MultiplexedInformationCharacteristic, (action2) =>
             {
-                // Inspection Breakpoint
-                var a2 = action2;
-
-                SetState(States.Write, 1f);
-
-                //BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.DeviceInfoService, PMDictionary.SerialNumberStringCharacteristic, (action3) =>
-                //{
-                //    // Breakpoint
-                //    var a3 = action3;
-
-                //    BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.DeviceInfoService, PMDictionary.HardwareRevisionStringCharacteristic, (action4) =>
-                //    {
-                //        // Breakpoint
-                //        var a4 = action4;
-
-                //        BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.DeviceInfoService, PMDictionary.FirmwareRevisionStringCharacteristic, (action5) =>
-                //        {
-                //            // Breakpoint
-                //            var a5 = action5;
-
-                //            SetState(States.Write, 3f);
-
-                //        }, (characteristicUUID, rawBytes) =>
-                //        {
-                //            // Breakpoint
-                //            var a = rawBytes;
-                //        });
-
-                //    }, (characteristicUUID, rawBytes) =>
-                //    {
-                //        // Breakpoint
-                //        var a = rawBytes;
-                //    });
-
-                //}, (characteristicUUID, rawBytes) =>
-                //{
-                //    // Breakpoint
-                //    var a = rawBytes;
-                //});
+                // Successfully subscribed to updates
+                SetState(States.Subscribed, 1f);
 
             }, (characteristicUUID, rawBytes) =>
             {
-                // Inspection Breakpoint
-                var a = CSAFECommand.Read(rawBytes);
+                // Convert first byte to hex
+                string key = Convert.ToInt32(rawBytes[0]).ToString("X");
+                
+                // If valid multiplexed data
+                if (MultiplexedCharacteristics.Contains(key))
+                {
+                    // Process into seperate arrays
+                    ProcessData(rawBytes);
+                }
             });
 
         }, (characteristicUUID, rawBytes) =>
         {
-            // Inspection Breakpoint
-            var a = CSAFECommand.Read(rawBytes);
+            // Convert first byte to hex
+            string key = Convert.ToInt32(rawBytes[0]).ToString("X");
 
-            //SetState(States.Connected, 1f);
+            // Update RowingData
+            RowingData.Add(key, rawBytes);
         });
     }
 
@@ -380,7 +320,8 @@ public class PMCommunication : MonoBehaviour
                 DeviceListItem.Disconnect();
                 DeviceAddress = null;
 
-                SetState(States.None, 1f);
+                ResetList();
+                ResetDevices();
             });
         });
     }
@@ -430,5 +371,92 @@ public class PMCommunication : MonoBehaviour
         SetState(States.Scan, 1f);
 
         ResetList();
+    }
+    
+    public static byte[] RowingStatusData = new byte[19];
+    public static byte[] RowingStatusData1 = new byte[19];
+    public static byte[] RowingStatusData2 = new byte[18];
+
+    public static byte[] StrokeData = new byte[18];
+    public static byte[] StrokeData1 = new byte[17];
+
+    public static byte[] SplitIntervalData = new byte[18];
+    public static byte[] SplitIntervalData1 = new byte[18];
+
+    public static byte[] HeartRateData = new byte[6];
+
+    public static byte[] EndOfWorkoutData = new byte[18];
+    public static byte[] EndOfWorkoutData1 = new byte[18];
+    public static byte[] EndOfWorkoutData2 = new byte[10];
+
+    private void ProcessData(byte[] data)
+    {
+        const byte RowingStatus0 = 0x031;
+        const byte RowingStatus1 = 0x032;
+        const byte RowingStatus2 = 0x033;
+
+        const byte Stroke = 0x035;
+        const byte Stroke1 = 0x036;
+
+        const byte SplitInterval = 0x037;
+        const byte SplitInterval1 = 0x038;
+
+        const byte HeartRate = 0x03B;
+
+        const byte EndOfWorkout = 0x039;
+        const byte EndOfWorkout1 = 0x03A;
+        const byte EndOfWorkout2 = 0x03C;
+
+        int Characteristic = Convert.ToInt32(data[0]);
+
+        int offset = 1;
+        int length = data.Length - 1;
+
+        switch (Characteristic)
+        {
+            case RowingStatus0:
+                RowingStatusData = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case RowingStatus1:
+                RowingStatusData1 = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case RowingStatus2:
+                RowingStatusData2 = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case Stroke:
+                StrokeData = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case Stroke1:
+                StrokeData1 = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case SplitInterval:
+                SplitIntervalData = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case SplitInterval1:
+                SplitIntervalData1 = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case HeartRate:
+                HeartRateData = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case EndOfWorkout:
+                EndOfWorkoutData = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case EndOfWorkout1:
+                EndOfWorkoutData1 = HelperFunctions.SubArray(data, offset, length);
+                break;
+
+            case EndOfWorkout2:
+                EndOfWorkoutData2 = HelperFunctions.SubArray(data, offset, length);
+                break;
+        }
     }
 }

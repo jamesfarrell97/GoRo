@@ -28,6 +28,6 @@ public class PlayerManager : MonoBehaviour
 
     private void CreateController()
     {
-        PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player", "Player"), new Vector3(-250, 0.55f, -1000), Quaternion.identity);
+        PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player", "Player"), new Vector3(-258, 0.55f, -1027), Quaternion.identity);
     }
 }

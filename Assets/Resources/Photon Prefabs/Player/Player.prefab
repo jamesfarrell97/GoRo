@@ -513,14 +513,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1030232925536891795}
-  - component: {fileID: 5713990635216331756}
   m_Layer: 14
   m_Name: Tracked Objects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1030232925536891795
 Transform:
   m_ObjectHideFlags: 0
@@ -538,26 +537,6 @@ Transform:
   m_Father: {fileID: 544200170205449594}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5713990635216331756
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2980988315032172663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d53b0fe8b84b3df4d894dd915c5b00cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  trackPositions:
-  - {fileID: 3543557081932316719}
-  - {fileID: 5002740088752945365}
-  - {fileID: 1765213440453254823}
-  - {fileID: 8336659236843852772}
-  - {fileID: 8049211549034843166}
-  - {fileID: 7645117762639413654}
-  speed: 5
 --- !u!1 &3004531319348594440
 GameObject:
   m_ObjectHideFlags: 0
@@ -937,7 +916,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 549606936477510173}
+        - m_Target: {fileID: 7977840259449109546}
           m_MethodName: StartATimeTrial
           m_Mode: 1
           m_Arguments:
@@ -2968,7 +2947,6 @@ GameObject:
   - component: {fileID: 6543703448051235227}
   - component: {fileID: 6543703448051235224}
   - component: {fileID: 6543703448051235225}
-  - component: {fileID: 549606936477510173}
   - component: {fileID: 688560699970769450}
   m_Layer: 14
   m_Name: Boat
@@ -3012,8 +2990,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boat: {fileID: 1058638635569168776}
-  boatSpeed: 12
+  boatSpeed: 0
   boatTurningSpeed: 1
+  participatingInRace: 0
+  participatingInTimeTrial: 0
   route: []
 --- !u!114 &1058638635569168776
 MonoBehaviour:
@@ -3108,29 +3088,6 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
---- !u!114 &549606936477510173
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6543703448051235228}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c3141371ca6c344e934c28b329844ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  route: []
-  boat: {fileID: 1058638635569168776}
-  speed: 0
-  startMovement: 0
-  rotationSpeedInRadians: 0.2
-  waypointIndex: 0
-  currentLap: 1
-  amountOfLaps: 0
-  timeOfCompletion: 0
-  currentRace: {fileID: 0}
-  currentTimeTrial: {fileID: 0}
 --- !u!114 &688560699970769450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3143,6 +3100,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5cb22d331ef7d64796f917c6a455a32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveTarget: 0
+  currentLap: 1
+  amountOfLaps: 0
+  halfPointOftrackReached: 0
+  lastIndex: 0
+  timeOfCompletion: 0
+  currentRace: {fileID: 0}
+  currentTimeTrial: {fileID: 0}
   Circuit: {fileID: 0}
   lookAheadForTargetOffset: 0.25
   lookAheadForTargetFactor: 0.1
@@ -3151,6 +3116,7 @@ MonoBehaviour:
   progressStyle: 0
   pointToPointThreshold: 4
   target: {fileID: 544200170205449594}
+  progressDistance: 0
 --- !u!1 &6956221329685377023
 GameObject:
   m_ObjectHideFlags: 0
@@ -3349,7 +3315,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 549606936477510173}
+      - m_Target: {fileID: 688560699970769450}
         m_MethodName: UpdateSpeedOfBoat
         m_Mode: 2
         m_Arguments:
@@ -3571,7 +3537,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 549606936477510173}
+        - m_Target: {fileID: 7977840259449109546}
           m_MethodName: StartARace
           m_Mode: 1
           m_Arguments:

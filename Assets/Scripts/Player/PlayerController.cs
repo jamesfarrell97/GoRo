@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
 using UnityStandardAssets.Utility;
 
@@ -9,8 +11,10 @@ using UnityStandardAssets.Utility;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] Boat boat;
-    [SerializeField] float boatSpeed = 30f;
+    [SerializeField] public float boatSpeed = 0f;
     [SerializeField] float boatTurningSpeed = 1f;
+    [SerializeField] public bool participatingInRace = false;
+    [SerializeField] public bool participatingInTimeTrial = false;
 
     [SerializeField] public Transform[] route;
 
@@ -41,7 +45,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
+        //GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
 
         if (photonView.IsMine) return;
 
@@ -68,6 +72,26 @@ public class PlayerController : MonoBehaviour
         CalculateVelocity();
         CalculateTurnAngle();
     }
+
+    #region Race/Time Trial Event Methods
+    public void StartARace()
+    {
+        if (participatingInTimeTrial == false && participatingInRace == false)
+        {
+            participatingInRace = true;
+            GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(boat);
+        }
+    }
+
+    public void StartATimeTrial()
+    {
+        //if (participatingInRace == false && participatingInTimeTrial == false)
+        //{
+        //    participatingInTimeTrial = true;
+        //    GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(boat);
+        //}
+    }
+    #endregion
 
     public void CalculateVelocity()
     {

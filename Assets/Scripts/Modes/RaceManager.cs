@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityStandardAssets.Utility;
 
 public class RaceManager : MonoBehaviour
 {
@@ -39,12 +40,15 @@ public class RaceManager : MonoBehaviour
     //waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
     public void AddPlayerToRace(Boat player)
     {
-        Race heroBeachRace = GameObject.Find("HeroBeachRace").GetComponent<Race>();
+        Race heroBeachRace = GameObject.Find("Hero Beach Island Race").GetComponent<Race>();
+        //player.GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
+        player.GetComponent<WaypointProgressTracker>().Circuit = GameObject.Find("Hero Beach Island Race").GetComponent<WaypointCircuit>();
+        player.GetComponent<WaypointProgressTracker>().currentRace = heroBeachRace;
+        player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachRace.route.Length-1;
         heroBeachRace.raceInitiated = true;
         heroBeachRace.timeRaceInitiated = Time.timeSinceLevelLoad;
         heroBeachRace.numberOfLaps = 1;
         heroBeachRace.raceCapacity = 1;
-        player.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().currentRace = heroBeachRace;
         heroBeachRace.AddParticipantIntoRace(player);
     }
     

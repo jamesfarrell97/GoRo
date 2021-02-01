@@ -15,7 +15,6 @@ public class Race : MonoBehaviour
     [SerializeField] public List<Boat> participants;
     [SerializeField] public Dictionary<int, Boat> participantsCompletedRace;
 
-
     [SerializeField] public int numberOfLaps;
     [SerializeField] public int raceCapacity;
 
@@ -50,13 +49,12 @@ public class Race : MonoBehaviour
         if(participants.Count < raceCapacity)
         {
             participants.Add(player);
-            player.GetComponent<Boat>().GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();            
-            player.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().amountOfLaps = numberOfLaps;
-            player.transform.position = route[0].position;
-            player.transform.LookAt(route[1].position);
+            //player.GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
+            //GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
+            player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
+            //player.transform.position = route[0].position;
+            //player.transform.LookAt(route[1].position);
 
-
-            string s = "";
             //Vector3 vector = route[1].position - player.transform.position;
             //player.transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, vector, 0f * Time.deltaTime, 0.0f));
         }
@@ -130,9 +128,8 @@ public class Race : MonoBehaviour
             //{
             //    //Make participant transparent
             //}            
-            
-            participant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().startMovement = true;
-            //participant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().speed = 2f;
+
+            participant.GetComponent<WaypointProgressTracker>().moveTarget = true;
         }
 
         raceInProgress = true;
@@ -190,13 +187,15 @@ public class Race : MonoBehaviour
         countdown = 3f;
         currentTimeInCountdown = 0;
         timeRaceInitiated = 0;
+        racePositionIndex = 1;
     }
 
     private void ResetRaceStatsForParticipants()
     {
         foreach(Boat player in participants)
         {
-            player.GetComponent<DictatePlayerMovement>().ResetPlayerEventData();
+            player.GetComponent<PlayerController>().participatingInRace = false;
+            //player.GetComponent<DictatePlayerMovement>().ResetPlayerEventData();
             //Transform player back to start point, could later make it(random), 
             //to perhaps overlook oher races whilst in neutral mood
             //player.transform.position = new Vector3(-258, 0.55f, -1027); 

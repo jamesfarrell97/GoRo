@@ -34,7 +34,6 @@ public class TimeTrialManager : MonoBehaviour
         heroBeachTimeTrial.timeTrialInitiated = true;
         heroBeachTimeTrial.timeTheTimeTrialInitiated = Time.timeSinceLevelLoad;
         heroBeachTimeTrial.numberOfLaps = 1;
-        player.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().currentTimeTrial = heroBeachTimeTrial;
         heroBeachTimeTrial.AddParticipantIntoTimeTrial(player);
     }
 

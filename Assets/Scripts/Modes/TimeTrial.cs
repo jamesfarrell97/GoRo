@@ -64,10 +64,9 @@ public class TimeTrial : MonoBehaviour
     public void AddParticipantIntoTimeTrial(Boat player)
     {
         participant = player;
-        participant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().route = route;
-        participant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().amountOfLaps = numberOfLaps;
+        //participant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().route = route;
+        //participant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().amountOfLaps = numberOfLaps;
         participant.transform.position = route[0].position;
-        //participant.transform.LookAt(route[1].position);
     }
 
     //REf for basic countdown implementation: https://answers.unity.com/questions/369581/countdown-to-start-game.html
@@ -98,8 +97,8 @@ public class TimeTrial : MonoBehaviour
 
     private void StartTimeTrial()
     {
-        participant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().startMovement = true;
-        //participant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().speed = 2f;
+        //KEEPTHISparticipant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().startMovement = true;
+        //KEEPTHISparticipant.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().speed = 2f;
 
         timeTrialInProgress = true;
         timeTheTimeTrialStarted = Time.timeSinceLevelLoad;
@@ -129,7 +128,7 @@ public class TimeTrial : MonoBehaviour
     //Reset all datatypes back to their initial state, after a race is finished
     private void DisposeSessionResources()
     {
-        participant.GetComponent<DictatePlayerMovement>().ResetPlayerEventData();
+        //participant.GetComponent<DictatePlayerMovement>().ResetPlayerEventData();
         //participant.transform.position = new Vector3(-258, 0.55f, -1027);
         participant = null;
         timeTrialInitiated = false;

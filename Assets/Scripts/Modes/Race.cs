@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using UnityStandardAssets.Utility;
 
 public class Race : MonoBehaviour
 {
@@ -49,7 +50,7 @@ public class Race : MonoBehaviour
         if(participants.Count < raceCapacity)
         {
             participants.Add(player);
-            player.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().route = route;            
+            player.GetComponent<Boat>().GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();            
             player.GetComponent<Boat>().GetComponent<DictatePlayerMovement>().amountOfLaps = numberOfLaps;
             player.transform.position = route[0].position;
             player.transform.LookAt(route[1].position);

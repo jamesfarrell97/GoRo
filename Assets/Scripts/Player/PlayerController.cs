@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using UnityStandardAssets.Utility;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -11,8 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float boatSpeed = 30f;
     [SerializeField] float boatTurningSpeed = 1f;
 
-    [SerializeField] GameObject leftTurningPoint;
-    [SerializeField] GameObject rightTurningPoint;
+    [SerializeField] public Transform[] route;
 
     private BoxCollider boxCollider;
     private Rigidbody rigidBody;
@@ -41,7 +41,11 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
+
         if (photonView.IsMine) return;
+
+        previousPosition = transform.position;
 
         Destroy(GetComponentInChildren<Camera>().gameObject);
         Destroy(rigidBody);
@@ -49,67 +53,138 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+
+
+    }
+
+    private void FixedUpdate()
+    {
         if (!photonView.IsMine) return;
 
         achievementTracker.TrackAchievements(photonView, stats);
 
         if (!allowedMove) return;
 
-        if (Input.GetKey(KeyCode.W))
+        CalculateVelocity();
+        CalculateTurnAngle();
+    }
+
+    public void CalculateVelocity()
+    {
+        //currDist = BluetoothManager.RowingStatusData[3] * 10;   // Convert to meters
+        //currTime = BluetoothManager.RowingStatusData[0] * 100;  // Convert to seconds
+
+        //deltDist = currDist - prevDist;
+        //deltTime = currTime - prevTime;
+
+        //velocity = deltDist / deltTime;
+
+        //rigidBody.AddForce(-transform.forward * boatSpeed * Mathf.Abs(velocity / 100));
+
+        //prevDist = currDist;
+        //prevTime = currTime;
+
+        if (Input.GetKey(KeyCode.W) || moveForward)
         {
-            rigidBody.AddForce(transform.forward * boatSpeed);
+            speed = boatSpeed;
+            transform.position += transform.forward * speed;
         }
-        else if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.S) || moveBack)
         {
-            rigidBody.AddForce(-transform.forward * boatSpeed);
+            speed = -boatSpeed;
+            transform.position += transform.forward * speed;
         }
-        else if (Input.GetKey(KeyCode.A))
+    }
+
+    int nodeIndex = 0;
+    Transform currentNode;
+
+    private float distance = 0;
+    private float prevDist = 0;
+    private float angle = 0;
+    private float prevAngl = 0;
+    private float currTime = 0;
+    private float prevTime = 0;
+    private float deltaDistance = 0;
+    private float deltAngl = 0;
+    private float deltTime = 0;
+    private float time = 0;
+    private float velocity = 0;
+    private float speed = 0;
+
+    private Vector3 previousPosition;
+    private Vector3 cross;
+
+    private const float MIN_DISTANCE = 1f;
+
+    public void CalculateTurnAngle()
+    {
+        return;
+
+        // Only update if moving
+        if (speed == 0) return;
+
+
+        // Extract target node
+        //
+        // Doesn't need to called every update - performance intensive
+        // Remove in future iterations
+        Transform targetNode = route[nodeIndex];
+
+        // If the player is at the target node
+        if (Vector3.Distance(transform.position, targetNode.position) < 1f)
         {
-            rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
+            if (nodeIndex < route.Length - 1)
+            {
+                nodeIndex++;
+            }
+            else
+            {
+                nodeIndex = 0;
+            }
+
+            //// Iterate node
+            //nodeIndex = (nodeIndex < route.Length - 1) 
+            //    ? nodeIndex++ 
+            //    : 0;
+            return;
         }
 
-        if (Input.GetKey(KeyCode.Q))
-        {
-            rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        }
-        else if (Input.GetKey(KeyCode.E))
-        {
-            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        }
-        
-        if (moveForward)
-        {
-            rigidBody.AddForce(transform.forward * boatSpeed);
-        }
+        // Distance to target
+        distance = Vector3.Distance(transform.position, targetNode.position);
 
-        if (moveBack)
-        {
-            rigidBody.AddForce(-transform.forward * boatSpeed);
-        }
+        // Distance moved since last frame
+        deltaDistance = Vector3.Distance(transform.position, previousPosition);
 
-        if (moveLeft)
-        {
-            rigidBody.AddForce(-transform.right * boatSpeed);
-        }
+        // Direction to target position from current position
+        Vector3 direction = (targetNode.position - transform.position);
 
-        if (moveRight)
-        {
-            rigidBody.AddForce(transform.right * boatSpeed);
-        }
+        // Angle between current direction and target direction
+        angle = Vector3.SignedAngle(transform.forward, direction, Vector3.up);
 
-        if (rotateLeft)
-        {
-            rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        }
+        // Calculate velocity
+        // 1 units per timeStep
+        //velocity = deltaDistance / Time.fixedDeltaTime;
 
-        if (rotateRight)
-        {
-            rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        }
+        // Predicted time to reach node based on current velocity
+        // 20 / 2 
+        time = distance / deltaDistance;
+
+        // Required angle per time step to successfully face next node
+        angle = angle / time;
+
+        // Turn to face next node
+        transform.Rotate(Vector3.up, angle);
+
+        // Update values
+        previousPosition = transform.position;
+        prevDist = distance;
+
+        // Update position
+        transform.position = transform.position + (direction.normalized * speed);
+
+        //prevAngl = currAngl;
+        //prevTime = currTime;
     }
 
     public void MoveForward()
@@ -122,26 +197,6 @@ public class PlayerController : MonoBehaviour
         moveBack = true;
     }
 
-    public void MoveLeft()
-    {
-        moveLeft = true;
-    }
-
-    public void MoveRight()
-    {
-        moveRight = true;
-    }
-
-    public void RotateLeft()
-    {
-        rotateLeft = true;
-    }
-
-    public void RotateRight()
-    {
-        rotateRight = true;
-    }
-
     public void StopMoveForward()
     {
         moveForward = false;
@@ -152,34 +207,6 @@ public class PlayerController : MonoBehaviour
         moveBack = false;
     }
 
-    public void StopMoveLeft()
-    {
-        moveLeft = false;
-    }
-
-    public void StopMoveRight()
-    {
-        moveRight = false;
-    }
-
-    public void StopRotateLeft()
-    {
-        rotateLeft = false;
-    }
-
-    public void StopRotateRight()
-    {
-        rotateRight = false;
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.collider.tag.Equals("Obstacle"))
-        {
-            FindObjectOfType<AudioManager>().Play("Collision");
-        }    
-    }
-
     public void PauseMovement()
     {
         this.allowedMove = false;
@@ -188,5 +215,13 @@ public class PlayerController : MonoBehaviour
     public void ResumeMovement()
     {
         this.allowedMove = true;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.tag.Equals("Obstacle"))
+        {
+            FindObjectOfType<AudioManager>().Play("Collision");
+        }
     }
 }

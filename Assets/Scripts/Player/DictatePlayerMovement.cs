@@ -35,17 +35,17 @@ public class DictatePlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (startMovement == true)
-        {
-            LookAtTargetWaypoint();
-            distance = Vector3.Distance(transform.position, route[waypointIndex].position);
+        //if (startMovement == true)
+        //{
+        //    LookAtTargetWaypoint();
+        //    distance = Vector3.Distance(transform.position, route[waypointIndex].position);
 
-            if (distance < 3f)
-            {
-                IncreaseIndex();
-            }
-            Patrol();
-        }
+        //    if (distance < 3f)
+        //    {
+        //        IncreaseIndex();
+        //    }
+        //    Patrol();
+        //}
     }
 
     private void LookAtTargetWaypoint()

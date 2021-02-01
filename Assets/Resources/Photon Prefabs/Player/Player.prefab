@@ -451,7 +451,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1856003422794418536
 Transform:
   m_ObjectHideFlags: 0
@@ -601,7 +601,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b9930be78920de49969d8f41fe7cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidBody: {fileID: 6543703448051235231}
+  rigidBody: {fileID: 0}
   floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
@@ -794,7 +794,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b9930be78920de49969d8f41fe7cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidBody: {fileID: 6543703448051235231}
+  rigidBody: {fileID: 0}
   floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
@@ -1508,7 +1508,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b9930be78920de49969d8f41fe7cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidBody: {fileID: 6543703448051235231}
+  rigidBody: {fileID: 0}
   floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
@@ -2156,7 +2156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b9930be78920de49969d8f41fe7cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidBody: {fileID: 6543703448051235231}
+  rigidBody: {fileID: 0}
   floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
@@ -2241,7 +2241,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b9930be78920de49969d8f41fe7cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidBody: {fileID: 6543703448051235231}
+  rigidBody: {fileID: 0}
   floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
@@ -2368,7 +2368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b9930be78920de49969d8f41fe7cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidBody: {fileID: 6543703448051235231}
+  rigidBody: {fileID: 0}
   floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
@@ -2962,7 +2962,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 544200170205449594}
-  - component: {fileID: 6543703448051235231}
   - component: {fileID: 7977840259449109546}
   - component: {fileID: 1058638635569168776}
   - component: {fileID: 6543703448051235226}
@@ -2970,6 +2969,7 @@ GameObject:
   - component: {fileID: 6543703448051235224}
   - component: {fileID: 6543703448051235225}
   - component: {fileID: 549606936477510173}
+  - component: {fileID: 688560699970769450}
   m_Layer: 14
   m_Name: Boat
   m_TagString: Untagged
@@ -2999,22 +2999,6 @@ Transform:
   m_Father: {fileID: 9127280265979921555}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &6543703448051235231
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6543703448051235228}
-  serializedVersion: 2
-  m_Mass: 0.2
-  m_Drag: 0.0001
-  m_AngularDrag: 0.0001
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &7977840259449109546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3028,10 +3012,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boat: {fileID: 1058638635569168776}
-  boatSpeed: 3
+  boatSpeed: 12
   boatTurningSpeed: 1
-  leftTurningPoint: {fileID: 0}
-  rightTurningPoint: {fileID: 0}
+  route: []
 --- !u!114 &1058638635569168776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3148,6 +3131,26 @@ MonoBehaviour:
   timeOfCompletion: 0
   currentRace: {fileID: 0}
   currentTimeTrial: {fileID: 0}
+--- !u!114 &688560699970769450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6543703448051235228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5cb22d331ef7d64796f917c6a455a32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Circuit: {fileID: 0}
+  lookAheadForTargetOffset: 0.25
+  lookAheadForTargetFactor: 0.1
+  lookAheadForSpeedOffset: 10
+  lookAheadForSpeedFactor: 0.2
+  progressStyle: 0
+  pointToPointThreshold: 4
+  target: {fileID: 544200170205449594}
 --- !u!1 &6956221329685377023
 GameObject:
   m_ObjectHideFlags: 0
@@ -3221,7 +3224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b9930be78920de49969d8f41fe7cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidBody: {fileID: 6543703448051235231}
+  rigidBody: {fileID: 0}
   floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
@@ -4079,7 +4082,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b9930be78920de49969d8f41fe7cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidBody: {fileID: 6543703448051235231}
+  rigidBody: {fileID: 0}
   floaterCount: 8
   depthBeforeSubmerged: 1
   displacementAmount: 3
@@ -4401,7 +4404,8 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2465134475674024864, guid: 424ba705a7ed02e459d8d82bed643354, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 424ba705a7ed02e459d8d82bed643354, type: 3}
 --- !u!4 &7650562458477908305 stripped
 Transform:
@@ -4511,7 +4515,8 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 44695881408686075, guid: 3a605a142da8ba14f817b50f74d78f3b, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 3a605a142da8ba14f817b50f74d78f3b, type: 3}
 --- !u!4 &6044168213232185268 stripped
 Transform:

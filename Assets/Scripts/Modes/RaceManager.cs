@@ -16,7 +16,7 @@ public class RaceManager : MonoBehaviour
     #region Race Initiation Button Responses
     public void AddPlayerToHeroBeachRace()
     {
-        Race heroBeachRace = GameObject.Find("HeroBeachRace").GetComponent<Race>();
+        Race heroBeachRace = GameObject.Find("Hero Beach Island Race").GetComponent<Race>();
         if(heroBeachRace.raceInitiated == false)
         {
             //BringUpRaceSetupMenu
@@ -38,6 +38,7 @@ public class RaceManager : MonoBehaviour
 
     //HardCoded Method to reach simple solution for Base Version of the 
     //waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
+    //IMPORTANT: Everything being set in this method will need to be set for every player joining game, it is essential 
     public void AddPlayerToRace(Boat player)
     {
         Race heroBeachRace = GameObject.Find("Hero Beach Island Race").GetComponent<Race>();

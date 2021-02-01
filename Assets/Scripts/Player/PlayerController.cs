@@ -85,11 +85,11 @@ public class PlayerController : MonoBehaviour
 
     public void StartATimeTrial()
     {
-        //if (participatingInRace == false && participatingInTimeTrial == false)
-        //{
-        //    participatingInTimeTrial = true;
-        //    GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(boat);
-        //}
+        if (participatingInRace == false && participatingInTimeTrial == false)
+        {
+            participatingInTimeTrial = true;
+            GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(boat);
+        }
     }
     #endregion
 

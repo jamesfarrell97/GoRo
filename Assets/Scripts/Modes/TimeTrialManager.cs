@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityStandardAssets.Utility;
 
 public class TimeTrialManager : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class TimeTrialManager : MonoBehaviour
     #region Time Trial Initiation Button Responses
     public void AddPlayerToHeroBeachTimeTrial()
     {
-        TimeTrial heroBeachTimeTrial = GameObject.Find("HeroBeachTimeTrial").GetComponent<TimeTrial>();
+        TimeTrial heroBeachTimeTrial = GameObject.Find("Hero Beach Island Time Trial").GetComponent<TimeTrial>();
         if (heroBeachTimeTrial.timeTrialInitiated == false)
         {
             //BringUpRaceSetupMenu
@@ -30,7 +31,10 @@ public class TimeTrialManager : MonoBehaviour
     //waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
     public void AddPlayerToTimeTrial(Boat player)
     {
-        TimeTrial heroBeachTimeTrial = GameObject.Find("HeroBeachTimeTrial").GetComponent<TimeTrial>();
+        TimeTrial heroBeachTimeTrial = GameObject.Find("Hero Beach Island Time Trial").GetComponent<TimeTrial>();
+        player.GetComponent<WaypointProgressTracker>().Circuit = GameObject.Find("Hero Beach Island Time Trial").GetComponent<WaypointCircuit>();
+        player.GetComponent<WaypointProgressTracker>().currentTimeTrial = heroBeachTimeTrial;
+        player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachTimeTrial.route.Length - 1;
         heroBeachTimeTrial.timeTrialInitiated = true;
         heroBeachTimeTrial.timeTheTimeTrialInitiated = Time.timeSinceLevelLoad;
         heroBeachTimeTrial.numberOfLaps = 1;

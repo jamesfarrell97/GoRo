@@ -152,8 +152,6 @@ public class Race : MonoBehaviour
 
     private void UpdateStopWatch()
     {
-        //GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{(int)(timeSecs-timeRaceStarted)}";
-
         raceDuration = TimeSpan.FromSeconds(timeSecs - timeRaceStarted);
         GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{raceDuration.ToString(@"mm\:ss")}";
     }
@@ -195,10 +193,6 @@ public class Race : MonoBehaviour
         foreach(Boat player in participants)
         {
             player.GetComponent<PlayerController>().participatingInRace = false;
-            //player.GetComponent<DictatePlayerMovement>().ResetPlayerEventData();
-            //Transform player back to start point, could later make it(random), 
-            //to perhaps overlook oher races whilst in neutral mood
-            //player.transform.position = new Vector3(-258, 0.55f, -1027); 
         }
     }
 }

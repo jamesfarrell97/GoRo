@@ -32,7 +32,7 @@ public class BluetoothManager : MonoBehaviour
 
     private DeviceListItem DeviceListItem;
     private string DeviceAddress;
-    
+
     private float Timeout = 0f;
 
     public static Dictionary<string, byte[]> RowingData { get; private set; }
@@ -223,15 +223,15 @@ public class BluetoothManager : MonoBehaviour
 
             DeviceListItem.Connect();
 
-            if (IsEqual(serviceUUID, PMDictionary.C2PMControlServiceUUID))
+            if (IsEqual(serviceUUID, PMDictionary.RowingServiceUUID))
             {
                 StatusMessage = "Found Service UUID";
-                SetState(States.RequestMTU, 1f);
+                SetState(States.RequestMTU, 3f);
             }
 
         }, null);
     }
-    
+
     private void RequestMTU()
     {
         StatusMessage = "Requesting MTU";
@@ -239,7 +239,7 @@ public class BluetoothManager : MonoBehaviour
         BluetoothLEHardwareInterface.RequestMtu(DeviceAddress, 247, (address, newMTU) => {
 
             StatusMessage = "MTU set to " + newMTU.ToString();
-            SetState(States.Read, 1f);
+            SetState(States.Subscribe, 2f);
         });
     }
 
@@ -257,7 +257,7 @@ public class BluetoothManager : MonoBehaviour
 
             SetState(States.Write, 1f);
         });
-    } 
+    }
 
     private void ReadCharacteristic()
     {
@@ -271,7 +271,7 @@ public class BluetoothManager : MonoBehaviour
         });
     }
 
-    private List<string> MultiplexedCharacteristics = new List<string>(){ "31", "32", "33", "35", "36", "37", "38", "39", "3A", "3B", "3C" };
+    private List<string> MultiplexedCharacteristics = new List<string>() { "31", "32", "33", "35", "36", "37", "38", "39", "3A", "3B", "3C" };
 
     private void SubscribeCharacteristic()
     {
@@ -288,7 +288,7 @@ public class BluetoothManager : MonoBehaviour
             {
                 // Convert first byte to hex
                 string key = Convert.ToInt32(rawBytes[0]).ToString("X");
-                
+
                 // If valid multiplexed data
                 if (MultiplexedCharacteristics.Contains(key))
                 {
@@ -372,7 +372,7 @@ public class BluetoothManager : MonoBehaviour
 
         ResetList();
     }
-    
+
     public static byte[] RowingStatusData = new byte[19];
     public static byte[] RowingStatusData1 = new byte[19];
     public static byte[] RowingStatusData2 = new byte[18];

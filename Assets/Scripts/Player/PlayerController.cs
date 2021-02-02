@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
+using UnityStandardAssets.Utility;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -8,11 +11,12 @@ using Photon.Pun;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] Boat boat;
-    [SerializeField] float boatSpeed = 30f;
+    [SerializeField] public float boatSpeed = 0f;
     [SerializeField] float boatTurningSpeed = 1f;
+    [SerializeField] public bool participatingInRace = false;
+    [SerializeField] public bool participatingInTimeTrial = false;
 
-    [SerializeField] GameObject leftTurningPoint;
-    [SerializeField] GameObject rightTurningPoint;
+    [SerializeField] public Transform[] route;
 
     [SerializeField] Animator[] rowingAnimators;
 
@@ -31,14 +35,6 @@ public class PlayerController : MonoBehaviour
     private bool rotateLeft = false;
     private bool rotateRight = false;
 
-    private float currDist = 0;
-    private float prevDist = 0;
-    private float currTime = 0;
-    private float prevTime = 0;
-    private float deltDist = 0;
-    private float deltTime = 0;
-    private float velocity = 0;
-
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
@@ -51,12 +47,42 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        //GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
+
         if (photonView.IsMine) return;
+
+        previousPosition = transform.position;
 
         Destroy(GetComponentInChildren<Camera>().gameObject);
         Destroy(rigidBody);
     }
 
+    int nodeIndex = 0;
+    Transform currentNode;
+
+    private float currDist = 0;
+    private float prevDist = 0;
+    private float currTime = 0;
+    private float prevTime = 0;
+    private float deltDist = 0;
+    private float deltTime = 0;
+    private float velocity = 0;
+
+    private float distance = 0;
+    private float angle = 0;
+    private float prevAngl = 0;
+    private float deltaDistance = 0;
+    private float deltAngl = 0;
+    private float time = 0;
+    private float speed = 0;
+
+    private Vector3 previousPosition;
+    private Vector3 cross;
+
+    private const float MIN_DISTANCE = 1f;
+
+    Vector3 force;
+    int count = 0;
     private void Update()
     {
         if (!photonView.IsMine) return;
@@ -72,70 +98,33 @@ public class PlayerController : MonoBehaviour
         currTime = BluetoothManager.RowingStatusData[0] * 100;  // Convert to seconds
 
         deltDist = currDist - prevDist;
-        deltTime = currTime - prevTime;
+        deltTime = Time.time - prevTime;
 
-        velocity = deltDist / deltTime;
+        if (deltTime != 0)
+        {
+            velocity = deltDist / deltTime;
 
-        rigidBody.AddForce(-transform.forward * boatSpeed * Mathf.Abs(velocity / 100));
+            force = -transform.forward * boatSpeed * Mathf.Abs(velocity / 100);
+
+            rigidBody.AddForce(force);
+
+            if (count > 50)
+            {
+                Debug.Log("DUNITY: CurrDist: " + currDist);
+                Debug.Log("DUNITY: CurrTime: " + currTime);
+                Debug.Log("DUNITY: DeltDist: " + deltDist);
+                Debug.Log("DUNITY: DeltTime: " + deltTime);
+                Debug.Log("DUNITY: Velocity: " + velocity);
+                Debug.Log("DUNITY: Force: " + force);
+                count = 0;
+
+            }
+
+            count++;
+        }
 
         prevDist = currDist;
         prevTime = currTime;
-
-        //if (Input.GetKey(KeyCode.W))
-        //{
-        //    rigidBody.AddForce(transform.forward * boatSpeed);
-        //}
-        //else if (Input.GetKey(KeyCode.S))
-        //{
-        //    rigidBody.AddForce(-transform.forward * boatSpeed);
-        //}
-        //else if (Input.GetKey(KeyCode.A))
-        //{
-        //    rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        //}
-        //else if (Input.GetKey(KeyCode.D))
-        //{
-        //    rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        //}
-
-        //if (Input.GetKey(KeyCode.Q))
-        //{
-        //    rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        //}
-        //else if (Input.GetKey(KeyCode.E))
-        //{
-        //    rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        //}
-
-        //if (moveForward)
-        //{
-        //    rigidBody.AddForce(transform.forward * boatSpeed);
-        //}
-
-        //if (moveBack)
-        //{
-        //    rigidBody.AddForce(-transform.forward * boatSpeed);
-        //}
-
-        //if (moveLeft)
-        //{
-        //    rigidBody.AddForce(-transform.right * boatSpeed);
-        //}
-
-        //if (moveRight)
-        //{
-        //    rigidBody.AddForce(transform.right * boatSpeed);
-        //}
-
-        //if (rotateLeft)
-        //{
-        //    rigidBody.AddTorque(transform.up * boatTurningSpeed);
-        //}
-
-        //if (rotateRight)
-        //{
-        //    rigidBody.AddTorque(-transform.up * boatTurningSpeed);
-        //}
 
         foreach (Animator animator in rowingAnimators)
         {
@@ -147,6 +136,55 @@ public class PlayerController : MonoBehaviour
             {
                 animator.SetBool("Play", false);
             }
+        }
+
+        CalculateVelocity();
+    }
+
+    #region Race/Time Trial Event Methods
+    public void StartARace()
+    {
+        if (participatingInTimeTrial == false && participatingInRace == false)
+        {
+            participatingInRace = true;
+            GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(boat);
+        }
+    }
+
+    public void StartATimeTrial()
+    {
+        if (participatingInRace == false && participatingInTimeTrial == false)
+        {
+            participatingInTimeTrial = true;
+            GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(boat);
+        }
+    }
+    #endregion
+
+    public void CalculateVelocity()
+    {
+        //currDist = BluetoothManager.RowingStatusData[3] * 10;   // Convert to meters
+        //currTime = BluetoothManager.RowingStatusData[0] * 100;  // Convert to seconds
+
+        //deltDist = currDist - prevDist;
+        //deltTime = currTime - prevTime;
+
+        //velocity = deltDist / deltTime;
+
+        //rigidBody.AddForce(-transform.forward * boatSpeed * Mathf.Abs(velocity / 100));
+
+        //prevDist = currDist;
+        //prevTime = currTime;
+
+        if (Input.GetKey(KeyCode.W) || moveForward)
+        {
+            speed = boatSpeed;
+            transform.position += transform.forward * speed;
+        }
+        else if (Input.GetKey(KeyCode.S) || moveBack)
+        {
+            speed = -boatSpeed;
+            transform.position += transform.forward * speed;
         }
     }
 
@@ -160,26 +198,6 @@ public class PlayerController : MonoBehaviour
         moveBack = true;
     }
 
-    public void MoveLeft()
-    {
-        moveLeft = true;
-    }
-
-    public void MoveRight()
-    {
-        moveRight = true;
-    }
-
-    public void RotateLeft()
-    {
-        rotateLeft = true;
-    }
-
-    public void RotateRight()
-    {
-        rotateRight = true;
-    }
-
     public void StopMoveForward()
     {
         moveForward = false;
@@ -190,34 +208,6 @@ public class PlayerController : MonoBehaviour
         moveBack = false;
     }
 
-    public void StopMoveLeft()
-    {
-        moveLeft = false;
-    }
-
-    public void StopMoveRight()
-    {
-        moveRight = false;
-    }
-
-    public void StopRotateLeft()
-    {
-        rotateLeft = false;
-    }
-
-    public void StopRotateRight()
-    {
-        rotateRight = false;
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.collider.tag.Equals("Obstacle"))
-        {
-            FindObjectOfType<AudioManager>().Play("Collision");
-        }    
-    }
-
     public void PauseMovement()
     {
         this.allowedMove = false;
@@ -226,5 +216,13 @@ public class PlayerController : MonoBehaviour
     public void ResumeMovement()
     {
         this.allowedMove = true;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.tag.Equals("Obstacle"))
+        {
+            FindObjectOfType<AudioManager>().Play("Collision");
+        }
     }
 }

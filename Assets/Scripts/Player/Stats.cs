@@ -3,33 +3,30 @@ using TMPro;
 
 public class Stats : MonoBehaviour
 {
-    [SerializeField] TMP_Text SplitTimeDisplay;
-    [SerializeField] TMP_Text SplitDistDisplay;
-    [SerializeField] TMP_Text TimeDisplay;
-    [SerializeField] TMP_Text DistanceDisplay;
-
-    [SerializeField] TMP_Text StrokesPerMinDisplay;
-    [SerializeField] TMP_Text StrokePowerDisplay;
-    [SerializeField] TMP_Text DriveLengthDisplay;
-
     // TODO: EXTRACT INTO APPDATA SETTINGS FILE
     public static readonly int[] SplitDistances = { 100, 500, 1000, 1500, 5000 };
     public static readonly float KILOMETERS_METER = 1000;
-    public static readonly float SECS_MINUTE = 5;
+    public static readonly float SECS_MINUTE = 60;
+    
+    [SerializeField] private TMP_Text SplitTimeDisplay;
+    [SerializeField] private TMP_Text SplitDistDisplay;
+    [SerializeField] private TMP_Text TimeDisplay;
+    [SerializeField] private TMP_Text DistanceDisplay;
 
-    private int SplitIterator = 0;
+    [SerializeField] private TMP_Text StrokesPerMinDisplay;
+    [SerializeField] private TMP_Text StrokePowerDisplay;
+    [SerializeField] private TMP_Text DriveLengthDisplay;
 
-    private int PreviousDistance = 0;
-    private float PreviousTime = 0;
+    [HideInInspector] public float DistanceCovered;
+    [HideInInspector] public float TimeRowing;
 
-    private int MetersRowed;
-    private float SecondsRowing;
+    [HideInInspector] public float SplitTime;
+    [HideInInspector] public float SplitDist;
+    [HideInInspector] public float DriveLength;
 
-    private int SplitTime;
-    private int SplitDist;
-    private int StrokesPerMin;
-    private int StrokePower;
-    private float DriveLength;
+    [HideInInspector] public int StrokesPerMin;
+    [HideInInspector] public int StrokePower;
+    [HideInInspector] public int StrokeState;
 
     private void Awake()
     {
@@ -39,21 +36,19 @@ public class Stats : MonoBehaviour
 
     private void Update()
     {
-        UpdateTime();
         UpdateSplit();
         UpdateStats();
         UpdateDisplay();
     }
 
-    private void UpdateTime()
-    {
-        SecondsRowing += Time.deltaTime;
-    }
+    private int SplitIterator = 0;
+    private float PreviousDistance = 0;
+    private float PreviousTime = 0;
 
     private void UpdateSplit()
     {
         // The amount of distance that the user covered (deltaDist) and
-        // the amount of time it took them to cover it (deltatime) can 
+        // the amount of time it took them to cover it (deltatime) can
         // be used to determine how long it will take the user to reach
         // their desired split distance
         //
@@ -61,8 +56,8 @@ public class Stats : MonoBehaviour
         // splitDistance, and by then multiplying their deltaTime by
         // the resulting deltaFactor
 
-        int deltaDist = MetersRowed - PreviousDistance;
-        int deltaTime = (int) (SecondsRowing - PreviousTime);
+        int deltaDist = (int) (DistanceL - PreviousDistance);
+        int deltaTime = (int) (ElapsedTimeL - PreviousTime);
 
         if (deltaDist == 0) return;
 
@@ -70,25 +65,80 @@ public class Stats : MonoBehaviour
 
         int seconds = (int) (deltaFactor * deltaTime);
 
-        PreviousDistance = MetersRowed;
-        PreviousTime = SecondsRowing;
+        PreviousDistance = DistanceL;
+        PreviousTime = ElapsedTimeL;
     }
 
+    private float DistanceL;
+    private float DistanceM;
+    private float DistanceH;
+
+    // Measured as 0.01 meters per least-significant bit
+    private const float DISTANCE_L_METER_VALUE = 0.01f;                                     // Max       2.56 Meters
+    private const float DISTANCE_M_METER_VALUE = DISTANCE_L_METER_VALUE * 256;              // Max     655.35 Meters
+    private const float DISTANCE_H_METER_VALUE = DISTANCE_M_METER_VALUE * 256;              // Max 167,769.60 Meters
+
+    private float ElapsedTimeL;
+    private float ElapsedTimeM;
+    private float ElapsedTimeH;
+
+    // Measured as 0.01 seconds per least-significant bit
+    private const float ELAPSED_TIME_L_SECOND_VALUE = 0.01f;                                // Max       2.55 Seconds
+    private const float ELAPSED_TIME_M_SECOND_VALUE = ELAPSED_TIME_L_SECOND_VALUE * 256;    // Max     655.35 Seconds (11 Minutes)
+    private const float ELAPSED_TIME_H_SECOND_VALUE = ELAPSED_TIME_M_SECOND_VALUE * 256;    // Max 167,769.60 Seconds (46 Hours)
+
+    private int count = 0;
     private void UpdateStats()
     {
-        MetersRowed   = BluetoothManager.RowingStatusData[3] * 10;      // Distance Lo
-        SecondsRowing = BluetoothManager.RowingStatusData[0] * 100;     // Elapsed Time Lo
+        // Distance Covered (Meters)
+        DistanceL = BluetoothManager.RowingStatusData[3];           // Distance Lo
+        DistanceM = BluetoothManager.RowingStatusData[4];           // Distance Mid
+        DistanceH = BluetoothManager.RowingStatusData[5];           // Distance Hi
 
-        StrokePower   = BluetoothManager.RowingStatusData[16];          // Average Power Lo
-        StrokesPerMin = BluetoothManager.RowingStatusData1[5];          // Stroke Rate
-        DriveLength   = BluetoothManager.StrokeData[6];                 // Drive Length
+        DistanceCovered = (DistanceH * DISTANCE_H_METER_VALUE)
+                        + (DistanceM * DISTANCE_M_METER_VALUE)
+                        + (DistanceL * DISTANCE_L_METER_VALUE);
+
+        // Time Rowing (Seconds)
+        ElapsedTimeL = BluetoothManager.RowingStatusData[0];        // Elapsed Time Lo
+        ElapsedTimeM = BluetoothManager.RowingStatusData[1];        // Elapsed Time Mid
+        ElapsedTimeH = BluetoothManager.RowingStatusData[2];        // Elapsed Time Hi
+
+        TimeRowing = (ElapsedTimeH * ELAPSED_TIME_H_SECOND_VALUE)
+                   + (ElapsedTimeM * ELAPSED_TIME_M_SECOND_VALUE)
+                   + (ElapsedTimeL * ELAPSED_TIME_L_SECOND_VALUE);
+
+        StrokeState = BluetoothManager.RowingStatusData[10];        // Stroke State
+        StrokePower = BluetoothManager.StrokeData1[3];              // Average Power L
+
+        StrokesPerMin = BluetoothManager.RowingStatusData1[5];      // Stroke Rate
+        DriveLength = BluetoothManager.StrokeData[6];               // Drive Length
+
+        if (count > 50)
+        {
+            Debug.Log("DUNITY: Meters Rowed Lo: " + DistanceL);
+            Debug.Log("DUNITY: Meters Rowed Mid: " + DistanceM);
+            Debug.Log("DUNITY: Meters Rowed High: " + DistanceH);
+            Debug.Log("DUNITY: Meters Rowed: " + DistanceCovered);
+            Debug.Log("DUNITY: Seconds Rowing Lo: " + ElapsedTimeL);
+            Debug.Log("DUNITY: Seconds Rowing Mid: " + ElapsedTimeM);
+            Debug.Log("DUNITY: Seconds Rowing High: " + ElapsedTimeH);
+            Debug.Log("DUNITY: Time Rowing: " + TimeRowing);
+            Debug.Log("DUNITY: Stroke State: " + StrokeState);
+            Debug.Log("DUNITY: Stroke Power: " + StrokePower);
+            Debug.Log("DUNITY: SPM: " + StrokesPerMin);
+            Debug.Log("DUNITY: Drive Length: " + DriveLength);
+            count = 0;
+        }
+
+        count++;
     }
 
     private void ResetStats()
     {
         SplitTime = 0;
-        MetersRowed = 0;
-        SecondsRowing = 0;
+        DistanceL = 0;
+        ElapsedTimeL = 0;
         StrokePower = 0;
         StrokesPerMin = 0;
         DriveLength = 0;
@@ -108,43 +158,43 @@ public class Stats : MonoBehaviour
     private void UpdateDisplay()
     {
         SetSplitTimeDisplay(SplitTime);
-        SetTimeDisplay((int) SecondsRowing);
-        SetDistanceDiplay(MetersRowed);
+        SetTimeDisplay(TimeRowing);
+        SetDistanceDiplay(DistanceCovered);
         SetStrokesPerMinDisplay(StrokesPerMin);
         SetPowerDisplay(StrokePower);
         SetDriveLengthDisplay(DriveLength);
     }
 
-    private void SetSplitDistDisplay(int distance)
+    private void SetSplitDistDisplay(float distance)
     {
         if (!SplitDistDisplay.enabled) return;
 
         SplitDistDisplay.text = distance.ToString();
     }
 
-    private void SetSplitTimeDisplay(int seconds)
+    private void SetSplitTimeDisplay(float seconds)
     {
         if (!SplitTimeDisplay.enabled) return;
 
-        int[] hms = HelperFunctions.SecondsToHMS(seconds);
+        int[] hms = HelperFunctions.SecondsToHMS((int)seconds);
 
         SplitTimeDisplay.text = hms[1] + ":" + hms[2].ToString("D2");
     }
 
-    private void SetTimeDisplay(int seconds)
+    private void SetTimeDisplay(float seconds)
     {
         if (!TimeDisplay.enabled) return;
 
-        int[] hms = HelperFunctions.SecondsToHMS(seconds);
+        int[] hms = HelperFunctions.SecondsToHMS((int)seconds);
 
         TimeDisplay.text = hms[0].ToString("D2") + ":" + hms[1].ToString("D2") + ":" + hms[2].ToString("D2");
     }
 
-    private void SetDistanceDiplay(int distance)
+    private void SetDistanceDiplay(float distance)
     {
         if (!DistanceDisplay.enabled) return;
 
-        DistanceDisplay.text = distance + "m";
+        DistanceDisplay.text = (int) distance + "m";
     }
 
     private void SetStrokesPerMinDisplay(int strokesPerMin)
@@ -165,7 +215,7 @@ public class Stats : MonoBehaviour
     {
         if (!DriveLengthDisplay.enabled) return;
 
-        DriveLengthDisplay.text = driveLength + "m";
+        DriveLengthDisplay.text = (driveLength / 100) + "m";
     }
 
     public void CycleSplitDistance()
@@ -185,11 +235,11 @@ public class Stats : MonoBehaviour
 
     public int GetMetersRowed()
     {
-        return MetersRowed;
+        return (int) DistanceCovered;
     }
 
     public int GetSecondsRowing()
     {
-        return (int) SecondsRowing;
+        return (int) ElapsedTimeL;
     }
 }

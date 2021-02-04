@@ -73,7 +73,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.OfflineMode = false;
-        buildIndex = 2;
+        buildIndex = 1;
 
         Debug.Log("Connected to Server.");
         MenuManager.Instance.OpenMenu("Loading");

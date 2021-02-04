@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Animator[] rowingAnimators;
 
     private BoxCollider boxCollider;
-    private Rigidbody rigidBody;
+    //private Rigidbody rigidBody;
 
     private PhotonView photonView;
     private AchievementTracker achievementTracker;
@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
-        rigidBody = GetComponent<Rigidbody>();
+        //rigidBody = GetComponent<Rigidbody>();
 
         photonView = GetComponent<PhotonView>();
         achievementTracker = GetComponent<AchievementTracker>();
@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
         previousPosition = transform.position;
 
         Destroy(GetComponentInChildren<Camera>().gameObject);
-        Destroy(rigidBody);
+        //Destroy(rigidBody);
     }
 
     int nodeIndex = 0;
@@ -106,7 +106,7 @@ public class PlayerController : MonoBehaviour
 
             force = -transform.forward * boatSpeed * Mathf.Abs(velocity / 100);
 
-            rigidBody.AddForce(force);
+           // rigidBody.AddForce(force);
 
             if (count > 50)
             {

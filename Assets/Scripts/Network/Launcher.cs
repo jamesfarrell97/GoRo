@@ -42,6 +42,11 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        ShowConnectionMenu();
+    }
+
+    public void ShowConnectionMenu()
+    {
         if (Application.isEditor)
         {
             MenuManager.Instance.OpenMenu("Main");

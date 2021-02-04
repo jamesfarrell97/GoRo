@@ -37,7 +37,7 @@ public class TimeTrialManager : MonoBehaviour
         player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachTimeTrial.route.Length - 1;
         heroBeachTimeTrial.timeTrialInitiated = true;
         heroBeachTimeTrial.timeTheTimeTrialInitiated = Time.timeSinceLevelLoad;
-        heroBeachTimeTrial.numberOfLaps = 1;
+        heroBeachTimeTrial.numberOfLaps = 3;
         heroBeachTimeTrial.AddParticipantIntoTimeTrial(player);
     }
 

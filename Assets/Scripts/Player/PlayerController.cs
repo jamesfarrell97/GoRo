@@ -1,8 +1,12 @@
 ﻿using System;
 using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.UI;
+using TMPro;
 using Photon.Pun;
 using UnityStandardAssets.Utility;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -15,8 +19,27 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float boatTurningSpeed = 1f;
     [SerializeField] public bool participatingInRace = false;
     [SerializeField] public bool participatingInTimeTrial = false;
-
     [SerializeField] public Transform[] route;
+
+    #region UI Variables
+    [SerializeField] public GameObject hudCanvas;
+    [SerializeField] public GameObject gameMenuCanvas;
+    [SerializeField] public GameObject confirmationCanvas;
+    [SerializeField] public GameObject speedSlider;
+    [SerializeField] public GameObject notificationTextPanel;
+    [SerializeField] public GameObject notificationText;
+    [SerializeField] public GameObject timePanel;
+    [SerializeField] public GameObject timeText;
+    [SerializeField] public GameObject lapPanel;
+    [SerializeField] public GameObject lapText;
+    [SerializeField] public GameObject countdownPanel;
+    [SerializeField] public GameObject countdownText;
+    [SerializeField] public GameObject confirmationText;
+
+    private bool waitingToConfirmLeaveRoom;
+    private bool waitingToConfirmExitGame;
+    private Launcher launcher;
+    #endregion
 
     private BoxCollider boxCollider;
     private Rigidbody rigidBody;
@@ -41,6 +64,10 @@ public class PlayerController : MonoBehaviour
         photonView = GetComponent<PhotonView>();
         achievementTracker = GetComponent<AchievementTracker>();
         stats = GetComponent<Stats>();
+        waitingToConfirmLeaveRoom = false;
+        waitingToConfirmExitGame = false;
+
+        launcher = FindObjectOfType<Launcher>();
     }
 
     private void Start()
@@ -57,8 +84,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-
-
+       
     }
 
     private void FixedUpdate()
@@ -73,12 +99,162 @@ public class PlayerController : MonoBehaviour
         CalculateTurnAngle();
     }
 
+    #region UI Interactions
+    public IEnumerator DisplayQuickNotificationText(string text, int duration)
+    {
+        notificationTextPanel.SetActive(true);
+        notificationText.GetComponent<Text>().text = text;
+        yield return new WaitForSeconds(duration);
+        notificationTextPanel.SetActive(false);
+    }
+
+    //Call in when you wish to keep text on screen infinitely, OR
+    //If the text will be overwritten later on, such as in Race->UpdateStopWatch();
+    public void DisplayNotificationText(string text)
+    {
+        notificationTextPanel.SetActive(true);
+        notificationText.GetComponent<Text>().text = text;
+    }
+
+    public void DisplayTimeAndLap(string time, string lap)
+    {
+        timePanel.SetActive(true);
+        timeText.GetComponent<Text>().text = time;
+
+        lapPanel.SetActive(true);
+        lapText.GetComponent<Text>().text = lap;
+    }
+
+    public IEnumerator DisplayCountdown(string time, int duration)
+    {
+        countdownPanel.SetActive(true);
+        countdownText.GetComponent<Text>().text = time;
+        yield return new WaitForSeconds(duration);
+        countdownPanel.SetActive(false);
+    }
+
+    #endregion
+
+    #region Game Menu Interactions
+
+    public void OpenGameMenu()
+    {
+        if(PhotonNetwork.OfflineMode == true)
+        {
+            PauseGame();
+        }
+
+        hudCanvas.SetActive(false);
+        gameMenuCanvas.SetActive(true);
+    }
+
+    public void CloseGameMenu()
+    {
+        if (PhotonNetwork.OfflineMode == true)
+        {
+            UnpauseGame();
+        }
+
+        gameMenuCanvas.SetActive(false);
+        hudCanvas.SetActive(true);
+    }
+
+    public void ConfirmPressed()
+    {
+        ConfirmChoice(true);
+    }
+
+    public void CancelPressed()
+    {
+        ConfirmChoice(false);
+    }
+
+    private void ConfirmChoice(bool confirmPressed)
+    {
+        if (confirmPressed == true)
+        {
+            if (waitingToConfirmLeaveRoom == true)
+            {
+                //launcher.ShowConnectionMenu();                
+            }
+            else if (waitingToConfirmExitGame == true)
+            {
+                Application.Quit();
+            }
+        }
+        else
+        {
+            waitingToConfirmLeaveRoom = false;
+            waitingToConfirmExitGame = false;
+            confirmationCanvas.SetActive(false);
+        }
+    }
+
+    public void LeaveRoom()
+    {
+        if(photonView.IsMine)
+        {
+            RequestConfirmPlayersChoice("leaveRoom");
+        }
+    }
+
+    public void ExitGame()
+    {
+        if (photonView.IsMine)
+        {
+            RequestConfirmPlayersChoice("exitGame");
+            //    Application.Quit();
+        }
+    }
+
+    private void RequestConfirmPlayersChoice(string eventBeingConfirmed)
+    {
+        confirmationCanvas.SetActive(true);
+
+        if(eventBeingConfirmed == "leaveRoom")
+        {
+            confirmationText.GetComponent<Text>().text = "Are you sure you wish to leave this lobby?";
+            waitingToConfirmLeaveRoom = true;
+        }
+        else if(eventBeingConfirmed == "exitGame")
+        {
+            confirmationText.GetComponent<Text>().text = "Are you sure you wish to exit the game?";
+            waitingToConfirmExitGame = true;
+        }
+    }
+
+    private void PauseGame()
+    {
+        if(participatingInRace == true)
+        {
+            boat.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().PauseSingleplayerRace();
+        }
+        else if(participatingInTimeTrial == true)
+        {
+            boat.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().PauseSingleplayerTimeTrial();
+        }
+    }
+
+    private void UnpauseGame()
+    {
+        if (participatingInRace == true)
+        {
+            boat.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().UnpauseSingleplayerRace();
+        }
+        else if (participatingInTimeTrial == true)
+        {
+            boat.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().UnpauseSingleplayerTimeTrial();
+        }
+    }
+
     #region Race/Time Trial Event Methods
     public void StartARace()
     {
         if (participatingInTimeTrial == false && participatingInRace == false)
         {
+            CloseGameMenu();
             participatingInRace = true;
+            speedSlider.SetActive(true);
             GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(boat);
         }
     }
@@ -87,10 +263,14 @@ public class PlayerController : MonoBehaviour
     {
         if (participatingInRace == false && participatingInTimeTrial == false)
         {
+            CloseGameMenu();
             participatingInTimeTrial = true;
+            speedSlider.SetActive(true);
             GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(boat);
         }
     }
+    #endregion
+
     #endregion
 
     public void CalculateVelocity()

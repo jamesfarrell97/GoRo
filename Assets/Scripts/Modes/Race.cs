@@ -32,6 +32,8 @@ public class Race : MonoBehaviour
     private PlayerController participant;
     private PhotonView photonView;
     private float timeSecs;
+    private bool gamePaused = false;
+    private float durationOfRaceWithoutPauses;
 
     private float countdown = 4f;
     private float currentTimeInCountdown = 0;
@@ -52,11 +54,7 @@ public class Race : MonoBehaviour
             //player.GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
             //GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
             player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
-            //player.transform.position = route[0].position;
-            //player.transform.LookAt(route[1].position);
-
-            //Vector3 vector = route[1].position - player.transform.position;
-            //player.transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, vector, 0f * Time.deltaTime, 0.0f));
+            
         }
     }
 
@@ -68,26 +66,51 @@ public class Race : MonoBehaviour
         CheckIfRaceComplete();
     }
 
+    //If Menu is brought up in SINGLEPLAYER, pause race
+    public void PauseSingleplayerRace()
+    {
+        gamePaused = true;
+        durationOfRaceWithoutPauses = durationOfRaceWithoutPauses + (timeSecs - timeRaceStarted);  
+        foreach(Boat player in participants)
+        {
+            player.GetComponent<WaypointProgressTracker>().moveTarget = false;
+        }
+    }
+
+    //Unpause race in SINGLEPLAYER if game menu is closed 
+    public void UnpauseSingleplayerRace()
+    {
+        gamePaused = false;
+        timeRaceStarted = Time.timeSinceLevelLoad;
+        foreach (Boat player in participants)
+        {
+            player.GetComponent<WaypointProgressTracker>().moveTarget = true;
+        }
+    }
+
     void Update()
     {
-        timeSecs = Time.timeSinceLevelLoad;
-
-        if (raceInitiated == true)
+        if (gamePaused == false)
         {
-            if (raceComplete == true)
+            timeSecs = Time.timeSinceLevelLoad;
+
+            if (raceInitiated == true)
             {
-                EndRace();
-            }
-            else if (raceInProgress == false)
-            {
-                if (participants.Count == raceCapacity || (timeRaceInitiated + timeSecs) > waitTimeForOtherPlayersToJoin)
+                if (raceComplete == true)
                 {
-                    StartCountdown();                   
+                    EndRace();
                 }
-            }
-            else
-            {
-                UpdateStopWatch();
+                else if (raceInProgress == false)
+                {
+                    if (participants.Count == raceCapacity || (timeRaceInitiated + timeSecs) > waitTimeForOtherPlayersToJoin)
+                    {
+                        StartCountdown();
+                    }
+                }
+                else
+                {
+                    UpdateStopWatch();
+                }
             }
         }
     }
@@ -106,17 +129,42 @@ public class Race : MonoBehaviour
             }
             else if(countdown - 1 <= 0)
             {
-                GameObject.Find("UINotificationText").GetComponent<Text>().text = $"Start!";
+                DisplayCountdownToParticipants("Start!");
                 countdown = 0;
             }           
             else
             {
                 countdown -= 1;
-                GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{countdown}";
+                DisplayCountdownToParticipants($"{countdown}");
                 currentTimeInCountdown = 0;
             }
         }
 
+    }
+
+    private void DisplayTextToParticipants(string text, int time=0)
+    {
+        foreach (Boat player in participants)
+        {
+            StartCoroutine(player.GetComponent<PlayerController>().DisplayQuickNotificationText(text, time));
+        }
+    }
+
+    private void DisplayRaceDataToParticipants(string time)
+    {
+        foreach (Boat player in participants)
+        {
+            Debug.Log($"Laps Completed:{player.GetComponent<WaypointProgressTracker>().currentLap}");
+            player.GetComponent<PlayerController>().DisplayTimeAndLap(time, $"Lap: {player.GetComponent<WaypointProgressTracker>().currentLap}/{numberOfLaps}");
+        }
+    }
+
+    private void DisplayCountdownToParticipants(string count)
+    {
+        foreach (Boat player in participants)
+        {
+            StartCoroutine(player.GetComponent<PlayerController>().DisplayCountdown(count, 3));
+        }
     }
 
     private void StartRace()
@@ -152,8 +200,10 @@ public class Race : MonoBehaviour
 
     private void UpdateStopWatch()
     {
-        raceDuration = TimeSpan.FromSeconds(timeSecs - timeRaceStarted);
-        GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{raceDuration.ToString(@"mm\:ss")}";
+        raceDuration = TimeSpan.FromSeconds((timeSecs + durationOfRaceWithoutPauses) - timeRaceStarted);
+        //GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{raceDuration.ToString(@"mm\:ss")}";
+        //DisplayTextToParticipants(false, $"{raceDuration.ToString(@"mm\:ss")}");
+        DisplayRaceDataToParticipants($"{raceDuration.ToString(@"mm\:ss")}");
     }
 
     //Display window showing participants their place in the race, how long they took and 
@@ -165,7 +215,10 @@ public class Race : MonoBehaviour
         foreach(KeyValuePair<int, Boat> player in participantsCompletedRace)
         {
             //Modify to display for player only(photon.mine)
-            GameObject.Find("UINotificationText").GetComponent<Text>().text = $"Your position within the race: {player.Key}";
+            //GameObject.Find("UINotificationText").GetComponent<Text>().text = $"Your position within the race: {player.Key}";
+            player.Value.GetComponent<PlayerController>().timePanel.SetActive(false);
+            player.Value.GetComponent<PlayerController>().lapPanel.SetActive(false);
+            StartCoroutine(player.Value.GetComponent<PlayerController>().DisplayQuickNotificationText($"Your position within the race: {player.Key}", 6));
         }
 
     }
@@ -186,6 +239,7 @@ public class Race : MonoBehaviour
         currentTimeInCountdown = 0;
         timeRaceInitiated = 0;
         racePositionIndex = 1;
+        durationOfRaceWithoutPauses = 0;
     }
 
     private void ResetRaceStatsForParticipants()
@@ -193,6 +247,8 @@ public class Race : MonoBehaviour
         foreach(Boat player in participants)
         {
             player.GetComponent<PlayerController>().participatingInRace = false;
+            player.GetComponent<PlayerController>().speedSlider.SetActive(false);
+            player.GetComponent<PlayerController>().speedSlider.GetComponent<Slider>().value = 0;
         }
     }
 }

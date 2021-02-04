@@ -208,6 +208,7 @@ namespace UnityStandardAssets.Utility
 
                     if (distance < pointToPointThreshold)
                     {
+                        halfPointOftrackReached = false;
                         UpdateEventLapCount();
                     }
                 }

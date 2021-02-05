@@ -1,19 +1,18 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
+﻿using System.Collections;
+using System;
 using System.Collections.Generic;
-
-using UnityEngine;
-using UnityEngine.UI;
 using Photon.Pun;
+using UnityEngine.UI;
+using UnityEngine;
 using UnityStandardAssets.Utility;
+using TMPro;
 
 public class Race : MonoBehaviour
 {
     #region Public Variables   
     [SerializeField] public Transform[] route;
-    [SerializeField] public List<Boat> participants;
-    [SerializeField] public Dictionary<int, Boat> participantsCompletedRace;
+    [SerializeField] public List<PlayerController> participants;
+    [SerializeField] public Dictionary<int, PlayerController> participantsCompletedRace;
 
     [SerializeField] public int numberOfLaps;
     [SerializeField] public int raceCapacity;
@@ -29,7 +28,6 @@ public class Race : MonoBehaviour
     #endregion Public Variables
 
     #region Private Variables
-    private PlayerController participant;
     private PhotonView photonView;
     private float timeSecs;
 
@@ -37,30 +35,26 @@ public class Race : MonoBehaviour
     private float currentTimeInCountdown = 0;
     private int racePositionIndex = 1;
     #endregion Private Variables
-
+    
     private void Awake()
     {
         photonView = GetComponent<PhotonView>();
-        participantsCompletedRace = new Dictionary<int, Boat>();
+        participantsCompletedRace = new Dictionary<int, PlayerController>();
+
+        route = FindObjectOfType<Race>().GetComponentsInChildren<Transform>();
     }
 
-    public void AddParticipantIntoRace(Boat player)
+    public void AddParticipantIntoRace(PlayerController player)
     {
         if(participants.Count < raceCapacity)
         {
             participants.Add(player);
-            //player.GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
-            //GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
-            player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
-            //player.transform.position = route[0].position;
-            //player.transform.LookAt(route[1].position);
 
-            //Vector3 vector = route[1].position - player.transform.position;
-            //player.transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, vector, 0f * Time.deltaTime, 0.0f));
+            player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
         }
     }
 
-    public void AddParticipantToCompletedRaceList(Boat player)
+    public void AddParticipantToCompletedRaceList(PlayerController player)
     {
         participantsCompletedRace.Add(racePositionIndex, player);
         racePositionIndex++;
@@ -92,48 +86,71 @@ public class Race : MonoBehaviour
         }
     }
 
-    //REf for basic countdown implementation: https://answers.unity.com/questions/369581/countdown-to-start-game.html
+    // Ref for basic countdown implementation: https://answers.unity.com/questions/369581/countdown-to-start-game.html
     private void StartCountdown()
     {
-        float delta = Time.deltaTime;
-        currentTimeInCountdown += delta;
-
-        if(currentTimeInCountdown >= 1)
+        foreach(PlayerController participant in participants)
         {
-            if (countdown - 1 <= -1)
+            // Pause player movement
+            participant.PauseMovement();
+
+            float delta = Time.deltaTime;
+            currentTimeInCountdown += delta;
+            
+            // Retrieve notification container
+            Transform notificationContainer = participant.transform.Find("HUD").Find("Notification Cont");
+
+            // Activate component if not current active
+            if (!notificationContainer.gameObject.activeSelf)
             {
-                StartRace();
+                notificationContainer.gameObject.SetActive(true);
             }
-            else if(countdown - 1 <= 0)
+
+            if(currentTimeInCountdown >= 1)
             {
-                GameObject.Find("UINotificationText").GetComponent<Text>().text = $"Start!";
-                countdown = 0;
-            }           
-            else
-            {
-                countdown -= 1;
-                GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{countdown}";
-                currentTimeInCountdown = 0;
+                if (countdown - 1 <= -1)
+                {
+                    StartRace();
+                }
+                else if(countdown - 1 <= 0)
+                {
+                    notificationContainer.GetComponentInChildren<TMP_Text>().text = "Start!";
+                    countdown = 0;
+                }           
+                else
+                {
+                    countdown -= 1;
+
+                    notificationContainer.GetComponentInChildren<TMP_Text>().text = $"{countdown}";
+                    currentTimeInCountdown = 0;
+                }
             }
         }
-
     }
 
     private void StartRace()
     {
         //Allow participants to move [May need to figure out a better way to allow movement, where they'll all start at the EXACT same time]
-        foreach (Boat participant in participants)
+        foreach (PlayerController participant in participants)
         {
-            //if (!photonView.IsMine)
-            //{
-            //    //Make participant transparent
-            //}            
+            // Resume player movement
+            participant.ResumeMovement();
 
             participant.GetComponent<WaypointProgressTracker>().moveTarget = true;
+
+            // Retrieve notification container
+            Transform notificationContainer = participant.transform.Find("HUD").Find("Notification Cont");
+
+            // Activate component if not current active
+            if (!notificationContainer.gameObject.activeSelf)
+            {
+                notificationContainer.gameObject.SetActive(true);
+                notificationContainer.GetComponentInChildren<TMP_Text>().text = "";
+            }
         }
 
-        raceInProgress = true;
         timeRaceStarted = Time.timeSinceLevelLoad;
+        raceInProgress = true;
     }
 
     private void CheckIfRaceComplete()
@@ -146,33 +163,78 @@ public class Race : MonoBehaviour
 
     private void EndRace()
     {
-        DisplayEndOfRaceStats();
+        StartCoroutine(DisplayRaceStats());
+    }
+
+    // Display window showing the participant their overall progress within the time trial, how long they took and 
+    // Any achievements/ leaderboard score they obtained through that race + stat increase
+    IEnumerator DisplayRaceStats()
+    {
+        // Show leaderboard (of partcipants) for this race
+        // GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{countdown}";
+        foreach (KeyValuePair<int, PlayerController> participant in participantsCompletedRace)
+        {
+            // Retrieve notification container
+            Transform notificationContainer = participant.Value.transform.Find("HUD").Find("Notification Cont");
+
+            // Update notification value
+            notificationContainer.GetComponentInChildren<TMP_Text>().text = $"Position: {participant.Key}";
+        }
+
+        //Wait for 4 seconds
+        yield return new WaitForSeconds(3);
+
+        // Show leaderboard (of partcipants) for this race
+        // GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{countdown}";
+        foreach (KeyValuePair<int, PlayerController> participant in participantsCompletedRace)
+        {
+            // Retrieve notification container
+            Transform notificationContainer = participant.Value.transform.Find("HUD").Find("Notification Cont");
+
+            // Update notification value
+            notificationContainer.GetComponentInChildren<TMP_Text>().text = $"Leaving...";
+        }
+
+        //Wait for 2 seconds
+        yield return new WaitForSeconds(2);
+
+        // Show leaderboard (of partcipants) for this race
+        // GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{countdown}";
+        foreach (KeyValuePair<int, PlayerController> participant in participantsCompletedRace)
+        {
+            // Retrieve notification container
+            Transform notificationContainer = participant.Value.transform.Find("HUD").Find("Notification Cont");
+
+            // Update notification value
+            notificationContainer.gameObject.SetActive(false);
+            notificationContainer.GetComponentInChildren<TMP_Text>().text = $"";
+        }
+
         DisposeSessionResources();
     }
 
     private void UpdateStopWatch()
     {
-        raceDuration = TimeSpan.FromSeconds(timeSecs - timeRaceStarted);
-        GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{raceDuration.ToString(@"mm\:ss")}";
-    }
-
-    //Display window showing participants their place in the race, how long they took and 
-    //Any achievements/ leaderboard score they obtained through that race + stat increase
-    private void DisplayEndOfRaceStats()
-    {
-        //Show leaderboard (of partcipants) for this race
-        //GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{countdown}";
-        foreach(KeyValuePair<int, Boat> player in participantsCompletedRace)
+        foreach(PlayerController participant in participants)
         {
-            //Modify to display for player only(photon.mine)
-            GameObject.Find("UINotificationText").GetComponent<Text>().text = $"Your position within the race: {player.Key}";
-        }
+            raceDuration = TimeSpan.FromSeconds(timeSecs - timeRaceStarted);
 
+            // Retrieve notification container
+            Transform notificationContainer = participant.transform.Find("HUD").Find("Notification Cont");
+
+            // Update notification value
+            notificationContainer.GetComponentInChildren<TMP_Text>().text = $"{raceDuration.ToString(@"mm\:ss")}";
+        }
     }
 
-    //Reset all datatypes back to their initial state, after a race is finished
+    // Reset all datatypes back to their initial state, after a race is finished
     private void DisposeSessionResources()
     {
+        foreach(PlayerController participant in participants)
+        {
+            participant.JustRow();
+        }
+
         ResetRaceStatsForParticipants();
         participants.Clear();
         participantsCompletedRace.Clear();
@@ -190,9 +252,9 @@ public class Race : MonoBehaviour
 
     private void ResetRaceStatsForParticipants()
     {
-        foreach(Boat player in participants)
+        foreach(PlayerController participant in participants)
         {
-            player.GetComponent<PlayerController>().participatingInRace = false;
+            participant.participatingInRace = false;
         }
     }
 }

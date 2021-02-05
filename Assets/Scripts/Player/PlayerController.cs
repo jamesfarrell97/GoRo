@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityStandardAssets.Utility;
+using UnityEngine;
 using Photon.Pun;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
@@ -50,22 +51,19 @@ public class PlayerController : MonoBehaviour
 
         achievementTracker.TrackAchievements(photonView, stats);
 
-        if (!allowedMove) return;
+        if (!allowedMove)
+        {
+            velocity = 0;
+            return;
+        }
 
         if (Input.GetKey(KeyCode.W))
         {
             moveForward = true;
-            moveBack = false;
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            moveForward = false;
-            moveBack = true;
         }
         else
         {
             moveForward = false;
-            moveBack = false;
         }
 
         UpdateSpeed();
@@ -73,23 +71,21 @@ public class PlayerController : MonoBehaviour
         Animate();
     }
 
+    public float speedIncreaseFactor = 0.1f;
+    public float speedDecayFactor = 0.1f;
+
     private void UpdateSpeed()
     {
-        // Fake it till you make it
         if (moveForward)
         {
             speed = 5;
-        }
-        else if (moveBack)
-        {
-            speed = -5;
         }
         else
         {
             speed = 0;
         }
 
-        //speed = stats.GetSpeed();
+        //speed = stats.GetSpeed() * 1000;
     }
 
     private float velocity;
@@ -118,14 +114,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     #region Race/Time Trial Event Methods
     public void StartARace()
     {
         if (participatingInTimeTrial == false && participatingInRace == false)
         {
             participatingInRace = true;
-            GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(boat);
+
+            // Reset track distance
+            GetComponent<WaypointProgressTracker>().progressDistance = 0;
+
+            GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(this);
         }
     }
 
@@ -134,8 +133,23 @@ public class PlayerController : MonoBehaviour
         if (participatingInRace == false && participatingInTimeTrial == false)
         {
             participatingInTimeTrial = true;
-            GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(boat);
+
+            // Reset track distance
+            GetComponent<WaypointProgressTracker>().progressDistance = 0;
+
+            GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(this);
         }
+    }
+
+    public void JustRow()
+    {
+        WaypointProgressTracker waypointProgressTracker = GetComponent<WaypointProgressTracker>();
+
+        // Reset track distance
+        waypointProgressTracker.progressDistance = 0;
+
+        // Reset track
+        waypointProgressTracker.Circuit = waypointProgressTracker.Routes[0];
     }
     #endregion
 

@@ -75,9 +75,9 @@ public class Stats : MonoBehaviour
         DistanceM = BluetoothManager.RowingStatusData[4];           // Distance Mid
         DistanceH = BluetoothManager.RowingStatusData[5];           // Distance Hi
 
-        DistanceCovered = (DistanceH * DISTANCE_H_METER_VALUE)
+        DistanceCovered = ((DistanceH * DISTANCE_H_METER_VALUE)
                         + (DistanceM * DISTANCE_M_METER_VALUE)
-                        + (DistanceL * DISTANCE_L_METER_VALUE) * 10;
+                        + (DistanceL * DISTANCE_L_METER_VALUE)) * 10;
 
         // Time Rowing (Seconds)
         ElapsedTimeL = BluetoothManager.RowingStatusData[0];        // Elapsed Time Lo

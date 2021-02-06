@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public Transform[] route;
 
     [SerializeField] Animator[] rowingAnimators;
+    [SerializeField] [Range(0f, 1f)] float otherPlayerTransparency = 0.5f;
+    [SerializeField] Material otherPlayerMaterial;
 
     #region UI Variables
     [SerializeField] public GameObject hudCanvas;
@@ -68,11 +70,47 @@ public class PlayerController : MonoBehaviour
     {
         if (photonView.IsMine) return;
 
-        Destroy(GetComponentInChildren<Camera>().gameObject); // Main Camera
-        Destroy(GetComponentInChildren<Camera>().gameObject); // Minimap Camera
+        Camera[] cameras = GetComponentsInChildren<Camera>();
+        foreach (Camera c in cameras)
+        {
+            c.gameObject.SetActive(false);
+        }
+
+        Canvas[] canvas = GetComponentsInParent<Canvas>();
+        foreach (Canvas c in canvas)
+        {
+            Destroy(c);
+        }
+
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+
+        foreach (Renderer renderer in renderers)
+        {
+            Material[] materials = renderer.materials;
+
+            for (int i = 0; i < renderer.materials.Length; i++)
+            {
+                // Change minimap icon color
+                if (renderer.gameObject.name == "Boat Front" || renderer.gameObject.name == "Boat Rear")
+                {
+                    materials[i].color = Color.red;
+                }
+                else if (renderer.gameObject.name.Contains("Mask"))
+                {
+                    Destroy(renderer.transform.parent.gameObject.GetComponent<SetRenderQueue>());
+                    Destroy(renderer.gameObject);
+                }
+                else if (!materials[i].color.Equals(null))
+                {
+                    materials[i] = otherPlayerMaterial;
+                }
+            }
+
+            renderer.materials = materials;
+        }
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (!photonView.IsMine) return;
 
@@ -101,29 +139,106 @@ public class PlayerController : MonoBehaviour
     public float speedIncreaseFactor = 0.1f;
     public float speedDecayFactor = 0.1f;
 
+    private float currDist = 0;
+    private float prevDist = 0;
+    private float deltDist = 0;
+
+    private float currTime = 0;
+    private float prevTime = 0;
+    private float deltTime = 0;
+
     private void UpdateSpeed()
     {
+        //#if UNITY_EDITOR
+        //        if (moveForward)
+        //        {
+        //            currDist += 3 * Time.fixedDeltaTime; //     3 meters
+        //            currTime += 1 * Time.fixedDeltaTime; // per 1 second
+        //        }
+        //#else
+        //        currDist = stats.GetMetersRowed();
+        //        currTime = stats.GetSecondsRowing();
+        //#endif
+
+        //        deltDist = currDist - prevDist;
+        //        deltTime = currTime - prevTime;
+
+        //        if (deltTime <= 0) deltTime = Time.fixedDeltaTime;
+
+        //        speed = ((deltDist) / (deltTime) * Time.fixedDeltaTime);
+
+        //        prevDist = currDist;
+        //        prevTime = currTime;
+
         if (moveForward)
         {
-            speed = 30;
-        }
-        else
-        {
-            speed = 0;
+            currDist += 2 * Time.fixedDeltaTime; //     3 meters
+            currTime += 1 * Time.fixedDeltaTime; // per 1 second
         }
 
-        //speed = stats.GetSpeed() * 1000;
+        //currDist += 2 * Time.fixedDeltaTime; //     3 meters
+        //currTime += 1 * Time.fixedDeltaTime; // per 1 second
+
+        //currDist = stats.GetMetersRowed();
+        //currTime = stats.GetSecondsRowing();
+
+        deltDist = currDist - prevDist;
+        deltTime = currTime - prevTime;
+
+        if (deltTime <= 0) deltTime = Time.fixedDeltaTime;
+
+        speed = (deltDist) / (deltTime);
+
+        prevDist = currDist;
+        prevTime = currTime;
     }
 
     private float velocity;
     private void CalculateVelocity()
     {
+        //if (velocity < 0)
+        //{
+        //    velocity = 0;
+        //}
+        //else if (speed == 0)
+        //{
+        //    velocity -= speedDecayFactor;
+        //}
+        //else
+        //{
+        //    velocity = speed;
+        //}
+
+        // Decay velocity over time if no speed applied
+        if (speed <= 0)
+        {
+            velocity -= speedDecayFactor * Time.fixedDeltaTime;
+        }
+
+        // Increase velocity over time if speed applied
+        else
+        {
+            velocity += speedIncreaseFactor * Time.fixedDeltaTime;
+        }
+
+        // Min speed
+        if (velocity < 0)
+        {
+            velocity = 0;
+        }
+
+        // Max speed
+        else if (speed != 0 && velocity > speed)
+        {
+            velocity = speed;
+        }
+
         // speed is measured in meters per second and this function is ran 
         // fixedDeltaTime's per second - so, we can figure out how far to 
         // move this update, if we evenly spread the speed out across the 
         // second by multiplying it by fixedDeltaTime
 
-        velocity = speed * Time.deltaTime;
+        //velocity = speed * Time.deltaTime;
     }
 
     private void Animate()
@@ -141,7 +256,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    #region UI Interactions
+#region UI Interactions
     public IEnumerator DisplayQuickNotificationText(string text, int duration)
     {
         notificationTextPanel.SetActive(true);
@@ -174,12 +289,12 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(duration);
         countdownPanel.SetActive(false);
     }
-    #endregion
+#endregion
 
-    #region Game Menu Interactions
+#region Game Menu Interactions
     public void OpenGameMenu()
     {
-        if(PhotonNetwork.OfflineMode == true)
+        if (PhotonNetwork.OfflineMode == true)
         {
             PauseGame();
         }
@@ -264,7 +379,7 @@ public class PlayerController : MonoBehaviour
 
     private void PauseGame()
     {
-        if(participatingInRace == true)
+        if (participatingInRace == true)
         {
             GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().PauseSingleplayerRace();
         }
@@ -285,46 +400,85 @@ public class PlayerController : MonoBehaviour
             GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().UnpauseSingleplayerTimeTrial();
         }
     }
-    #endregion
+#endregion
 
-    #region Race/Time Trial Event Methods
+#region Race/Time Trial Event Methods
     public void StartARace()
     {
-        if (participatingInTimeTrial == false && participatingInRace == false)
-        {
-            CloseGameMenu();
-            participatingInRace = true;
-            
-            // Reset track distance
-            GetComponent<WaypointProgressTracker>().progressDistance = 0;
+        // Multiplayer race not yet supported
+        if (!PhotonNetwork.OfflineMode) return;
 
-            GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(this);
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
+
+        foreach (PlayerController player in players)
+        {
+            // Skip to next player if not our photon view
+            if (!player.photonView.IsMine) continue;
+
+            if (participatingInTimeTrial == false && participatingInRace == false)
+            {
+                CloseGameMenu();
+                participatingInRace = true;
+            
+                // Reset track distance
+                GetComponent<WaypointProgressTracker>().progressDistance = 0;
+
+                GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(player);
+            }
+
+            // Found our view, so return
+            return;
         }
     }
 
     public void StartATimeTrial()
-    {
-        if (participatingInRace == false && participatingInTimeTrial == false)
+    {   
+        // Multiplayer time-trial not yet supported
+        if (!PhotonNetwork.OfflineMode) return;
+
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
+
+        foreach (PlayerController player in players)
         {
-            CloseGameMenu();
-            participatingInTimeTrial = true;
+            // Skip to next player if not our photon view
+            if (!player.photonView.IsMine) continue;
 
-            // Reset track distance
-            GetComponent<WaypointProgressTracker>().progressDistance = 0;
+            if (participatingInRace == false && participatingInTimeTrial == false)
+            {
+                CloseGameMenu();
+                participatingInTimeTrial = true;
 
-            GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(this);
+                // Reset track distance
+                GetComponent<WaypointProgressTracker>().progressDistance = 0;
+
+                GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(player);
+            }
+
+            // Found our view, so return
+            return;
         }
     }
 
     public void JustRow()
     {
-        WaypointProgressTracker waypointProgressTracker = GetComponent<WaypointProgressTracker>();
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
 
-        // Reset track distance
-        waypointProgressTracker.progressDistance = 0;
+        foreach (PlayerController player in players)
+        {
+            // Skip to next player if not our photon view
+            if (!player.photonView.IsMine) continue;
 
-        // Reset track
-        waypointProgressTracker.Circuit = waypointProgressTracker.Routes[0];
+            WaypointProgressTracker waypointProgressTracker = GetComponent<WaypointProgressTracker>();
+
+            // Reset track distance
+            waypointProgressTracker.progressDistance = 0;
+
+            // Reset track
+            waypointProgressTracker.Circuit = waypointProgressTracker.Routes[0];
+
+            // Found our view, so return
+            return;
+        }
     }
     #endregion
 

@@ -82,7 +82,11 @@ public class Launcher : MonoBehaviourPunCallbacks
 
         Debug.Log("Connected to Server.");
         MenuManager.Instance.OpenMenu("Loading");
-        PhotonNetwork.ConnectUsingSettings();
+
+        if (!PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.ConnectUsingSettings();
+        }
     }
 
     public void ConnectedToPerformanceMonitor()
@@ -160,6 +164,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         errorText.text = "Room creation failed: " + message;
+        PhotonNetwork.Disconnect();
+        PhotonNetwork.OfflineMode = true;
         MenuManager.Instance.OpenMenu("Error");
     }
 

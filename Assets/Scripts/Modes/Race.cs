@@ -184,7 +184,7 @@ public class Race : MonoBehaviour
             participant.GetComponent<WaypointProgressTracker>().moveTarget = true;
 
             // Retrieve notification container
-            Transform notificationContainer = participant.transform.Find("HUD").Find("Notification Cont");
+            Transform notificationContainer = participant.transform.parent.Find("HUD").Find("Notification Cont");
 
             // Activate component if not current active
             if (!notificationContainer.gameObject.activeSelf)

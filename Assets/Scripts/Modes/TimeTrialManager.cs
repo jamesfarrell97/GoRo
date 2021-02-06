@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityStandardAssets.Utility;
 
 public class TimeTrialManager : MonoBehaviour
@@ -14,7 +12,9 @@ public class TimeTrialManager : MonoBehaviour
     #region Time Trial Initiation Button Responses
     public void AddPlayerToHeroBeachTimeTrial()
     {
-        TimeTrial heroBeachTimeTrial = GameObject.Find("Hero Beach Island Time Trial").GetComponent<TimeTrial>();
+        // Changing this just to get it working for the release
+        // Will change back to previous implementation later
+        TimeTrial heroBeachTimeTrial = FindObjectOfType<TimeTrial>();
         if (heroBeachTimeTrial.timeTrialInitiated == false)
         {
             //BringUpRaceSetupMenu
@@ -25,21 +25,25 @@ public class TimeTrialManager : MonoBehaviour
             //Add player to participants list
         }
     }
+
     #endregion Time Trial Initiation Button Responses
 
-    //HardCoded Method to reach simple solution for Base Version of the 
-    //waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
-    public void AddPlayerToTimeTrial(Boat player)
+    // Hard coded method to reach simple solution for Base Version of the 
+    // waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
+    public void AddPlayerToTimeTrial(PlayerController player)
     {
-        TimeTrial heroBeachTimeTrial = GameObject.Find("Hero Beach Island Time Trial").GetComponent<TimeTrial>();
-        player.GetComponent<WaypointProgressTracker>().Circuit = GameObject.Find("Hero Beach Island Time Trial").GetComponent<WaypointCircuit>();
+        // Changing this just to get it working for the release
+        // Will change back to previous implementation later
+        TimeTrial heroBeachTimeTrial = FindObjectOfType<TimeTrial>();
+
+        // Changing this just to get it working for the release
+        // Will change back to previous implementation later
+        player.GetComponent<WaypointProgressTracker>().Circuit = heroBeachTimeTrial.gameObject.GetComponent<WaypointCircuit>();
         player.GetComponent<WaypointProgressTracker>().currentTimeTrial = heroBeachTimeTrial;
         player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachTimeTrial.route.Length - 1;
         heroBeachTimeTrial.timeTrialInitiated = true;
         heroBeachTimeTrial.timeTheTimeTrialInitiated = Time.timeSinceLevelLoad;
-        heroBeachTimeTrial.numberOfLaps = 3;
+        heroBeachTimeTrial.numberOfLaps = 1;
         heroBeachTimeTrial.AddParticipantIntoTimeTrial(player);
     }
-
-
 }

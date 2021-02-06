@@ -1,12 +1,11 @@
-﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
-using UnityEngine.UI;
-using TMPro;
-using Photon.Pun;
+﻿using System.Collections;
+
 using UnityStandardAssets.Utility;
-using System.Collections;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine;
+
+using Photon.Pun;
+using TMPro;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -14,7 +13,6 @@ using UnityEngine.SceneManagement;
 //
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] Boat boat;
     [SerializeField] public float boatSpeed = 0f;
     [SerializeField] float boatTurningSpeed = 1f;
     [SerializeField] public bool participatingInRace = false;
@@ -22,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public Transform[] route;
 
     [SerializeField] Animator[] rowingAnimators;
+
     #region UI Variables
     [SerializeField] public GameObject hudCanvas;
     [SerializeField] public GameObject gameMenuCanvas;
@@ -42,28 +41,22 @@ public class PlayerController : MonoBehaviour
     private Launcher launcher;
     #endregion
 
-    private BoxCollider boxCollider;
-    private Rigidbody rigidBody;
-
-    private PhotonView photonView;
     private AchievementTracker achievementTracker;
+    private BoxCollider boxCollider;
+    private PhotonView photonView;
     private Stats stats;
 
     private bool allowedMove = true;
     private bool moveForward = false;
     private bool moveBack = false;
-    private bool moveLeft = false;
-    private bool moveRight = false;
-    private bool rotateLeft = false;
-    private bool rotateRight = false;
+
+    private float speed;
 
     private void Awake()
     {
-        boxCollider = GetComponent<BoxCollider>();
-        rigidBody = GetComponent<Rigidbody>();
-
-        photonView = GetComponent<PhotonView>();
         achievementTracker = GetComponent<AchievementTracker>();
+        boxCollider = GetComponent<BoxCollider>();
+        photonView = GetComponent<PhotonView>();
         stats = GetComponent<Stats>();
         waitingToConfirmLeaveRoom = false;
         waitingToConfirmExitGame = false;
@@ -73,88 +66,71 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        //GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
-
         if (photonView.IsMine) return;
 
-        previousPosition = transform.position;
-
-        Destroy(GetComponentInChildren<Camera>().gameObject);
-        Destroy(rigidBody);
+        Destroy(GetComponentInChildren<Camera>().gameObject); // Main Camera
+        Destroy(GetComponentInChildren<Camera>().gameObject); // Minimap Camera
     }
 
-    int nodeIndex = 0;
-    Transform currentNode;
-
-    private float currDist = 0;
-    private float prevDist = 0;
-    private float currTime = 0;
-    private float prevTime = 0;
-    private float deltDist = 0;
-    private float deltTime = 0;
-    private float velocity = 0;
-
-    private float distance = 0;
-    private float angle = 0;
-    private float prevAngl = 0;
-    private float deltaDistance = 0;
-    private float deltAngl = 0;
-    private float time = 0;
-    private float speed = 0;
-
-    private Vector3 previousPosition;
-    private Vector3 cross;
-
-    private const float MIN_DISTANCE = 1f;
-
-    Vector3 force;
-    int count = 0;
     private void Update()
     {
         if (!photonView.IsMine) return;
 
         achievementTracker.TrackAchievements(photonView, stats);
 
-        if (!allowedMove) return;
-
-        // RowingStatusData[0] == TimeLo
-        // RowingStatusData[3] == DistanceLo
-
-        currDist = BluetoothManager.RowingStatusData[3] * 10;   // Convert to meters
-        currTime = BluetoothManager.RowingStatusData[0] * 100;  // Convert to seconds
-
-        deltDist = currDist - prevDist;
-        deltTime = Time.time - prevTime;
-
-        if (deltTime != 0)
+        if (!allowedMove)
         {
-            velocity = deltDist / deltTime;
-
-            force = -transform.forward * boatSpeed * Mathf.Abs(velocity / 100);
-
-            rigidBody.AddForce(force);
-
-            if (count > 50)
-            {
-                Debug.Log("DUNITY: CurrDist: " + currDist);
-                Debug.Log("DUNITY: CurrTime: " + currTime);
-                Debug.Log("DUNITY: DeltDist: " + deltDist);
-                Debug.Log("DUNITY: DeltTime: " + deltTime);
-                Debug.Log("DUNITY: Velocity: " + velocity);
-                Debug.Log("DUNITY: Force: " + force);
-                count = 0;
-
-            }
-
-            count++;
+            velocity = 0;
+            return;
         }
 
-        prevDist = currDist;
-        prevTime = currTime;
+        if (Input.GetKey(KeyCode.W))
+        {
+            moveForward = true;
+        }
+        else
+        {
+            moveForward = false;
+        }
 
+        UpdateSpeed();
+        CalculateVelocity();
+        Animate();
+    }
+
+    public float speedIncreaseFactor = 0.1f;
+    public float speedDecayFactor = 0.1f;
+
+    private void UpdateSpeed()
+    {
+        if (moveForward)
+        {
+            speed = 30;
+        }
+        else
+        {
+            speed = 0;
+        }
+
+        //speed = stats.GetSpeed() * 1000;
+    }
+
+    private float velocity;
+    private void CalculateVelocity()
+    {
+        // speed is measured in meters per second and this function is ran 
+        // fixedDeltaTime's per second - so, we can figure out how far to 
+        // move this update, if we evenly spread the speed out across the 
+        // second by multiplying it by fixedDeltaTime
+
+        velocity = speed * Time.deltaTime;
+    }
+
+    private void Animate()
+    {
         foreach (Animator animator in rowingAnimators)
         {
-            if (deltDist > 0)
+            if (speed > 0)
             {
                 animator.SetBool("Play", true);
             }
@@ -163,15 +139,13 @@ public class PlayerController : MonoBehaviour
                 animator.SetBool("Play", false);
             }
         }
-
-        CalculateVelocity();
     }
 
     #region UI Interactions
     public IEnumerator DisplayQuickNotificationText(string text, int duration)
     {
         notificationTextPanel.SetActive(true);
-        notificationText.GetComponent<Text>().text = text;
+        notificationText.GetComponent<TMP_Text>().text = text;
         yield return new WaitForSeconds(duration);
         notificationTextPanel.SetActive(false);
     }
@@ -181,7 +155,7 @@ public class PlayerController : MonoBehaviour
     public void DisplayNotificationText(string text)
     {
         notificationTextPanel.SetActive(true);
-        notificationText.GetComponent<Text>().text = text;
+        notificationText.GetComponent<TMP_Text>().text = text;
     }
 
     public void DisplayTimeAndLap(string time, string lap)
@@ -200,11 +174,9 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(duration);
         countdownPanel.SetActive(false);
     }
-
     #endregion
 
     #region Game Menu Interactions
-
     public void OpenGameMenu()
     {
         if(PhotonNetwork.OfflineMode == true)
@@ -243,7 +215,7 @@ public class PlayerController : MonoBehaviour
         {
             if (waitingToConfirmLeaveRoom == true)
             {
-                //launcher.ShowConnectionMenu();                
+                launcher.LeaveRoom();
             }
             else if (waitingToConfirmExitGame == true)
             {
@@ -271,7 +243,6 @@ public class PlayerController : MonoBehaviour
         if (photonView.IsMine)
         {
             RequestConfirmPlayersChoice("exitGame");
-            //    Application.Quit();
         }
     }
 
@@ -295,11 +266,11 @@ public class PlayerController : MonoBehaviour
     {
         if(participatingInRace == true)
         {
-            boat.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().PauseSingleplayerRace();
+            GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().PauseSingleplayerRace();
         }
         else if(participatingInTimeTrial == true)
         {
-            boat.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().PauseSingleplayerTimeTrial();
+            GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().PauseSingleplayerTimeTrial();
         }
     }
 
@@ -307,13 +278,14 @@ public class PlayerController : MonoBehaviour
     {
         if (participatingInRace == true)
         {
-            boat.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().UnpauseSingleplayerRace();
+            GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().UnpauseSingleplayerRace();
         }
         else if (participatingInTimeTrial == true)
         {
-            boat.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().UnpauseSingleplayerTimeTrial();
+            GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().UnpauseSingleplayerTimeTrial();
         }
     }
+    #endregion
 
     #region Race/Time Trial Event Methods
     public void StartARace()
@@ -322,8 +294,11 @@ public class PlayerController : MonoBehaviour
         {
             CloseGameMenu();
             participatingInRace = true;
-            speedSlider.SetActive(true);
-            GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(boat);
+            
+            // Reset track distance
+            GetComponent<WaypointProgressTracker>().progressDistance = 0;
+
+            GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(this);
         }
     }
 
@@ -333,40 +308,25 @@ public class PlayerController : MonoBehaviour
         {
             CloseGameMenu();
             participatingInTimeTrial = true;
-            speedSlider.SetActive(true);
-            GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(boat);
+
+            // Reset track distance
+            GetComponent<WaypointProgressTracker>().progressDistance = 0;
+
+            GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(this);
         }
     }
-    #endregion
 
-    #endregion
-
-    public void CalculateVelocity()
+    public void JustRow()
     {
-        //currDist = BluetoothManager.RowingStatusData[3] * 10;   // Convert to meters
-        //currTime = BluetoothManager.RowingStatusData[0] * 100;  // Convert to seconds
+        WaypointProgressTracker waypointProgressTracker = GetComponent<WaypointProgressTracker>();
 
-        //deltDist = currDist - prevDist;
-        //deltTime = currTime - prevTime;
+        // Reset track distance
+        waypointProgressTracker.progressDistance = 0;
 
-        //velocity = deltDist / deltTime;
-
-        //rigidBody.AddForce(-transform.forward * boatSpeed * Mathf.Abs(velocity / 100));
-
-        //prevDist = currDist;
-        //prevTime = currTime;
-
-        if (Input.GetKey(KeyCode.W) || moveForward)
-        {
-            speed = boatSpeed;
-            transform.position += transform.forward * speed;
-        }
-        else if (Input.GetKey(KeyCode.S) || moveBack)
-        {
-            speed = -boatSpeed;
-            transform.position += transform.forward * speed;
-        }
+        // Reset track
+        waypointProgressTracker.Circuit = waypointProgressTracker.Routes[0];
     }
+    #endregion
 
     public void MoveForward()
     {
@@ -396,6 +356,11 @@ public class PlayerController : MonoBehaviour
     public void ResumeMovement()
     {
         this.allowedMove = true;
+    }
+
+    public float GetVelocity()
+    {
+        return velocity;
     }
 
     private void OnCollisionEnter(Collision collision)

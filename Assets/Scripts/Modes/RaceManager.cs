@@ -1,13 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityStandardAssets.Utility;
 
 public class RaceManager : MonoBehaviour
 {
-
-    public void TakePartInARace(Boat player)
+    public void TakePartInARace(PlayerController player)
     {
         //Will initiate Menu Screen to appear where player will be prompted to select race track they wish to take part in
         //From this interaction the following methods starting with "AddPlayerToXXX" represent the button pressed actions relevant to race selected
@@ -16,7 +12,9 @@ public class RaceManager : MonoBehaviour
     #region Race Initiation Button Responses
     public void AddPlayerToHeroBeachRace()
     {
-        Race heroBeachRace = GameObject.Find("Hero Beach Island Race").GetComponent<Race>();
+        // Changing this just to get it working for the release
+        // Will change back to previous implementation later
+        Race heroBeachRace = FindObjectOfType<Race>();
         if(heroBeachRace.raceInitiated == false)
         {
             //BringUpRaceSetupMenu
@@ -39,19 +37,21 @@ public class RaceManager : MonoBehaviour
     //HardCoded Method to reach simple solution for Base Version of the 
     //waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
     //IMPORTANT: Everything being set in this method will need to be set for every player joining game, it is essential 
-    public void AddPlayerToRace(Boat player)
+    public void AddPlayerToRace(PlayerController player)
     {
-        Race heroBeachRace = GameObject.Find("Hero Beach Island Race").GetComponent<Race>();
-        //player.GetComponent<WaypointProgressTracker>().Circuit = FindObjectOfType<WaypointCircuit>();
-        player.GetComponent<WaypointProgressTracker>().Circuit = GameObject.Find("Hero Beach Island Race").GetComponent<WaypointCircuit>();
+        // Changing this just to get it working for the release
+        // Will change back to previous implementation later
+        Race heroBeachRace = FindObjectOfType<Race>();
+
+        // Changing this just to get it working for the release
+        // Will change back to previous implementation later
+        player.GetComponent<WaypointProgressTracker>().Circuit = heroBeachRace.gameObject.GetComponent<WaypointCircuit>();
         player.GetComponent<WaypointProgressTracker>().currentRace = heroBeachRace;
         player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachRace.route.Length-1;
         heroBeachRace.raceInitiated = true;
         heroBeachRace.timeRaceInitiated = Time.timeSinceLevelLoad;
-        heroBeachRace.numberOfLaps = 3;
+        heroBeachRace.numberOfLaps = 1;
         heroBeachRace.raceCapacity = 1;
         heroBeachRace.AddParticipantIntoRace(player);
     }
-    
-
 }

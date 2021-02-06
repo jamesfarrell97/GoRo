@@ -1,16 +1,18 @@
 ﻿using System.Collections;
 using System;
-using System.Collections.Generic;
-using Photon.Pun;
+
+using UnityStandardAssets.Utility;
 using UnityEngine.UI;
 using UnityEngine;
-using UnityStandardAssets.Utility;
+
+using Photon.Pun;
+using TMPro;
 
 public class TimeTrial : MonoBehaviour
 {
     #region Public Variables   
     [SerializeField] public Transform[] route;
-    [SerializeField] public Boat participant;
+    [SerializeField] public PlayerController participant;
 
     [SerializeField] public int numberOfLaps;
 
@@ -30,6 +32,7 @@ public class TimeTrial : MonoBehaviour
 
     private bool gamePaused = false;
     private float durationOfTimeTrialWithoutPauses;
+
     private float countdown = 4f;
     private float currentTimeInCountdown = 0;
     private int timeTrialPositionIndex = 1;
@@ -38,6 +41,8 @@ public class TimeTrial : MonoBehaviour
     private void Awake()
     {
         photonView = GetComponent<PhotonView>();
+
+        route = FindObjectOfType<TimeTrial>().GetComponentsInChildren<Transform>();
     }
 
     void Update()
@@ -67,15 +72,18 @@ public class TimeTrial : MonoBehaviour
         }
     }
 
-    public void AddParticipantIntoTimeTrial(Boat player)
+    public void AddParticipantIntoTimeTrial(PlayerController player)
     {
         participant = player;
         player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
     }
 
-    //REf for basic countdown implementation: https://answers.unity.com/questions/369581/countdown-to-start-game.html
+    // Ref for basic countdown implementation: https://answers.unity.com/questions/369581/countdown-to-start-game.html
     private void StartCountdown()
     {
+        // Pause player movement
+        participant.PauseMovement();
+
         float delta = Time.deltaTime;
         currentTimeInCountdown += delta;
 
@@ -87,15 +95,14 @@ public class TimeTrial : MonoBehaviour
             }
             else if (countdown - 1 <= 0)
             {
-                //GameObject.Find("UINotificationText").GetComponent<Text>().text = $"Start!";
-                StartCoroutine(participant.GetComponent<PlayerController>().DisplayCountdown($"Start!", 3));
+                StartCoroutine(participant.DisplayCountdown($"Start!", 3));
                 countdown = 0;
             }
             else
             {
                 countdown -= 1;
-                //GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{countdown}";
-                StartCoroutine(participant.GetComponent<PlayerController>().DisplayCountdown($"{countdown}", 3));
+
+                StartCoroutine(participant.DisplayCountdown($"{countdown}", 3));
                 currentTimeInCountdown = 0;
             }
         }
@@ -103,15 +110,20 @@ public class TimeTrial : MonoBehaviour
 
     private void StartTimeTrial()
     {
+        // Resume player movement
+        participant.ResumeMovement();
+
         timeTrialInProgress = true;
         timeTheTimeTrialStarted = Time.timeSinceLevelLoad;
         participant.GetComponent<WaypointProgressTracker>().moveTarget = true;
     }
 
-    private void EndTimeTrial()
+    private void UpdateStopWatch()
     {
-        DisplayEndOfTimeTrialStats();
-        DisposeSessionResources();
+        timeTrialDuration = TimeSpan.FromSeconds((timeSecs + durationOfTimeTrialWithoutPauses) - timeTheTimeTrialStarted);
+        
+        string time = $"{timeTrialDuration.ToString(@"mm\:ss")}";
+        participant.DisplayTimeAndLap(time, $"Lap: {participant.GetComponent<WaypointProgressTracker>().currentLap}/{numberOfLaps}");
     }
 
     //If Menu is brought up in SINGLEPLAYER, pause time trial
@@ -132,32 +144,30 @@ public class TimeTrial : MonoBehaviour
         participant.GetComponent<WaypointProgressTracker>().moveTarget = true;
     }
 
-    private void UpdateStopWatch()
+    private void EndTimeTrial()
     {
-        timeTrialDuration = TimeSpan.FromSeconds((timeSecs + durationOfTimeTrialWithoutPauses) - timeTheTimeTrialStarted);
-        //GameObject.Find("UINotificationText").GetComponent<Text>().text = $"{timeTrialDuration.ToString(@"mm\:ss")}";
-        string time = $"{timeTrialDuration.ToString(@"mm\:ss")}";
-        participant.GetComponent<PlayerController>().DisplayTimeAndLap(time, $"Lap: {participant.GetComponent<WaypointProgressTracker>().currentLap}/{numberOfLaps}");
+        DisplayEndOfTimeTrialStats();
+        DisposeSessionResources();
     }
 
-    //Display window showing the participant their overall progress within the time trial, how long they took and 
-    //Any achievements/ leaderboard score they obtained through that race + stat increase
     private void DisplayEndOfTimeTrialStats()
     {
         participant.GetComponent<PlayerController>().timePanel.SetActive(false);
         participant.GetComponent<PlayerController>().lapPanel.SetActive(false);
         //Show achievements for this time trial
-        //GameObject.Find("UINotificationText").GetComponent<Text>().text = $"You completed {numberOfLaps} lap(s) within {timeTrialDuration.ToString(@"mm\:ss")}";
+       
         string text = $"You completed {numberOfLaps} lap(s) within {timeTrialDuration.ToString(@"mm\:ss")}";
         StartCoroutine(participant.GetComponent<PlayerController>().DisplayQuickNotificationText(text, 6));
     }
 
-    //Reset all datatypes back to their initial state, after a race is finished
+    // Reset all datatypes back to their initial state, after a race is finished
     private void DisposeSessionResources()
     {
         participant.GetComponent<PlayerController>().participatingInTimeTrial = false;
-        participant.GetComponent<PlayerController>().speedSlider.SetActive(false);
-        participant.GetComponent<PlayerController>().speedSlider.GetComponent<Slider>().value = 0;
+
+        participant.JustRow();
+        participant.participatingInTimeTrial = false;
+
         participant = null;
         timeTrialInitiated = false;
         timeTrialInProgress = false;
@@ -170,5 +180,4 @@ public class TimeTrial : MonoBehaviour
         timeTheTimeTrialInitiated = 0;
         durationOfTimeTrialWithoutPauses = 0;
     }
-
 }

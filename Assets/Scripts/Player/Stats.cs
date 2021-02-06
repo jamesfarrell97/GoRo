@@ -17,16 +17,17 @@ public class Stats : MonoBehaviour
     [SerializeField] private TMP_Text StrokePowerDisplay;
     [SerializeField] private TMP_Text DriveLengthDisplay;
 
-    [HideInInspector] public float DistanceCovered;
-    [HideInInspector] public float TimeRowing;
+    private float DistanceCovered;
+    private float TimeRowing;
+    private float Speed;
 
-    [HideInInspector] public float SplitTime;
-    [HideInInspector] public float SplitDist;
-    [HideInInspector] public float DriveLength;
+    private float SplitTime;
+    private float SplitDist;
+    private float DriveLength;
 
-    [HideInInspector] public int StrokesPerMin;
-    [HideInInspector] public int StrokePower;
-    [HideInInspector] public int StrokeState;
+    private int StrokesPerMin;
+    private int StrokePower;
+    private int StrokeState;
 
     private void Awake()
     {
@@ -36,9 +37,93 @@ public class Stats : MonoBehaviour
 
     private void Update()
     {
+        RetrieveStats();
         UpdateSplit();
-        UpdateStats();
         UpdateDisplay();
+    }
+
+    private float DistanceL;
+    private float DistanceM;
+    private float DistanceH;
+
+    // Measured as 0.01 meters per least-significant bit
+    private const float DISTANCE_L_METER_VALUE = 0.01f;                                     // Max       2.56 Meters
+    private const float DISTANCE_M_METER_VALUE = DISTANCE_L_METER_VALUE * 256;              // Max     655.35 Meters
+    private const float DISTANCE_H_METER_VALUE = DISTANCE_M_METER_VALUE * 256;              // Max 167,769.60 Meters
+
+    private float ElapsedTimeL;
+    private float ElapsedTimeM;
+    private float ElapsedTimeH;
+
+    // Measured as 0.01 seconds per least-significant bit
+    private const float ELAPSED_TIME_L_SECOND_VALUE = 0.01f;                                // Max       2.55 Seconds
+    private const float ELAPSED_TIME_M_SECOND_VALUE = ELAPSED_TIME_L_SECOND_VALUE * 256;    // Max     655.35 Seconds (11 Minutes)
+    private const float ELAPSED_TIME_H_SECOND_VALUE = ELAPSED_TIME_M_SECOND_VALUE * 256;    // Max 167,769.60 Seconds (46 Hours)
+
+    private float SpeedL;
+    private float SpeedH;
+
+    // Measured as 0.001 m/s per least-significant bit
+    private const float SPEED_L_MPS_VALUE = 0.001f;                                         // Max       2.55 m/s
+    private const float SPEED_H_MPS_VALUE = SPEED_L_MPS_VALUE * 256;                        // Max     655.35 m/s
+
+    private int count = 0;
+    private void RetrieveStats()
+    {
+        // Distance Covered (Meters)
+        DistanceL = BluetoothManager.RowingStatusData[3];           // Distance Lo
+        DistanceM = BluetoothManager.RowingStatusData[4];           // Distance Mid
+        DistanceH = BluetoothManager.RowingStatusData[5];           // Distance Hi
+
+        DistanceCovered = (DistanceH * DISTANCE_H_METER_VALUE)
+                        + (DistanceM * DISTANCE_M_METER_VALUE)
+                        + (DistanceL * DISTANCE_L_METER_VALUE) * 10;
+
+        // Time Rowing (Seconds)
+        ElapsedTimeL = BluetoothManager.RowingStatusData[0];        // Elapsed Time Lo
+        ElapsedTimeM = BluetoothManager.RowingStatusData[1];        // Elapsed Time Mid
+        ElapsedTimeH = BluetoothManager.RowingStatusData[2];        // Elapsed Time Hi
+
+        TimeRowing = (ElapsedTimeH * ELAPSED_TIME_H_SECOND_VALUE)
+                   + (ElapsedTimeM * ELAPSED_TIME_M_SECOND_VALUE)
+                   + (ElapsedTimeL * ELAPSED_TIME_L_SECOND_VALUE);
+
+        // Speed (m/s)
+        SpeedL = BluetoothManager.RowingStatusData[0];              // Speed Lo
+        SpeedH = BluetoothManager.RowingStatusData[1];              // Speed Hi
+
+        Speed = (SpeedH * SPEED_H_MPS_VALUE)
+              + (SpeedL * SPEED_L_MPS_VALUE);
+
+        StrokeState = BluetoothManager.RowingStatusData[10];        // Stroke State
+        StrokePower = BluetoothManager.StrokeData1[3];              // Average Power L
+
+        StrokesPerMin = BluetoothManager.RowingStatusData1[5];      // Stroke Rate
+        DriveLength = BluetoothManager.StrokeData[6];               // Drive Length
+
+#if !UNITY_EDITOR
+        if (count > 50)
+        {
+            Debug.Log("DUNITY: Meters Rowed Low: " + DistanceL);
+            Debug.Log("DUNITY: Meters Rowed Mid: " + DistanceM);
+            Debug.Log("DUNITY: Meters Rowed High: " + DistanceH);
+            Debug.Log("DUNITY: Meters Rowed: " + DistanceCovered);
+            Debug.Log("DUNITY: Seconds Rowing Low: " + ElapsedTimeL);
+            Debug.Log("DUNITY: Seconds Rowing Mid: " + ElapsedTimeM);
+            Debug.Log("DUNITY: Seconds Rowing High: " + ElapsedTimeH);
+            Debug.Log("DUNITY: Speed Low: " + SpeedL);
+            Debug.Log("DUNITY: Speed High: " + SpeedH);
+            Debug.Log("DUNITY: Speed: " + Speed);
+            Debug.Log("DUNITY: Time Rowing: " + TimeRowing);
+            Debug.Log("DUNITY: Stroke State: " + StrokeState);
+            Debug.Log("DUNITY: Stroke Power: " + StrokePower);
+            Debug.Log("DUNITY: SPM: " + StrokesPerMin);
+            Debug.Log("DUNITY: Drive Length: " + DriveLength);
+            count = 0;
+        }
+#endif
+
+        count++;
     }
 
     private int SplitIterator = 0;
@@ -69,69 +154,14 @@ public class Stats : MonoBehaviour
         PreviousTime = ElapsedTimeL;
     }
 
-    private float DistanceL;
-    private float DistanceM;
-    private float DistanceH;
-
-    // Measured as 0.01 meters per least-significant bit
-    private const float DISTANCE_L_METER_VALUE = 0.01f;                                     // Max       2.56 Meters
-    private const float DISTANCE_M_METER_VALUE = DISTANCE_L_METER_VALUE * 256;              // Max     655.35 Meters
-    private const float DISTANCE_H_METER_VALUE = DISTANCE_M_METER_VALUE * 256;              // Max 167,769.60 Meters
-
-    private float ElapsedTimeL;
-    private float ElapsedTimeM;
-    private float ElapsedTimeH;
-
-    // Measured as 0.01 seconds per least-significant bit
-    private const float ELAPSED_TIME_L_SECOND_VALUE = 0.01f;                                // Max       2.55 Seconds
-    private const float ELAPSED_TIME_M_SECOND_VALUE = ELAPSED_TIME_L_SECOND_VALUE * 256;    // Max     655.35 Seconds (11 Minutes)
-    private const float ELAPSED_TIME_H_SECOND_VALUE = ELAPSED_TIME_M_SECOND_VALUE * 256;    // Max 167,769.60 Seconds (46 Hours)
-
-    private int count = 0;
-    private void UpdateStats()
+    private void UpdateDisplay()
     {
-        // Distance Covered (Meters)
-        DistanceL = BluetoothManager.RowingStatusData[3];           // Distance Lo
-        DistanceM = BluetoothManager.RowingStatusData[4];           // Distance Mid
-        DistanceH = BluetoothManager.RowingStatusData[5];           // Distance Hi
-
-        DistanceCovered = (DistanceH * DISTANCE_H_METER_VALUE)
-                        + (DistanceM * DISTANCE_M_METER_VALUE)
-                        + (DistanceL * DISTANCE_L_METER_VALUE);
-
-        // Time Rowing (Seconds)
-        ElapsedTimeL = BluetoothManager.RowingStatusData[0];        // Elapsed Time Lo
-        ElapsedTimeM = BluetoothManager.RowingStatusData[1];        // Elapsed Time Mid
-        ElapsedTimeH = BluetoothManager.RowingStatusData[2];        // Elapsed Time Hi
-
-        TimeRowing = (ElapsedTimeH * ELAPSED_TIME_H_SECOND_VALUE)
-                   + (ElapsedTimeM * ELAPSED_TIME_M_SECOND_VALUE)
-                   + (ElapsedTimeL * ELAPSED_TIME_L_SECOND_VALUE);
-
-        StrokeState = BluetoothManager.RowingStatusData[10];        // Stroke State
-        StrokePower = BluetoothManager.StrokeData1[3];              // Average Power L
-
-        StrokesPerMin = BluetoothManager.RowingStatusData1[5];      // Stroke Rate
-        DriveLength = BluetoothManager.StrokeData[6];               // Drive Length
-
-        if (count > 50)
-        {
-            Debug.Log("DUNITY: Meters Rowed Lo: " + DistanceL);
-            Debug.Log("DUNITY: Meters Rowed Mid: " + DistanceM);
-            Debug.Log("DUNITY: Meters Rowed High: " + DistanceH);
-            Debug.Log("DUNITY: Meters Rowed: " + DistanceCovered);
-            Debug.Log("DUNITY: Seconds Rowing Lo: " + ElapsedTimeL);
-            Debug.Log("DUNITY: Seconds Rowing Mid: " + ElapsedTimeM);
-            Debug.Log("DUNITY: Seconds Rowing High: " + ElapsedTimeH);
-            Debug.Log("DUNITY: Time Rowing: " + TimeRowing);
-            Debug.Log("DUNITY: Stroke State: " + StrokeState);
-            Debug.Log("DUNITY: Stroke Power: " + StrokePower);
-            Debug.Log("DUNITY: SPM: " + StrokesPerMin);
-            Debug.Log("DUNITY: Drive Length: " + DriveLength);
-            count = 0;
-        }
-
-        count++;
+        SetSplitTimeDisplay(SplitTime);
+        SetTimeDisplay(TimeRowing);
+        SetDistanceDiplay(DistanceCovered);
+        SetStrokesPerMinDisplay(StrokesPerMin);
+        SetPowerDisplay(StrokePower);
+        SetDriveLengthDisplay(DriveLength);
     }
 
     private void ResetStats()
@@ -146,6 +176,8 @@ public class Stats : MonoBehaviour
 
     private void ResetDisplay()
     {
+        SplitIterator = 0;
+
         SetSplitDistDisplay(SplitDistances[SplitIterator]);
         SetSplitTimeDisplay(0);
         SetTimeDisplay(0);
@@ -153,16 +185,6 @@ public class Stats : MonoBehaviour
         SetStrokesPerMinDisplay(0);
         SetPowerDisplay(0);
         SetDriveLengthDisplay(0);
-    }
-
-    private void UpdateDisplay()
-    {
-        SetSplitTimeDisplay(SplitTime);
-        SetTimeDisplay(TimeRowing);
-        SetDistanceDiplay(DistanceCovered);
-        SetStrokesPerMinDisplay(StrokesPerMin);
-        SetPowerDisplay(StrokePower);
-        SetDriveLengthDisplay(DriveLength);
     }
 
     private void SetSplitDistDisplay(float distance)
@@ -176,7 +198,7 @@ public class Stats : MonoBehaviour
     {
         if (!SplitTimeDisplay.enabled) return;
 
-        int[] hms = HelperFunctions.SecondsToHMS((int)seconds);
+        int[] hms = HelperFunctions.SecondsToHMS((int) seconds);
 
         SplitTimeDisplay.text = hms[1] + ":" + hms[2].ToString("D2");
     }
@@ -185,7 +207,7 @@ public class Stats : MonoBehaviour
     {
         if (!TimeDisplay.enabled) return;
 
-        int[] hms = HelperFunctions.SecondsToHMS((int)seconds);
+        int[] hms = HelperFunctions.SecondsToHMS((int) seconds);
 
         TimeDisplay.text = hms[0].ToString("D2") + ":" + hms[1].ToString("D2") + ":" + hms[2].ToString("D2");
     }
@@ -240,6 +262,11 @@ public class Stats : MonoBehaviour
 
     public int GetSecondsRowing()
     {
-        return (int) ElapsedTimeL;
+        return (int) TimeRowing;
+    }
+
+    public int GetSpeed()
+    {
+        return (int) Speed;
     }
 }

@@ -8,16 +8,15 @@ namespace UnityStandardAssets.Utility
     public class WaypointProgressTracker : MonoBehaviour
     {
         #region Race/Time Trial Event Variables
-        [SerializeField] public bool moveTarget = false;
-        [SerializeField] public int currentLap = 1;
-        [SerializeField] public int amountOfLaps = 0;
+        [HideInInspector] public int currentLap = 1;
+        [HideInInspector] public int amountOfLaps = 0;
 
-        [SerializeField] public bool halfPointOftrackReached;
-        [SerializeField] public int lastIndex;
+        [HideInInspector] public bool halfPointOftrackReached;
+        [HideInInspector] public int lastIndex;
 
-        [SerializeField] public float timeOfCompletion;
-        [SerializeField] public Race currentRace;
-        [SerializeField] public TimeTrial currentTimeTrial;
+        [HideInInspector] public float timeOfCompletion;
+        [HideInInspector] public Race currentRace;
+        [HideInInspector] public TimeTrial currentTimeTrial;
 
         private PlayerController player;
         private TimeSpan eventDuration;
@@ -80,6 +79,7 @@ namespace UnityStandardAssets.Utility
         private void Start()
         {
             player = GetComponent<PlayerController>();
+            halfPointOftrackReached = false;
 
             // we use a transform to represent the point to aim for, and the point which
             // is considered for upcoming changes-of-speed. This allows this component
@@ -87,7 +87,6 @@ namespace UnityStandardAssets.Utility
 
             // you can manually create a transform and assign it to this component *and* the AI,
             // then this component will update it, and the AI can read it.
-            halfPointOftrackReached = false;
             if (target == null)
             {
                 target = new GameObject(name + " Waypoint Target").transform;
@@ -103,15 +102,6 @@ namespace UnityStandardAssets.Utility
             {
                 target.position = Circuit.Waypoints[progressNum].position;
                 target.rotation = Circuit.Waypoints[progressNum].rotation;
-            }
-        }
-
-        // temporary way of processing speed of boat -> for demo purposes due to lack of access to concept 2 machine
-        public void UpdateSpeedOfBoat(Slider slidier)
-        {
-            if (moveTarget == true)
-            {
-                velocity = slidier.value;
             }
         }
 
@@ -212,25 +202,22 @@ namespace UnityStandardAssets.Utility
 
         private void CheckIfLapComplete()
         {
-            if (moveTarget == true)
+            if (halfPointOftrackReached == true)//Precaution to avoid this firing off instantly on start of race
             {
-                if (halfPointOftrackReached == true)//Precaution to avoid this firing off instantly on start of race
+                float distance;
+                if (target.GetComponent<PlayerController>().participatingInRace == true)
                 {
-                    float distance;
-                    if (target.GetComponent<PlayerController>().participatingInRace == true)
-                    {
-                        distance = Vector3.Distance(transform.position, currentRace.route[lastIndex].position);
-                    }
-                    else
-                    {
-                        distance = Vector3.Distance(transform.position, currentTimeTrial.route[lastIndex].position);
-                    }
+                    distance = Vector3.Distance(transform.position, currentRace.route[lastIndex].position);
+                }
+                else
+                {
+                    distance = Vector3.Distance(transform.position, currentTimeTrial.route[lastIndex].position);
+                }
 
-                    if (distance < pointToPointThreshold)
-                    {
-                        halfPointOftrackReached = false;
-                        UpdateEventLapCount();
-                    }
+                if (distance < pointToPointThreshold)
+                {
+                    halfPointOftrackReached = false;
+                    UpdateEventLapCount();
                 }
             }
         }
@@ -245,7 +232,6 @@ namespace UnityStandardAssets.Utility
             else
             {
                 velocity = 0;
-                moveTarget = false;
                 CompleteEvent();
                 ResetEventData();
             }
@@ -255,7 +241,7 @@ namespace UnityStandardAssets.Utility
         {
             if (target.GetComponent<PlayerController>().participatingInRace == true)
             {
-                //Time, position and race info(amount of laps, track(distance), amount of participants) to be all stored relating to the new highscore obtained for this particular setup->Add with Player data
+                // Time, position and race info(amount of laps, track(distance), amount of participants) to be all stored relating to the new highscore obtained for this particular setup->Add with Player data
                 eventDuration = TimeSpan.FromSeconds(Time.timeSinceLevelLoad - currentRace.timeRaceStarted);
                 currentRace.AddParticipantToCompletedRaceList(target.GetComponent<PlayerController>());
             }

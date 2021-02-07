@@ -28,7 +28,7 @@ public class BluetoothManager : MonoBehaviour
 {
     [SerializeField] Transform DeviceListContent;
     [SerializeField] GameObject DeviceListItemPrefab;
-    [SerializeField] Launcher Launcher;
+    [SerializeField] GameManager Launcher;
 
     private DeviceListItem DeviceListItem;
     private string DeviceAddress;
@@ -191,7 +191,7 @@ public class BluetoothManager : MonoBehaviour
 
     private void Subscribed()
     {
-        Launcher.Instance.ConnectedToPerformanceMonitor();
+        GameManager.Instance.ConnectedToPerformanceMonitor();
     }
 
     private void ScanForPM()
@@ -219,7 +219,7 @@ public class BluetoothManager : MonoBehaviour
 
             BluetoothLEHardwareInterface.StopScan();
 
-            StatusMessage = "Connected.";
+            StatusMessage = "Connected";
 
             DeviceListItem.Connect();
 

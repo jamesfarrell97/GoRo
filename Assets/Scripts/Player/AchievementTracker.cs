@@ -99,7 +99,7 @@ public class AchievementTracker : MonoBehaviour
     {
         if (time1_Flag) return;
 
-        if (secondsRowing / Stats.SECS_MINUTE > time1_Target)
+        if (secondsRowing / StatsManager.SECS_MINUTE > time1_Target)
         {
             ActivateAchievement(photonView, time1.name);
             time1_Flag = true;
@@ -110,7 +110,7 @@ public class AchievementTracker : MonoBehaviour
     {
         if (time2_Flag) return;
 
-        if (secondsRowing / Stats.SECS_MINUTE > time2_Target)
+        if (secondsRowing / StatsManager.SECS_MINUTE > time2_Target)
         {
             ActivateAchievement(photonView, time2.name);
             time2_Flag = true;
@@ -121,7 +121,7 @@ public class AchievementTracker : MonoBehaviour
     {
         if (time3_Flag) return;
 
-        if (secondsRowing / Stats.SECS_MINUTE > time3_Target)
+        if (secondsRowing / StatsManager.SECS_MINUTE > time3_Target)
         {
             ActivateAchievement(photonView, time3.name);
             time3_Flag = true;
@@ -131,8 +131,10 @@ public class AchievementTracker : MonoBehaviour
     
     #endregion
 
-    public void TrackAchievements(PhotonView photonView, Stats stats)
+    public void TrackAchievements(PhotonView photonView)
     {
+        StatsManager stats = GameManager.Instance.GetComponent<StatsManager>();
+
         metersRowed = stats.GetMetersRowed();
         secondsRowing = stats.GetSecondsRowing();
 

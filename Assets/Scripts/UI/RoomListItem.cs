@@ -23,6 +23,6 @@ public class RoomListItem : MonoBehaviour
 
     public void OnClick()
     {
-        Launcher.Instance.JoinRoom(info);
+        GameManager.Instance.JoinRoom(info);
     }
 }

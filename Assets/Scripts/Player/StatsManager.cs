@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 
-public class Stats : MonoBehaviour
+public class StatsManager : MonoBehaviour
 {
     // TODO: EXTRACT INTO APPDATA SETTINGS FILE
     public static readonly int[] SplitDistances = { 100, 500, 1000, 1500, 5000 };
@@ -67,7 +67,13 @@ public class Stats : MonoBehaviour
     private const float SPEED_L_MPS_VALUE = 0.001f;                                         // Max       2.55 m/s
     private const float SPEED_H_MPS_VALUE = SPEED_L_MPS_VALUE * 256;                        // Max     655.35 m/s
 
-    private int count = 0;
+    private int PowerL;
+    private int PowerH;
+
+    // Measured as 0.001 m/s per least-significant bit
+    private const int POWER_L_W_VALUE = 1;                                                  // Max          1 w
+    private const int POWER_H_W_VALUE = POWER_L_W_VALUE * 256;                              // Max        256 w
+
     private void RetrieveStats()
     {
         // Distance Covered (Meters)
@@ -95,35 +101,17 @@ public class Stats : MonoBehaviour
         Speed = (SpeedH * SPEED_H_MPS_VALUE)
               + (SpeedL * SPEED_L_MPS_VALUE);
 
+        // Power (w)
+        PowerL = BluetoothManager.StrokeData[3];                    // Stroke Power Lo
+        PowerH = BluetoothManager.StrokeData[4];                    // Stroke Power Hi
+
+        StrokePower = (PowerL * POWER_L_W_VALUE) 
+                    + (PowerH * POWER_H_W_VALUE);
+
         StrokeState = BluetoothManager.RowingStatusData[10];        // Stroke State
-        StrokePower = BluetoothManager.StrokeData1[3];              // Average Power L
 
         StrokesPerMin = BluetoothManager.RowingStatusData1[5];      // Stroke Rate
         DriveLength = BluetoothManager.StrokeData[6];               // Drive Length
-
-#if !UNITY_EDITOR
-        if (count > 50)
-        {
-            Debug.Log("DUNITY: Meters Rowed Low: " + DistanceL);
-            Debug.Log("DUNITY: Meters Rowed Mid: " + DistanceM);
-            Debug.Log("DUNITY: Meters Rowed High: " + DistanceH);
-            Debug.Log("DUNITY: Meters Rowed: " + DistanceCovered);
-            Debug.Log("DUNITY: Seconds Rowing Low: " + ElapsedTimeL);
-            Debug.Log("DUNITY: Seconds Rowing Mid: " + ElapsedTimeM);
-            Debug.Log("DUNITY: Seconds Rowing High: " + ElapsedTimeH);
-            Debug.Log("DUNITY: Speed Low: " + SpeedL);
-            Debug.Log("DUNITY: Speed High: " + SpeedH);
-            Debug.Log("DUNITY: Speed: " + Speed);
-            Debug.Log("DUNITY: Time Rowing: " + TimeRowing);
-            Debug.Log("DUNITY: Stroke State: " + StrokeState);
-            Debug.Log("DUNITY: Stroke Power: " + StrokePower);
-            Debug.Log("DUNITY: SPM: " + StrokesPerMin);
-            Debug.Log("DUNITY: Drive Length: " + DriveLength);
-            count = 0;
-        }
-#endif
-
-        count++;
     }
 
     private int SplitIterator = 0;

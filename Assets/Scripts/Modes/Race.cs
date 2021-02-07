@@ -1,30 +1,29 @@
-﻿using System.Collections;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Photon.Pun;
-using UnityEngine.UI;
-using UnityEngine;
+
 using UnityStandardAssets.Utility;
+using UnityEngine;
+using Photon.Pun;
 using TMPro;
 
 public class Race : MonoBehaviour
 {
     #region Public Variables   
-    [SerializeField] public Transform[] route;
-    [SerializeField] public List<PlayerController> participants;
-    [SerializeField] public Dictionary<int, PlayerController> participantsCompletedRace;
+    [HideInInspector] public Transform[] route;
+    [HideInInspector] public List<PlayerController> players;
+    [HideInInspector] public Dictionary<int, PlayerController> participantsCompletedRace;
 
+    [HideInInspector] public bool raceInitiated = false;
+    [HideInInspector] public bool raceInProgress = false;
+    [HideInInspector] public bool raceComplete = false;
+
+    [HideInInspector] public float waitTimeForOtherPlayersToJoin = 5f;
+    [HideInInspector] public float timeRaceInitiated;
+    [HideInInspector] public float timeRaceStarted;
+
+    [SerializeField] public TimeSpan raceDuration;
     [SerializeField] public int numberOfLaps;
     [SerializeField] public int raceCapacity;
-
-    [SerializeField] public bool raceInitiated = false;
-    [SerializeField] public bool raceInProgress = false;
-    [SerializeField] public bool raceComplete = false;
-
-    [SerializeField] public float waitTimeForOtherPlayersToJoin = 5f;
-    [SerializeField] public float timeRaceInitiated;
-    [SerializeField] public float timeRaceStarted;
-    [SerializeField] public TimeSpan raceDuration;
     #endregion Public Variables
 
     #region Private Variables
@@ -48,61 +47,21 @@ public class Race : MonoBehaviour
         route = FindObjectOfType<Race>().GetComponentsInChildren<Transform>();
     }
 
-    public void AddParticipantIntoRace(PlayerController player)
-    {
-        if(participants.Count < raceCapacity)
-        {
-            participants.Add(player);
-
-            player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
-        }
-    }
-
-    public void AddParticipantToCompletedRaceList(PlayerController player)
-    {
-        participantsCompletedRace.Add(racePositionIndex, player);
-        racePositionIndex++;
-
-        CheckIfRaceComplete();
-    }
-
-    //If Menu is brought up in SINGLEPLAYER, pause race
-    public void PauseSingleplayerRace()
-    {
-        gamePaused = true;
-        durationOfRaceWithoutPauses = durationOfRaceWithoutPauses + (timeSecs - timeRaceStarted);  
-        foreach(PlayerController player in participants)
-        {
-            player.GetComponent<WaypointProgressTracker>().moveTarget = false;
-        }
-    }
-
-    //Unpause race in SINGLEPLAYER if game menu is closed 
-    public void UnpauseSingleplayerRace()
-    {
-        gamePaused = false;
-        timeRaceStarted = Time.timeSinceLevelLoad;
-        foreach (PlayerController player in participants)
-        {
-            player.GetComponent<WaypointProgressTracker>().moveTarget = true;
-        }
-    }
-
     void Update()
     {
-        if (gamePaused == false)
+        if (!gamePaused)
         {
             timeSecs = Time.timeSinceLevelLoad;
 
-            if (raceInitiated == true)
+            if (raceInitiated)
             {
-                if (raceComplete == true)
+                if (raceComplete)
                 {
                     EndRace();
                 }
-                else if (raceInProgress == false)
+                else if (!raceInProgress)
                 {
-                    if (participants.Count == raceCapacity || (timeRaceInitiated + timeSecs) > waitTimeForOtherPlayersToJoin)
+                    if (players.Count == raceCapacity || (timeRaceInitiated + timeSecs) > waitTimeForOtherPlayersToJoin)
                     {
                         StartCountdown();
                     }
@@ -115,10 +74,10 @@ public class Race : MonoBehaviour
         }
     }
 
-    // Ref for basic countdown implementation: https://answers.unity.com/questions/369581/countdown-to-start-game.html
+    // Code referenced: https://answers.unity.com/questions/369581/countdown-to-start-game.html
     private void StartCountdown()
     {
-        foreach(PlayerController participant in participants)
+        foreach(PlayerController participant in players)
         {
             // Pause player movement
             participant.PauseMovement();
@@ -148,43 +107,44 @@ public class Race : MonoBehaviour
         }
     }
 
-    private void DisplayTextToParticipants(string text, int time=0)
+    private void UpdateStopWatch()
     {
-        foreach (PlayerController player in participants)
+        foreach (PlayerController participant in players)
         {
-            StartCoroutine(player.DisplayQuickNotificationText(text, time));
+            raceDuration = TimeSpan.FromSeconds((timeSecs + durationOfRaceWithoutPauses) - timeRaceStarted);
+
+            DisplayRaceDataToParticipants($"{raceDuration.ToString(@"mm\:ss")}");
         }
     }
 
-    private void DisplayRaceDataToParticipants(string time)
+    public void AddParticipantIntoRace(PlayerController player)
     {
-        foreach (PlayerController player in participants)
+        if (players.Count < raceCapacity)
         {
-            Debug.Log($"Laps Completed:{player.GetComponent<WaypointProgressTracker>().currentLap}");
-            player.DisplayTimeAndLap(time, $"Lap: {player.GetComponent<WaypointProgressTracker>().currentLap}/{numberOfLaps}");
+            players.Add(player);
+
+            player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
         }
     }
 
-    private void DisplayCountdownToParticipants(string count)
+    public void AddParticipantToCompletedRaceList(PlayerController player)
     {
-        foreach (PlayerController player in participants)
-        {
-            StartCoroutine(player.DisplayCountdown(count, 3));
-        }
+        participantsCompletedRace.Add(racePositionIndex, player);
+        racePositionIndex++;
+
+        CheckIfRaceComplete();
     }
 
     private void StartRace()
     {
-        //Allow participants to move [May need to figure out a better way to allow movement, where they'll all start at the EXACT same time]
-        foreach (PlayerController participant in participants)
+        // Allow participants to move [May need to figure out a better way to allow movement, where they'll all start at the EXACT same time]
+        foreach (PlayerController player in players)
         {
             // Resume player movement
-            participant.ResumeMovement();
-
-            participant.GetComponent<WaypointProgressTracker>().moveTarget = true;
-
+            player.ResumeMovement();
+            
             // Retrieve notification container
-            Transform notificationContainer = participant.transform.parent.Find("HUD").Find("Notification Cont");
+            Transform notificationContainer = GameManager.Instance.transform.Find("HUD/Notification Cont");
 
             // Activate component if not current active
             if (!notificationContainer.gameObject.activeSelf)
@@ -212,36 +172,91 @@ public class Race : MonoBehaviour
         DisposeSessionResources();
     }
 
+    // Pause singleplayer race if pause menu is opened
+    public void PauseSingleplayerRace()
+    {
+        gamePaused = true;
+        durationOfRaceWithoutPauses = durationOfRaceWithoutPauses + (timeSecs - timeRaceStarted);
+        foreach (PlayerController player in players)
+        {
+            player.PauseMovement();
+        }
+    }
+
+    // Resume singleplayer race if pause menu is closed
+    public void ResumeSingeplayerRace()
+    {
+        gamePaused = false;
+        timeRaceStarted = Time.timeSinceLevelLoad;
+        foreach (PlayerController player in players)
+        {
+            player.ResumeMovement();
+        }
+    }
+
+    private void DisplayRaceDataToParticipants(string time)
+    {
+        foreach (PlayerController player in players)
+        {
+            PhotonView photonView = player.GetComponent<PhotonView>();
+
+            if (!photonView.IsMine) continue;
+
+            int currentLap = player.GetComponent<WaypointProgressTracker>().currentLap;
+
+            GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
+
+            return;
+        }
+    }
+
+    private void DisplayCountdownToParticipants(string count)
+    {
+        foreach (PlayerController player in players)
+        {
+            PhotonView photonView = player.GetComponent<PhotonView>();
+
+            if (!photonView.IsMine) continue;
+
+            StartCoroutine(GameManager.Instance.DisplayCountdown(count, 3));
+
+            return;
+        }
+    }
+
+    private void DisplayTextToParticipants(string text, int time = 0)
+    {
+        foreach (PlayerController player in players)
+        {
+            PhotonView photonView = player.GetComponent<PhotonView>();
+
+            if (!photonView.IsMine) continue;
+
+            StartCoroutine(GameManager.Instance.DisplayQuickNotificationText(text, time));
+
+            return;
+        }
+    }
+
     private void DisplayEndOfRaceStats()
     {
         foreach (KeyValuePair<int, PlayerController> player in participantsCompletedRace)
         {
-            player.Value.timePanel.SetActive(false);
-            player.Value.lapPanel.SetActive(false);
-            StartCoroutine(player.Value.DisplayQuickNotificationText($"Your position within the race: {player.Key}", 6));
-        }
-    }
-
-    private void UpdateStopWatch()
-    {
-        foreach(PlayerController participant in participants)
-        {
-            raceDuration = TimeSpan.FromSeconds((timeSecs + durationOfRaceWithoutPauses) - timeRaceStarted);
-
-            DisplayRaceDataToParticipants($"{raceDuration.ToString(@"mm\:ss")}");
+            string text = $"Your position within the race: {player.Key}";
+            StartCoroutine(GameManager.Instance.DisplayQuickNotificationText(text, 6));
         }
     }
 
     // Reset all datatypes back to their initial state, after a race is finished
     private void DisposeSessionResources()
     {
-        foreach(PlayerController participant in participants)
+        foreach(PlayerController player in players)
         {
-            participant.JustRow();
+            GameManager.Instance.StartJustRow();
         }
 
         ResetRaceStatsForParticipants();
-        participants.Clear();
+        players.Clear();
         participantsCompletedRace.Clear();
         raceInitiated = false;
         raceInProgress = false;
@@ -258,7 +273,7 @@ public class Race : MonoBehaviour
 
     private void ResetRaceStatsForParticipants()
     {
-        foreach(PlayerController participant in participants)
+        foreach(PlayerController participant in players)
         {
             participant.GetComponent<PlayerController>().participatingInRace = false;
         }

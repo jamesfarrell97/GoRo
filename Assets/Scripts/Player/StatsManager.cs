@@ -253,8 +253,13 @@ public class StatsManager : MonoBehaviour
         return (int) TimeRowing;
     }
 
-    public int GetSpeed()
+    public float GetSpeed()
     {
-        return (int) Speed;
+        return Speed;
+    }
+
+    public int GetStrokeState()
+    {
+        return StrokeState;
     }
 }

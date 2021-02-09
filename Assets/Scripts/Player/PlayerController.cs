@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using UnityStandardAssets.Utility;
+using UnityEngine.Rendering.Universal;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -13,6 +15,8 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Animator[] rowingAnimators;
     [SerializeField] private Material otherPlayerMaterial;
+    [SerializeField] private Oar leftOar;
+    [SerializeField] private Oar rightOar;
 
     [HideInInspector] public Transform[] route;
 
@@ -21,6 +25,7 @@ public class PlayerController : MonoBehaviour
 
     private AchievementTracker achievementTracker;
     private BoxCollider boxCollider;
+    private Rigidbody rigidbody;
     private PhotonView photonView;
     private StatsManager stats;
 
@@ -34,6 +39,9 @@ public class PlayerController : MonoBehaviour
         achievementTracker = GetComponent<AchievementTracker>();
         boxCollider = GetComponent<BoxCollider>();
         photonView = GetComponent<PhotonView>();
+
+        leftOar.rowing = false;
+        rightOar.rowing = false;
     }
 
     private void Start()
@@ -41,12 +49,12 @@ public class PlayerController : MonoBehaviour
         if (photonView.IsMine)
         {
             AssignMenuCamera();
+
+            rigidbody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
         }
         else
         {
-            DestroyCameras();
-            DestroyCanvas();
-
+            DestroyComponents();
             UpdateAppearance();
         }
     }
@@ -63,22 +71,25 @@ public class PlayerController : MonoBehaviour
         MenuManager.Instance.OpenMenu("HUD");
     }
 
-    private void DestroyCameras()
+    private void DestroyComponents()
     {
+        // Destroy cameras
         Camera[] cameras = GetComponentsInChildren<Camera>();
         foreach (Camera c in cameras)
         {
-            c.gameObject.SetActive(false);
-        }
-    }
-
-    private void DestroyCanvas()
-    {
-        Canvas[] canvas = GetComponentsInParent<Canvas>();
-        foreach (Canvas c in canvas)
-        {
+            Destroy(c.GetComponent<UniversalAdditionalCameraData>());
             Destroy(c);
         }
+
+        // Destroy waypoint tracker
+        Destroy(GetComponent<WaypointProgressTracker>());
+
+        // Destroy animation
+        Destroy(GetComponent<Animation>());
+    }
+
+    private void DestroyProgressTracker()
+    {
     }
 
     private void UpdateAppearance()
@@ -115,7 +126,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (!photonView.IsMine) return;
 
@@ -124,152 +135,121 @@ public class PlayerController : MonoBehaviour
         if (!allowedMove)
         {
             velocity = 0;
-            return;
         }
-
-        //if (Input.GetKey(KeyCode.W))
-        //{
-        //    moveForward = true;
-        //}
-        //else
-        //{
-        //    moveForward = false;
-        //}
-
-        UpdateSpeed();
-        CalculateVelocity();
-        Animate();
+        else
+        {
+            UpdateSpeed();
+            Animate();
+        }
     }
 
-    private float currSpeed = 0;
+    private int strokeState = 0;
+    private float velocity = 0;
+
     private float prevSpeed = 0;
     private float deltSpeed = 0;
+    private float speed = 0;
 
-    private float velocity = 0;
-    private bool change;
+    private enum StrokeStates
+    {
+        WaitingForWheelToReachMinSpeed,
+        WaitingForWheelToAccelerate,
+        Driving,
+        DwellingAfterDrive,
+        RecoveryState
+    }
 
     private float currTime = 0;
     private void UpdateSpeed()
     {
-        if (currTime < 1f)
-        {
-            currTime += Time.fixedDeltaTime;
-            return;
-        }
-
-        currTime = 0;
         //#if UNITY_EDITOR
-        //        if (moveForward)
+        //        if (move)
         //        {
-        //            currDist += 3 * Time.fixedDeltaTime; //     3 meters
-        //            currTime += 1 * Time.fixedDeltaTime; // per 1 second
+        //            speed = (Random.Range(1.5f, 3f));
         //        }
-        //#else
-        //        currDist = stats.GetMetersRowed();
-        //        currTime = stats.GetSecondsRowing();
+
+        //        // Calculate delta speed
+        //        deltSpeed = Mathf.Abs(speed - prevSpeed);
+
+        //        // If the speed hasn't changed, don't add a force
+        //        if (stats)
+        //        {
+        //            rigidbody.AddForce(transform.forward * speed * Time.fixedDeltaTime);
+        //        }
+
+        //        velocity = rigidbody.velocity.magnitude * boatSpeed;
+
+        //        prevSpeed = speed;
+
+        //        return;
         //#endif
 
-        //        deltDist = currDist - prevDist;
-        //        deltTime = currTime - prevTime;
+        // Update speed - !!bring back down to end of function!!
+        //prevSpeed = speed;
 
-        //        if (deltTime <= 0) deltTime = Time.fixedDeltaTime;
 
-        //        speed = ((deltDist) / (deltTime) * Time.fixedDeltaTime);
 
-        //        prevDist = currDist;
-        //        prevTime = currTime;
+//#if UNITY_EDITOR
 
-        //currDist += 2 * Time.fixedDeltaTime; //     3 meters
-        //currTime += 1 * Time.fixedDeltaTime; // per 1 second
+        // Increase time
+        currTime += Time.deltaTime;
 
-        currSpeed = stats.GetSpeed();
+        // Simlating concpet2 update speed
+        if (currTime > 0.5f)
+        {
+            speed = (Random.Range(1.75f, 2.25f));
+            currTime = 0;
+        }
 
         if (move)
         {
-            currSpeed = (Random.Range(1.5f, 3f) / 35);
-        }
-
-        deltSpeed = currSpeed - prevSpeed;
-
-        change = (deltSpeed == 0) 
-            ? false 
-            : true;
-
-        currSpeed = (deltSpeed != 0)
-            ? currSpeed
-            : 0;
-
-        prevSpeed = currSpeed;
-    }
-
-    private void CalculateVelocity()
-    {
-        //if (velocity < 0)
-        //{
-        //    velocity = 0;
-        //}
-        //else if (speed == 0)
-        //{
-        //    velocity -= speedDecayFactor;
-        //}
-        //else
-        //{
-        //    velocity = speed;
-        //}
-
-        if (velocity < currSpeed)
-        {
-            velocity += speedIncreaseFactor * Time.fixedDeltaTime;
+            // Driving
+            strokeState = 2;
         }
         else
         {
-            velocity -= speedDecayFactor * Time.fixedDeltaTime;
+            // Resting
+            strokeState = 0;
         }
 
-        if (velocity < 0)
+//#else
+
+//        // Get speed from ERG
+//        speed = stats.GetSpeed();
+
+//        // Get stroke state from ERG
+//        strokeState = stats.GetStrokeState();
+
+//#endif
+
+        // If driving
+        if (strokeState == (int) StrokeStates.Driving)
         {
-            velocity = 0;
+            // Apply force
+            rigidbody.AddForce(transform.forward * speed * Time.deltaTime);
         }
-        //// Increase velocity over time if speed applied
-        //if (change)
-        //{
-        //    velocity += speedIncreaseFactor * Time.fixedDeltaTime;
-        //}
-        //else
-        //{
-        //    velocity -= speedDecayFactor * Time.fixedDeltaTime;
-        //}
 
-        //// Min speed
-        //if (velocity < 0)
-        //{
-        //    velocity = 0;
-        //}
+        // Update velocity
+        velocity = rigidbody.velocity.magnitude * boatSpeed;
 
-        //// Max speed
-        //else if (currSpeed != 0 && velocity > currSpeed)
-        //{
-        //    velocity = currSpeed;
-        //}
-
-        // speed is measured in meters per second and this function is ran 
-        // fixedDeltaTime's per second - so, we can figure out how far to 
-        // move this update, if we evenly spread the speed out across the 
-        // second by multiplying it by fixedDeltaTime
-
-        //velocity = speed * Time.deltaTime;
     }
 
     private void Animate()
     {
         foreach (Animator animator in rowingAnimators)
         {
-            if (velocity > 0)
+            if (strokeState == (int) StrokeStates.Driving)
             {
+                leftOar.rowing = true;
+                rightOar.rowing = true;
+
                 animator.SetBool("Play", true);
             }
             else
             {
+                leftOar.rowing = false;
+                rightOar.rowing = false;
+
                 animator.SetBool("Play", false);
             }
         }

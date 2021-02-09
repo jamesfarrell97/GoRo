@@ -28,7 +28,7 @@ public class BluetoothManager : MonoBehaviour
 {
     [SerializeField] Transform DeviceListContent;
     [SerializeField] GameObject DeviceListItemPrefab;
-    [SerializeField] Launcher Launcher;
+    [SerializeField] GameManager Launcher;
 
     private DeviceListItem DeviceListItem;
     private string DeviceAddress;
@@ -173,7 +173,7 @@ public class BluetoothManager : MonoBehaviour
         }
         else
         {
-            ErrorMessage = "Device not found";
+            ErrorMessage = "Error: Device not found";
         }
     }
 
@@ -191,7 +191,7 @@ public class BluetoothManager : MonoBehaviour
 
     private void Subscribed()
     {
-        Launcher.Instance.ConnectedToPerformanceMonitor();
+        GameManager.Instance.ConnectedToPerformanceMonitor();
     }
 
     private void ScanForPM()
@@ -225,7 +225,7 @@ public class BluetoothManager : MonoBehaviour
 
             if (IsEqual(serviceUUID, PMDictionary.RowingServiceUUID))
             {
-                StatusMessage = "Found Service UUID";
+                //StatusMessage = "Found Service UUID";
                 SetState(States.RequestMTU, 3f);
             }
 
@@ -234,18 +234,18 @@ public class BluetoothManager : MonoBehaviour
 
     private void RequestMTU()
     {
-        StatusMessage = "Requesting MTU";
+        StatusMessage = "Loading...";
 
         BluetoothLEHardwareInterface.RequestMtu(DeviceAddress, 247, (address, newMTU) => {
 
-            StatusMessage = "MTU set to " + newMTU.ToString();
+            //StatusMessage = "MTU set to " + newMTU.ToString();
             SetState(States.Subscribe, 2f);
         });
     }
 
     private void WriteCharacteristic()
     {
-        StatusMessage = "Writing characteristic...";
+        //StatusMessage = "Writing characteristic...";
 
         byte[] data = CSAFECommand.Write(new string[] { "CSAFE_STATUS_CMD" }).ToArray();
 
@@ -253,7 +253,7 @@ public class BluetoothManager : MonoBehaviour
 
             BluetoothLEHardwareInterface.Log("Write Succeeded");
 
-            StatusMessage = "Write Succeeded";
+            //StatusMessage = "Write Succeeded";
 
             SetState(States.Write, 1f);
         });
@@ -261,11 +261,13 @@ public class BluetoothManager : MonoBehaviour
 
     private void ReadCharacteristic()
     {
-        StatusMessage = "Reading characteristics...";
+        //StatusMessage = "Reading characteristics...";
 
         BluetoothLEHardwareInterface.ReadCharacteristic(DeviceAddress, PMDictionary.RowingServiceUUID, PMDictionary.GeneralRowingStatusCharacteristicUUID, (characteristicUUID, rawBytes) => {
 
             BluetoothLEHardwareInterface.Log("Read Succeeded");
+
+            //StatusMessage = "Read Succeeded";
 
             SetState(States.Read, 1f);
         });
@@ -275,7 +277,7 @@ public class BluetoothManager : MonoBehaviour
 
     private void SubscribeCharacteristic()
     {
-        StatusMessage = "Subscribe characteristics...";
+        //StatusMessage = "Subscribe characteristics...";
 
         BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMTransmitCharacteristic, (action1) =>
         {

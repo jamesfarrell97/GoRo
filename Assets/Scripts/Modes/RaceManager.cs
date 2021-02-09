@@ -26,7 +26,7 @@ public class RaceManager : MonoBehaviour
         }
         else
         {
-            if(heroBeachRace.participants.Count < heroBeachRace.raceCapacity)
+            if(heroBeachRace.players.Count < heroBeachRace.raceCapacity)
             {
                 //Add player to the partcipants list
             }
@@ -39,6 +39,8 @@ public class RaceManager : MonoBehaviour
     //IMPORTANT: Everything being set in this method will need to be set for every player joining game, it is essential 
     public void AddPlayerToRace(PlayerController player)
     {
+        player.participatingInRace = true;
+
         // Changing this just to get it working for the release
         // Will change back to previous implementation later
         Race heroBeachRace = FindObjectOfType<Race>();
@@ -50,8 +52,8 @@ public class RaceManager : MonoBehaviour
         player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachRace.route.Length-1;
         heroBeachRace.raceInitiated = true;
         heroBeachRace.timeRaceInitiated = Time.timeSinceLevelLoad;
-        heroBeachRace.numberOfLaps = 1;
-        heroBeachRace.raceCapacity = 1;
+        heroBeachRace.numberOfLaps = 3;
+        heroBeachRace.raceCapacity = 2;
         heroBeachRace.AddParticipantIntoRace(player);
     }
 }

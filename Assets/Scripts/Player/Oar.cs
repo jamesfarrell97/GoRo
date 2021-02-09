@@ -8,6 +8,8 @@ public class Oar : MonoBehaviour
     [SerializeField] Transform trackedObject;
     [SerializeField] Transform pivotPoint;
 
+    public bool rowing;
+
     private Vector3 offset;
     private bool playCollisionSound;
 
@@ -24,25 +26,10 @@ public class Oar : MonoBehaviour
         transform.position = pivotPoint.position;
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.collider.tag.Equals("Water") && playCollisionSound)
-        {
-            FindObjectOfType<AudioManager>().Play("Rowing" + Random.Range(1,5));
-            playCollisionSound = false;
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.collider.tag.Equals("Water"))
-        {
-            playCollisionSound = true;
-        }
-    }
-
     private void OnTriggerEnter(Collider other)
     {
+        if (!rowing) return;
+
         if (other.tag.Equals("Water") && playCollisionSound)
         {
             FindObjectOfType<AudioManager>().Play("Rowing" + Random.Range(1, 5));

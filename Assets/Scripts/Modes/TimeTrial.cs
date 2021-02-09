@@ -1,29 +1,25 @@
-﻿using System.Collections;
-using System;
+﻿using System;
 
 using UnityStandardAssets.Utility;
-using UnityEngine.UI;
 using UnityEngine;
-
 using Photon.Pun;
-using TMPro;
 
 public class TimeTrial : MonoBehaviour
 {
     #region Public Variables   
-    [SerializeField] public Transform[] route;
-    [SerializeField] public PlayerController participant;
+    [HideInInspector] public Transform[] route;
+    [HideInInspector] public PlayerController player;
 
-    [SerializeField] public int numberOfLaps;
+    [HideInInspector] public bool timeTrialInitiated = false;
+    [HideInInspector] public bool timeTrialInProgress = false;
+    [HideInInspector] public bool timeTrialComplete = false;
 
-    [SerializeField] public bool timeTrialInitiated = false;
-    [SerializeField] public bool timeTrialInProgress = false;
-    [SerializeField] public bool timeTrialComplete = false;
+    [HideInInspector] public float timeTheTimeTrialInitiated;
+    [HideInInspector] public float timeTheTimeTrialStarted;
+    [HideInInspector] public float pauseBeforeTimeTrialBegins = 5f;
 
-    [SerializeField] public float timeTheTimeTrialInitiated;
-    [SerializeField] public float timeTheTimeTrialStarted;
-    [SerializeField] public float pauseBeforeTimeTrialBegins = 5f;
     [SerializeField] public TimeSpan timeTrialDuration;
+    [SerializeField] public int numberOfLaps;
     #endregion Public Variables
 
     #region Private Variables
@@ -72,17 +68,11 @@ public class TimeTrial : MonoBehaviour
         }
     }
 
-    public void AddParticipantIntoTimeTrial(PlayerController player)
-    {
-        participant = player;
-        player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
-    }
-
-    // Ref for basic countdown implementation: https://answers.unity.com/questions/369581/countdown-to-start-game.html
+    // Code referenced: https://answers.unity.com/questions/369581/countdown-to-start-game.html
     private void StartCountdown()
     {
         // Pause player movement
-        participant.PauseMovement();
+        player.PauseMovement();
 
         float delta = Time.deltaTime;
         currentTimeInCountdown += delta;
@@ -95,53 +85,69 @@ public class TimeTrial : MonoBehaviour
             }
             else if (countdown - 1 <= 0)
             {
-                StartCoroutine(participant.DisplayCountdown($"Start!", 3));
+                StartCoroutine(GameManager.Instance.DisplayCountdown($"Start!", 3));
                 countdown = 0;
             }
             else
             {
                 countdown -= 1;
 
-                StartCoroutine(participant.DisplayCountdown($"{countdown}", 3));
+                StartCoroutine(GameManager.Instance.DisplayCountdown($"{countdown}", 3));
                 currentTimeInCountdown = 0;
             }
         }
     }
 
-    private void StartTimeTrial()
-    {
-        // Resume player movement
-        participant.ResumeMovement();
-
-        timeTrialInProgress = true;
-        timeTheTimeTrialStarted = Time.timeSinceLevelLoad;
-        participant.GetComponent<WaypointProgressTracker>().moveTarget = true;
-    }
-
     private void UpdateStopWatch()
     {
         timeTrialDuration = TimeSpan.FromSeconds((timeSecs + durationOfTimeTrialWithoutPauses) - timeTheTimeTrialStarted);
-        
-        string time = $"{timeTrialDuration.ToString(@"mm\:ss")}";
-        participant.DisplayTimeAndLap(time, $"Lap: {participant.GetComponent<WaypointProgressTracker>().currentLap}/{numberOfLaps}");
+
+        DisplayTimeTrialDataToParticipants($"{timeTrialDuration.ToString(@"mm\:ss")}");
     }
 
-    //If Menu is brought up in SINGLEPLAYER, pause time trial
+    public void AddParticipantIntoTimeTrial(PlayerController player)
+    {
+        this.player = player;
+        player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
+    }
+
+    private void StartTimeTrial()
+    {
+        player.ResumeMovement();
+
+        timeTrialInProgress = true;
+        timeTheTimeTrialStarted = Time.timeSinceLevelLoad;
+    }
+
+    // Pause singleplayer time trial if pause menu is opened
     public void PauseSingleplayerTimeTrial()
     {
         gamePaused = true;
         durationOfTimeTrialWithoutPauses = durationOfTimeTrialWithoutPauses + (timeSecs - timeTheTimeTrialStarted);
 
-        participant.GetComponent<WaypointProgressTracker>().moveTarget = false;
+        player.PauseMovement();
     }
 
-    //Unpause time trial in SINGLEPLAYER if game menu is closed 
-    public void UnpauseSingleplayerTimeTrial()
+    // Resume singleplayer time trial if pause menu is closed
+    public void ResumeSingleplayerTimeTrial()
     {
         gamePaused = false;
         timeTheTimeTrialStarted = Time.timeSinceLevelLoad;
 
-        participant.GetComponent<WaypointProgressTracker>().moveTarget = true;
+        player.ResumeMovement();
+    }
+
+    private void DisplayTimeTrialDataToParticipants(string time)
+    {
+        int currentLap = player.GetComponent<WaypointProgressTracker>().currentLap;
+
+        GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
+    }
+
+    private void DisplayEndOfTimeTrialStats()
+    {
+        string text = $"You completed {numberOfLaps} lap(s) within {timeTrialDuration.ToString(@"mm\:ss")}";
+        StartCoroutine(GameManager.Instance.DisplayQuickNotificationText(text, 6));
     }
 
     private void EndTimeTrial()
@@ -150,25 +156,15 @@ public class TimeTrial : MonoBehaviour
         DisposeSessionResources();
     }
 
-    private void DisplayEndOfTimeTrialStats()
-    {
-        participant.GetComponent<PlayerController>().timePanel.SetActive(false);
-        participant.GetComponent<PlayerController>().lapPanel.SetActive(false);
-        //Show achievements for this time trial
-       
-        string text = $"You completed {numberOfLaps} lap(s) within {timeTrialDuration.ToString(@"mm\:ss")}";
-        StartCoroutine(participant.GetComponent<PlayerController>().DisplayQuickNotificationText(text, 6));
-    }
-
     // Reset all datatypes back to their initial state, after a race is finished
     private void DisposeSessionResources()
     {
-        participant.GetComponent<PlayerController>().participatingInTimeTrial = false;
+        player.GetComponent<PlayerController>().participatingInTimeTrial = false;
 
-        participant.JustRow();
-        participant.participatingInTimeTrial = false;
+        GameManager.Instance.StartJustRow();
+        player.participatingInTimeTrial = false;
 
-        participant = null;
+        player = null;
         timeTrialInitiated = false;
         timeTrialInProgress = false;
         timeTrialComplete = false;

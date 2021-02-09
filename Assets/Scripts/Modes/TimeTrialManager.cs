@@ -5,8 +5,8 @@ public class TimeTrialManager : MonoBehaviour
 {
     public void TakePartInATimeTrial(Boat player)
     {
-        //Will initiate Menu Screen to appear where player will be prompted to select time trial track they wish to take part in
-        //From this interaction the following methods starting with "AddPlayerToXXX" represent the button pressed actions relevant to time trial selected
+        // Will initiate Menu Screen to appear where player will be prompted to select time trial track they wish to take part in
+        // From this interaction the following methods starting with "AddPlayerToXXX" represent the button pressed actions relevant to time trial selected
     }
 
     #region Time Trial Initiation Button Responses
@@ -32,6 +32,8 @@ public class TimeTrialManager : MonoBehaviour
     // waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
     public void AddPlayerToTimeTrial(PlayerController player)
     {
+        player.participatingInTimeTrial = true;
+
         // Changing this just to get it working for the release
         // Will change back to previous implementation later
         TimeTrial heroBeachTimeTrial = FindObjectOfType<TimeTrial>();
@@ -43,7 +45,7 @@ public class TimeTrialManager : MonoBehaviour
         player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachTimeTrial.route.Length - 1;
         heroBeachTimeTrial.timeTrialInitiated = true;
         heroBeachTimeTrial.timeTheTimeTrialInitiated = Time.timeSinceLevelLoad;
-        heroBeachTimeTrial.numberOfLaps = 1;
+        heroBeachTimeTrial.numberOfLaps = 3;
         heroBeachTimeTrial.AddParticipantIntoTimeTrial(player);
     }
 }

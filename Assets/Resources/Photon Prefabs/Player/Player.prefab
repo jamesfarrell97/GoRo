@@ -637,7 +637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 473406582f7f8f64b9966c13496da4ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boatSpeed: 1
+  boatSpeed: 1.25
   speedIncreaseFactor: 0.05
   speedDecayFactor: 0.5
   rowingAnimators:

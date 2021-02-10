@@ -52,7 +52,7 @@ public class RaceManager : MonoBehaviour
         player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachRace.route.Length-1;
         heroBeachRace.raceInitiated = true;
         heroBeachRace.timeRaceInitiated = Time.timeSinceLevelLoad;
-        heroBeachRace.numberOfLaps = 3;
+        heroBeachRace.numberOfLaps = 1;
         heroBeachRace.raceCapacity = 2;
         heroBeachRace.AddParticipantIntoRace(player);
     }

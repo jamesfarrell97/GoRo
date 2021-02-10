@@ -286,8 +286,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Retrieve player view
             PhotonView photonView = player.GetComponent<PhotonView>();
 
-            //// If not our view, skip rest of loop
-            //if (!photonView.IsMine) continue;
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
 
             // Check if player currently participating in event
             if (player.participatingInTimeTrial == false && player.participatingInRace == false)
@@ -302,8 +302,8 @@ public class GameManager : MonoBehaviourPunCallbacks
                 MenuManager.Instance.OpenMenu("HUD");
             }
 
-            //// No need to check any more views, so return
-            //return;
+            // No need to check any more views, so return
+            return;
         }
     }
 
@@ -317,8 +317,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Retrieve player view
             PhotonView photonView = player.GetComponent<PhotonView>();
 
-            //// If not our view, skip rest of loop
-            //if (!photonView.IsMine) continue;
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
 
             // Check if player currently participating in event
             if (player.participatingInTimeTrial == false && player.participatingInRace == false)
@@ -333,8 +333,8 @@ public class GameManager : MonoBehaviourPunCallbacks
                 MenuManager.Instance.OpenMenu("HUD");
             }
 
-            //// No need to check any more views, so return
-            //return;
+            // No need to check any more views, so return
+            return;
         }
     }
 
@@ -428,6 +428,86 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public void PauseGame()
+    {
+        // Retrieve all players
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
+
+        // For each loaded player
+        foreach (PlayerController player in players)
+        {
+            // Retrieve player view
+            PhotonView photonView = player.GetComponent<PhotonView>();
+
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
+
+            // If participating in race
+            if (player.participatingInRace == true)
+            {
+                // Pause singleplayer race
+                player.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().PauseSingleplayerRace();
+            }
+
+            // Else if participating in time trial
+            else if (player.participatingInTimeTrial == true)
+            {
+                // Pause singleplayer time trial
+                player.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().PauseSingleplayerTimeTrial();
+            }
+
+            // Otherwise
+            else
+            {
+                // Pause player
+                player.Pause();
+            }
+
+            // No need to check any more views, so return
+            return;
+        }
+    }
+
+    public void UnpauseGame()
+    {
+        // Retrieve all players
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
+
+        // For each loaded player
+        foreach (PlayerController player in players)
+        {
+            // Retrieve player view
+            PhotonView photonView = player.GetComponent<PhotonView>();
+
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
+
+            // If participating in race
+            if (player.participatingInRace == true)
+            {
+                // Resume singleplayer race
+                player.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().ResumeSingleplayerRace();
+            }
+
+            // Else if participating in time trial
+            else if (player.participatingInTimeTrial == true)
+            {
+                // Resume singleplayer time trial
+                player.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().ResumeSingleplayerTimeTrial();
+            }
+            
+            // Otherwise
+            else
+            {
+                // Unpause player
+                player.Unpause();
+            }
+            
+            // No need to check any more views, so return
+            return;
+        }
+    }
+
     public void DisplayTimeAndLap(string time, string lap)
     {
         timePanel.SetActive(true);
@@ -464,29 +544,5 @@ public class GameManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(duration);
         countdownPanel.SetActive(false);
     }
-
-    //private void PauseGame()
-    //{
-    //    if (participatingInRace == true)
-    //    {
-    //        GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().PauseSingleplayerRace();
-    //    }
-    //    else if (participatingInTimeTrial == true)
-    //    {
-    //        GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().PauseSingleplayerTimeTrial();
-    //    }
-    //}
-
-    //private void UnpauseGame()
-    //{
-    //    if (participatingInRace == true)
-    //    {
-    //        GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().UnpauseSingleplayerRace();
-    //    }
-    //    else if (participatingInTimeTrial == true)
-    //    {
-    //        GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().UnpauseSingleplayerTimeTrial();
-    //    }
-    //}
     #endregion
 }

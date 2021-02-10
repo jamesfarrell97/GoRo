@@ -80,7 +80,7 @@ public class Race : MonoBehaviour
         foreach(PlayerController participant in players)
         {
             // Pause player movement
-            participant.PauseMovement();
+            participant.Pause();
 
             float delta = Time.deltaTime;
             currentTimeInCountdown += delta;
@@ -141,7 +141,7 @@ public class Race : MonoBehaviour
         foreach (PlayerController player in players)
         {
             // Resume player movement
-            player.ResumeMovement();
+            player.Unpause();
             
             // Retrieve notification container
             Transform notificationContainer = GameManager.Instance.transform.Find("HUD/Notification Cont");
@@ -177,20 +177,21 @@ public class Race : MonoBehaviour
     {
         gamePaused = true;
         durationOfRaceWithoutPauses = durationOfRaceWithoutPauses + (timeSecs - timeRaceStarted);
+
         foreach (PlayerController player in players)
         {
-            player.PauseMovement();
+            player.Pause();
         }
     }
 
     // Resume singleplayer race if pause menu is closed
-    public void ResumeSingeplayerRace()
+    public void ResumeSingleplayerRace()
     {
         gamePaused = false;
         timeRaceStarted = Time.timeSinceLevelLoad;
         foreach (PlayerController player in players)
         {
-            player.ResumeMovement();
+            player.Unpause();
         }
     }
 

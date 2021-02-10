@@ -14,9 +14,10 @@ namespace UnityStandardAssets.Utility
         [HideInInspector] public bool halfPointOftrackReached = false;
         [HideInInspector] public int lastIndex;
 
-        [HideInInspector] public float timeOfCompletion;
         [HideInInspector] public Race currentRace;
         [HideInInspector] public TimeTrial currentTimeTrial;
+
+        [HideInInspector] public float timeOfCompletion;
 
         private PlayerController player;
         private TimeSpan eventDuration;
@@ -109,24 +110,26 @@ namespace UnityStandardAssets.Utility
             }
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             CheckIfLapComplete();
 
-            lookAheadForTargetOffset = player.GetVelocity();
+            if (player.Paused()) return;
 
             if (Circuit == null) return;
 
             if (Circuit.GetRoutePoint(0).Equals(null)) return;
+
+            lookAheadForTargetOffset = player.GetVelocity();
 
             if (progressStyle == ProgressStyle.SmoothAlongRoute)
             {                   
                 // determine the position we should currently be aiming for
                 // (this is different to the current progress position, it is a a certain amount ahead along the route)
                 // we use lerp as a simple way of smoothing out the speed over time.
-                if (Time.deltaTime > 0)
+                if (Time.fixedDeltaTime > 0)
                 {
-                    speed = Mathf.Lerp(speed, (lastPosition - transform.position).magnitude / Time.deltaTime, Time.deltaTime);
+                    speed = Mathf.Lerp(speed, (lastPosition - transform.position).magnitude / Time.fixedDeltaTime, Time.fixedDeltaTime);
 
                     target.position =
                         Circuit.GetRoutePoint(progressDistance + lookAheadForTargetOffset + lookAheadForTargetFactor * speed)
@@ -196,7 +199,7 @@ namespace UnityStandardAssets.Utility
             {
                 distance = Vector3.Distance(transform.position, currentTimeTrial.route[middleIndex].position);
 
-                if (distance < pointToPointThreshold)
+                if (distance < pointToPointThreshold)   
                 {
                     return true;
                 }

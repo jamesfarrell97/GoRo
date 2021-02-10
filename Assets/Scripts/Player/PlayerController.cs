@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using Photon.Pun;
-using UnityStandardAssets.Utility;
+﻿using UnityStandardAssets.Utility;
 using UnityEngine.Rendering.Universal;
+using UnityEngine;
+using Photon.Pun;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
     private PhotonView photonView;
     private StatsManager stats;
 
-    private bool allowedMove = true;
+    private bool paused = false;
     private bool move = false;
 
     private void Awake()
@@ -126,13 +126,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (!photonView.IsMine) return;
 
         achievementTracker.TrackAchievements(photonView);
 
-        if (!allowedMove)
+        if (paused)
         {
             velocity = 0;
         }
@@ -189,10 +189,10 @@ public class PlayerController : MonoBehaviour
 
 
 
-//#if UNITY_EDITOR
+#if UNITY_EDITOR
 
         // Increase time
-        currTime += Time.deltaTime;
+        currTime += Time.fixedDeltaTime;
 
         // Simlating concpet2 update speed
         if (currTime > 0.5f)
@@ -212,26 +212,25 @@ public class PlayerController : MonoBehaviour
             strokeState = 0;
         }
 
-//#else
+#else
 
-//        // Get speed from ERG
-//        speed = stats.GetSpeed();
+        // get speed from erg
+        speed = stats.getspeed();
 
-//        // Get stroke state from ERG
-//        strokeState = stats.GetStrokeState();
+        // get stroke state from erg
+        strokestate = stats.getstrokestate();
 
-//#endif
+#endif
 
         // If driving
         if (strokeState == (int) StrokeStates.Driving)
         {
             // Apply force
-            rigidbody.AddForce(transform.forward * speed * Time.deltaTime);
+            rigidbody.AddForce(transform.forward * speed * Time.fixedDeltaTime);
         }
 
         // Update velocity
         velocity = rigidbody.velocity.magnitude * boatSpeed;
-
     }
 
     private void Animate()
@@ -265,14 +264,19 @@ public class PlayerController : MonoBehaviour
         move = false;
     }
 
-    public void PauseMovement()
+    public void Pause()
     {
-        this.allowedMove = false;
+        this.paused = true;
     }
 
-    public void ResumeMovement()
+    public void Unpause()
     {
-        this.allowedMove = true;
+        this.paused = false;
+    }
+
+    public bool Paused()
+    {
+        return this.paused;
     }
 
     public float GetVelocity()

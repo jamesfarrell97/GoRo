@@ -72,7 +72,7 @@ public class TimeTrial : MonoBehaviour
     private void StartCountdown()
     {
         // Pause player movement
-        player.PauseMovement();
+        player.Pause();
 
         float delta = Time.deltaTime;
         currentTimeInCountdown += delta;
@@ -113,7 +113,7 @@ public class TimeTrial : MonoBehaviour
 
     private void StartTimeTrial()
     {
-        player.ResumeMovement();
+        player.Unpause();
 
         timeTrialInProgress = true;
         timeTheTimeTrialStarted = Time.timeSinceLevelLoad;
@@ -125,7 +125,7 @@ public class TimeTrial : MonoBehaviour
         gamePaused = true;
         durationOfTimeTrialWithoutPauses = durationOfTimeTrialWithoutPauses + (timeSecs - timeTheTimeTrialStarted);
 
-        player.PauseMovement();
+        player.Pause();
     }
 
     // Resume singleplayer time trial if pause menu is closed
@@ -134,7 +134,7 @@ public class TimeTrial : MonoBehaviour
         gamePaused = false;
         timeTheTimeTrialStarted = Time.timeSinceLevelLoad;
 
-        player.ResumeMovement();
+        player.Unpause();
     }
 
     private void DisplayTimeTrialDataToParticipants(string time)

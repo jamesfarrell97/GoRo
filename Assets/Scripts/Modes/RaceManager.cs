@@ -1,8 +1,16 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
 using UnityStandardAssets.Utility;
 
 public class RaceManager : MonoBehaviour
 {
+    PhotonView photonView;
+
+    void Awake()
+    {
+        photonView = GetComponent<PhotonView>();
+    }
+
     public void TakePartInARace(PlayerController player)
     {
         //Will initiate Menu Screen to appear where player will be prompted to select race track they wish to take part in
@@ -39,21 +47,35 @@ public class RaceManager : MonoBehaviour
     //IMPORTANT: Everything being set in this method will need to be set for every player joining game, it is essential 
     public void AddPlayerToRace(PlayerController player)
     {
-        player.participatingInRace = true;
+        // Retrieve race
+        Race race = FindObjectOfType<Race>();
 
-        // Changing this just to get it working for the release
-        // Will change back to previous implementation later
-        Race heroBeachRace = FindObjectOfType<Race>();
+        // Retrieve waypoint progress tracker
+        WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
 
-        // Changing this just to get it working for the release
-        // Will change back to previous implementation later
-        player.GetComponent<WaypointProgressTracker>().Circuit = heroBeachRace.gameObject.GetComponent<WaypointCircuit>();
-        player.GetComponent<WaypointProgressTracker>().currentRace = heroBeachRace;
-        player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachRace.route.Length-1;
-        heroBeachRace.raceInitiated = true;
-        heroBeachRace.timeRaceInitiated = Time.timeSinceLevelLoad;
-        heroBeachRace.numberOfLaps = 1;
-        heroBeachRace.raceCapacity = 2;
-        heroBeachRace.AddParticipantIntoRace(player);
+        // Setup wpt values
+        wpt.SetCircuit(race.gameObject.GetComponent<WaypointCircuit>());
+        wpt.UpdateLastNodeIndex(race.route.Length - 1);
+        wpt.SetRace(race);
+
+        PhotonView playerView = player.GetComponent<PhotonView>();
+        photonView.RPC("RPC_AddPlayerToRace", RpcTarget.All, playerView.ViewID);
+    }
+
+    [PunRPC]
+    void RPC_AddPlayerToRace(int playerID)
+    {
+        // Retrieve race
+        Race race = FindObjectOfType<Race>();
+
+        // Retrieve player view
+        PhotonView playerView = PhotonView.Find(playerID);
+
+        // Retrieve player controller
+        PlayerController player = playerView.gameObject.GetComponent<PlayerController>();
+        
+        // Setup race values
+        race.InitiateRace(1, 2);
+        race.AddParticipantIntoRace(player);
     }
 }

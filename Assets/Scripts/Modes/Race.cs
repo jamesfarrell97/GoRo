@@ -51,7 +51,7 @@ public class Race : MonoBehaviour
     {
         if (!gamePaused)
         {
-            timeSecs = Time.timeSinceLevelLoad;
+            timeSecs += Time.deltaTime;
 
             if (raceInitiated)
             {
@@ -61,9 +61,18 @@ public class Race : MonoBehaviour
                 }
                 else if (!raceInProgress)
                 {
-                    if (players.Count == raceCapacity || (timeRaceInitiated + timeSecs) > waitTimeForOtherPlayersToJoin)
+                    // If singleplayer
+                    if (PhotonNetwork.OfflineMode)
+                    {
+                        // Start race immediately
+                        StartCountdown();
+                    }
+
+                    // Otherwise, wait for other players to join
+                    else if (players.Count == raceCapacity || (timeSecs) > waitTimeForOtherPlayersToJoin)
                     {
                         StartCountdown();
+                        timeSecs = 0;
                     }
                 }
                 else
@@ -107,6 +116,15 @@ public class Race : MonoBehaviour
         }
     }
 
+    public void InitiateRace(int numberOfLaps, int raceCapacity)
+    {
+        raceInitiated = true;
+        timeRaceInitiated = Time.timeSinceLevelLoad;
+
+        this.numberOfLaps = numberOfLaps;
+        this.raceCapacity = raceCapacity;
+    }
+
     private void UpdateStopWatch()
     {
         foreach (PlayerController participant in players)
@@ -123,7 +141,13 @@ public class Race : MonoBehaviour
         {
             players.Add(player);
 
-            player.GetComponent<WaypointProgressTracker>().amountOfLaps = numberOfLaps;
+            player.participatingInRace = true;
+
+            WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
+
+            wpt.Reset();
+            wpt.UpdateLaps(numberOfLaps);
+            wpt.UpdatePosition();
         }
     }
 

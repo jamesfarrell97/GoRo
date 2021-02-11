@@ -131,7 +131,7 @@ Transform:
   m_GameObject: {fileID: 1652413137834809143}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: -1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1.25}
   m_Children:
   - {fileID: 1161307997334124168}
   - {fileID: 1296746928866240657}
@@ -364,6 +364,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4861678737240098229}
   - component: {fileID: 5351488142275987783}
+  - component: {fileID: 3056375462983036416}
   m_Layer: 14
   m_Name: Boat
   m_TagString: Untagged
@@ -405,6 +406,19 @@ MonoBehaviour:
   - {fileID: 3297226352705913803}
   - {fileID: 6989588143297707259}
   - {fileID: 5950234816122739502}
+--- !u!114 &3056375462983036416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2178233397470441811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62bfd6f043e958541b8369e30ffa5f3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_queues: c4090000
 --- !u!1 &2603743276884938908
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,12 +704,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentLap: 1
-  amountOfLaps: 0
+  numberOfLaps: 0
   halfPointOftrackReached: 0
   lastIndex: 0
-  timeOfCompletion: 0
   currentRace: {fileID: 0}
   currentTimeTrial: {fileID: 0}
+  timeOfCompletion: 0
   Circuit: {fileID: 0}
   Routes: []
   lookAheadForTargetOffset: 0
@@ -1907,7 +1921,6 @@ GameObject:
   - component: {fileID: 9042587317888976225}
   - component: {fileID: 5391480369863625412}
   - component: {fileID: 7869641901109313038}
-  - component: {fileID: 7060687693856294485}
   m_Layer: 11
   m_Name: Hull
   m_TagString: Untagged
@@ -1984,19 +1997,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &7060687693856294485
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8518112212375166939}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62bfd6f043e958541b8369e30ffa5f3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_queues: c4090000
 --- !u!1 &8821811442518244531
 GameObject:
   m_ObjectHideFlags: 0

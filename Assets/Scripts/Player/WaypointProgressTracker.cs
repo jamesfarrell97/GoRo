@@ -9,7 +9,7 @@ namespace UnityStandardAssets.Utility
     {
         #region Race/Time Trial Event Variables
         [HideInInspector] public int currentLap = 1;
-        [HideInInspector] public int amountOfLaps = 0;
+        [HideInInspector] public int numberOfLaps = 0;
 
         [HideInInspector] public bool halfPointOftrackReached = false;
         [HideInInspector] public int lastIndex;
@@ -97,19 +97,6 @@ namespace UnityStandardAssets.Utility
             Reset();
         }
 
-        // reset the object to sensible values
-        public void Reset()
-        {
-            progressDistance = 0;
-            progressNum = 0;
-
-            if (progressStyle == ProgressStyle.PointToPoint)
-            {
-                target.position = Circuit.Waypoints[progressNum].position;
-                target.rotation = Circuit.Waypoints[progressNum].rotation;
-            }
-        }
-
         private void FixedUpdate()
         {
             CheckIfLapComplete();
@@ -129,26 +116,7 @@ namespace UnityStandardAssets.Utility
                 // we use lerp as a simple way of smoothing out the speed over time.
                 if (Time.fixedDeltaTime > 0)
                 {
-                    speed = Mathf.Lerp(speed, (lastPosition - transform.position).magnitude / Time.fixedDeltaTime, Time.fixedDeltaTime);
-
-                    target.position =
-                        Circuit.GetRoutePoint(progressDistance + lookAheadForTargetOffset + lookAheadForTargetFactor * speed)
-                                .position;
-
-                    target.rotation =
-                        Quaternion.LookRotation(
-                            Circuit.GetRoutePoint(progressDistance + lookAheadForSpeedOffset + lookAheadForSpeedFactor * speed)
-                                    .direction);
-
-                    // get our current progress along the route
-                    progressPoint = Circuit.GetRoutePoint(progressDistance);
-                    Vector3 progressDelta = progressPoint.position - transform.position;
-                    if (Vector3.Dot(progressDelta, progressPoint.direction) < 0)
-                    {
-                        progressDistance += progressDelta.magnitude * 0.5f;
-                    }
-
-                    lastPosition = transform.position;
+                    UpdatePosition();
                 }
 
                 if (halfPointOftrackReached == false)
@@ -160,7 +128,6 @@ namespace UnityStandardAssets.Utility
             else
             {
                 // point to point mode. Just increase the waypoint if we're close enough:
-
                 Vector3 targetDelta = target.position - transform.position;
                 if (targetDelta.magnitude < pointToPointThreshold)
                 {
@@ -182,8 +149,66 @@ namespace UnityStandardAssets.Utility
             }
         }
 
+        public void Reset()
+        {
+            progressDistance = 0;
+            progressNum = 0;
+
+            if (progressStyle == ProgressStyle.PointToPoint)
+            {
+                target.position = Circuit.Waypoints[progressNum].position;
+                target.rotation = Circuit.Waypoints[progressNum].rotation;
+            }
+        }
+
+        public void SetCircuit(WaypointCircuit waypointCircuit)
+        {
+            Circuit = waypointCircuit;
+        }
+
+        public void UpdateLastNodeIndex(int lastNodeIndex)
+        {
+            lastIndex = lastNodeIndex;
+        }
+
+        public void SetRace(Race race)
+        {
+            currentRace = race;
+        }
+
+        public void UpdateLaps(int numberOfLaps)
+        {
+            this.numberOfLaps = numberOfLaps;
+        }
+
+        public void UpdatePosition()
+        {
+            speed = Mathf.Lerp(speed, (lastPosition - transform.position).magnitude / Time.fixedDeltaTime, Time.fixedDeltaTime);
+
+            target.position =
+                Circuit.GetRoutePoint(progressDistance + lookAheadForTargetOffset + lookAheadForTargetFactor * speed)
+                        .position;
+
+            target.rotation =
+                Quaternion.LookRotation(
+                    Circuit.GetRoutePoint(progressDistance + lookAheadForSpeedOffset + lookAheadForSpeedFactor * speed)
+                            .direction);
+
+            // get our current progress along the route
+            progressPoint = Circuit.GetRoutePoint(progressDistance);
+            Vector3 progressDelta = progressPoint.position - transform.position;
+            if (Vector3.Dot(progressDelta, progressPoint.direction) < 0)
+            {
+                progressDistance += progressDelta.magnitude * 0.5f;
+            }
+
+            lastPosition = transform.position;
+        }
+
         private bool CheckIfHalfPointOfTrackReached()
         {
+            if (!player.participatingInRace && !player.participatingInTimeTrial) return false;
+
             float distance;
             int middleIndex = lastIndex / 2;
             if (target.GetComponent<PlayerController>().participatingInRace == true)
@@ -210,7 +235,8 @@ namespace UnityStandardAssets.Utility
 
         private void CheckIfLapComplete()
         {
-            if (halfPointOftrackReached == true)//Precaution to avoid this firing off instantly on start of race
+            // Precaution to avoid this firing off instantly on start of race
+            if (halfPointOftrackReached == true)
             {
                 float distance;
                 if (target.GetComponent<PlayerController>().participatingInRace == true)
@@ -232,7 +258,7 @@ namespace UnityStandardAssets.Utility
 
         private void UpdateEventLapCount()
         {
-            if (currentLap < amountOfLaps)
+            if (currentLap < numberOfLaps)
             {
                 currentLap++;
             }
@@ -280,7 +306,7 @@ namespace UnityStandardAssets.Utility
             currentRace = null;
             currentTimeTrial = null;
             timeOfCompletion = 0;
-            amountOfLaps = 0;
+            numberOfLaps = 0;
             currentLap = 1;
         }
     }

@@ -105,6 +105,9 @@ public class PlayerController : MonoBehaviour
                 // Change minimap icon color
                 if (renderer.gameObject.name == "Boat Front" || renderer.gameObject.name == "Boat Rear")
                 {
+                    // Render other player icon below ours
+                    renderer.gameObject.transform.parent.Translate(new Vector3(0, -0.5f, 0));
+
                     materials[i].color = Color.red;
                 }
 
@@ -215,10 +218,10 @@ public class PlayerController : MonoBehaviour
 #else
 
         // get speed from erg
-        speed = stats.getspeed();
+        speed = stats.GetSpeed();
 
         // get stroke state from erg
-        strokestate = stats.getstrokestate();
+        strokeState = stats.GetStrokeState();
 
 #endif
 

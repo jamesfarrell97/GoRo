@@ -42,50 +42,50 @@ public class StatsManager : MonoBehaviour
         UpdateDisplay();
     }
 
+    // Measured as 0.1 meters per least-significant bit
+    private const float DISTANCE_L_METER_VALUE = 0.1f;                                      // Max        25.5 Meters
+    private const float DISTANCE_M_METER_VALUE = DISTANCE_L_METER_VALUE * 256;              // Max     6,553.5 Meters
+    private const float DISTANCE_H_METER_VALUE = DISTANCE_M_METER_VALUE * 256;              // Max 1,677,721.5 Meters
+
     private float DistanceL;
     private float DistanceM;
     private float DistanceH;
 
-    // Measured as 0.01 meters per least-significant bit
-    private const float DISTANCE_L_METER_VALUE = 0.01f;                                     // Max       2.56 Meters
-    private const float DISTANCE_M_METER_VALUE = DISTANCE_L_METER_VALUE * 256;              // Max     655.35 Meters
-    private const float DISTANCE_H_METER_VALUE = DISTANCE_M_METER_VALUE * 256;              // Max 167,769.60 Meters
+    // Measured as 0.01 seconds per least-significant bit
+    private const float ELAPSED_TIME_L_SECOND_VALUE = 0.01f;                                // Max        2.55 Seconds
+    private const float ELAPSED_TIME_M_SECOND_VALUE = ELAPSED_TIME_L_SECOND_VALUE * 256;    // Max      655.35 Seconds (11 Minutes)
+    private const float ELAPSED_TIME_H_SECOND_VALUE = ELAPSED_TIME_M_SECOND_VALUE * 256;    // Max  167,769.60 Seconds (46 Hours)
 
     private float ElapsedTimeL;
     private float ElapsedTimeM;
     private float ElapsedTimeH;
 
-    // Measured as 0.01 seconds per least-significant bit
-    private const float ELAPSED_TIME_L_SECOND_VALUE = 0.01f;                                // Max       2.55 Seconds
-    private const float ELAPSED_TIME_M_SECOND_VALUE = ELAPSED_TIME_L_SECOND_VALUE * 256;    // Max     655.35 Seconds (11 Minutes)
-    private const float ELAPSED_TIME_H_SECOND_VALUE = ELAPSED_TIME_M_SECOND_VALUE * 256;    // Max 167,769.60 Seconds (46 Hours)
+    // Measured as 0.001 m/s per least-significant bit
+    private const float SPEED_L_MPS_VALUE = 0.001f;                                         // Max        2.55 m/s
+    private const float SPEED_H_MPS_VALUE = SPEED_L_MPS_VALUE * 256;                        // Max      655.35 m/s
 
     private float SpeedL;
     private float SpeedH;
 
-    // Measured as 0.001 m/s per least-significant bit
-    private const float SPEED_L_MPS_VALUE = 0.001f;                                         // Max       2.55 m/s
-    private const float SPEED_H_MPS_VALUE = SPEED_L_MPS_VALUE * 256;                        // Max     655.35 m/s
+    // Measured as 1 watt per least-significant bit
+    private const int POWER_L_W_VALUE = 1;                                                  // Max         255 w
+    private const int POWER_H_W_VALUE = POWER_L_W_VALUE * 256;                              // Max      65,535 w
 
     private int PowerL;
     private int PowerH;
 
-    // Measured as 0.001 m/s per least-significant bit
-    private const int POWER_L_W_VALUE = 1;                                                  // Max          1 w
-    private const int POWER_H_W_VALUE = POWER_L_W_VALUE * 256;                              // Max        256 w
-
     private void RetrieveStats()
     {
-        // Distance Covered (Meters)
+        // Distance Covered (meters)
         DistanceL = BluetoothManager.RowingStatusData[3];           // Distance Lo
         DistanceM = BluetoothManager.RowingStatusData[4];           // Distance Mid
         DistanceH = BluetoothManager.RowingStatusData[5];           // Distance Hi
 
-        DistanceCovered = ((DistanceH * DISTANCE_H_METER_VALUE)
+        DistanceCovered = (DistanceH * DISTANCE_H_METER_VALUE)
                         + (DistanceM * DISTANCE_M_METER_VALUE)
-                        + (DistanceL * DISTANCE_L_METER_VALUE)) * 10;
+                        + (DistanceL * DISTANCE_L_METER_VALUE);
 
-        // Time Rowing (Seconds)
+        // Time Rowing (seconds)
         ElapsedTimeL = BluetoothManager.RowingStatusData[0];        // Elapsed Time Lo
         ElapsedTimeM = BluetoothManager.RowingStatusData[1];        // Elapsed Time Mid
         ElapsedTimeH = BluetoothManager.RowingStatusData[2];        // Elapsed Time Hi
@@ -102,14 +102,14 @@ public class StatsManager : MonoBehaviour
               + (SpeedL * SPEED_L_MPS_VALUE);
 
         // Power (w)
-        PowerL = BluetoothManager.StrokeData[3];                    // Stroke Power Lo
-        PowerH = BluetoothManager.StrokeData[4];                    // Stroke Power Hi
+        PowerL = BluetoothManager.StrokeData1[3];                   // Stroke Power Lo
+        PowerH = BluetoothManager.StrokeData1[4];                   // Stroke Power Hi
 
-        StrokePower = (PowerL * POWER_L_W_VALUE) 
+        StrokePower = (PowerL * POWER_L_W_VALUE)
                     + (PowerH * POWER_H_W_VALUE);
 
+        // Stroke data
         StrokeState = BluetoothManager.RowingStatusData[10];        // Stroke State
-
         StrokesPerMin = BluetoothManager.RowingStatusData1[5];      // Stroke Rate
         DriveLength = BluetoothManager.StrokeData[6];               // Drive Length
     }

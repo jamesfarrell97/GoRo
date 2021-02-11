@@ -327,7 +327,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(player);
                 
                 // Reset track distance
-                player.GetComponent<WaypointProgressTracker>().progressDistance = 0;
+                player.GetComponent<WaypointProgressTracker>().Reset();
 
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
@@ -355,7 +355,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             WaypointProgressTracker waypointProgressTracker = player.GetComponent<WaypointProgressTracker>();
 
             // Reset track distance
-            waypointProgressTracker.progressDistance = 0;
+            waypointProgressTracker.Reset();
 
             // Reset track
             waypointProgressTracker.Circuit = waypointProgressTracker.Routes[0];
@@ -430,6 +430,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void PauseGame()
     {
+        if (!PhotonNetwork.OfflineMode) return;
+
         // Retrieve all players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
 
@@ -470,6 +472,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void UnpauseGame()
     {
+        if (!PhotonNetwork.OfflineMode) return;
+
         // Retrieve all players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
 

@@ -160,7 +160,8 @@ public class Race : MonoBehaviour
 
     private void CheckIfRaceComplete()
     {
-        if(participantsCompletedRace.Count == raceCapacity)
+        //if(participantsCompletedRace.Count == raceCapacity)
+        if (participantsCompletedRace.Count == players.Count)
         {
             raceComplete = true;
         }
@@ -251,12 +252,14 @@ public class Race : MonoBehaviour
     // Reset all datatypes back to their initial state, after a race is finished
     private void DisposeSessionResources()
     {
-        foreach(PlayerController player in players)
+        Debug.Log($"DisposeSessionResources entered for race");
+        ResetRaceStatsForParticipants();
+
+        foreach (PlayerController player in players)
         {
             GameManager.Instance.StartJustRow();
         }
 
-        ResetRaceStatsForParticipants();
         players.Clear();
         participantsCompletedRace.Clear();
         raceInitiated = false;
@@ -276,7 +279,8 @@ public class Race : MonoBehaviour
     {
         foreach(PlayerController participant in players)
         {
-            participant.GetComponent<PlayerController>().participatingInRace = false;
+            //participant.GetComponent<PlayerController>().participatingInRace = false;
+            participant.participatingInRace = false;
         }
     }
 }

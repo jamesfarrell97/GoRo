@@ -117,7 +117,7 @@ namespace UnityStandardAssets.Utility
             if (player.Paused()) return;
 
             if (Circuit == null) return;
-
+            
             if (Circuit.GetRoutePoint(0).Equals(null)) return;
 
             lookAheadForTargetOffset = player.GetVelocity();
@@ -235,7 +235,6 @@ namespace UnityStandardAssets.Utility
             if (currentLap < amountOfLaps)
             {
                 currentLap++;
-                //Update Lap in UI for this player
             }
             else
             {
@@ -251,7 +250,8 @@ namespace UnityStandardAssets.Utility
             {
                 // Time, position and race info(amount of laps, track(distance), amount of participants) to be all stored relating to the new highscore obtained for this particular setup->Add with Player data
                 eventDuration = TimeSpan.FromSeconds(Time.timeSinceLevelLoad - currentRace.timeRaceStarted);
-                currentRace.AddParticipantToCompletedRaceList(target.GetComponent<PlayerController>());
+                //currentRace.AddParticipantToCompletedRaceList(target.GetComponent<PlayerController>());
+                currentRace.AddParticipantToCompletedRaceList(player);
             }
             else if (target.GetComponent<PlayerController>().participatingInTimeTrial == true)
             {
@@ -282,7 +282,6 @@ namespace UnityStandardAssets.Utility
             timeOfCompletion = 0;
             amountOfLaps = 0;
             currentLap = 1;
-            Circuit = null;
         }
     }
 }

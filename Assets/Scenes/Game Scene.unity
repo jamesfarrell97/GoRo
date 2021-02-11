@@ -1573,7 +1573,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4075475234430146, guid: f0128538fded24c8987bafa3b789931c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.6367359
+      value: -0.945
       objectReference: {fileID: 0}
     - target: {fileID: 4075475234430146, guid: f0128538fded24c8987bafa3b789931c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2995,6 +2995,41 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 211196366}
   m_PrefabAsset: {fileID: 0}
+--- !u!84 &220952718
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WaterDepthMap
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  serializedVersion: 3
+  m_Width: 1024
+  m_Height: 1024
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthFormat: 2
+  m_ColorFormat: 142
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
 --- !u!1001 &241103687
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5981,7 +6016,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4656579744416828, guid: 6108635b0aac04aada0cdeaae825f776, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.23472428
+      value: -0.39
       objectReference: {fileID: 0}
     - target: {fileID: 4656579744416828, guid: 6108635b0aac04aada0cdeaae825f776, type: 3}
       propertyPath: m_LocalPosition.z
@@ -13377,7 +13412,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4590211134741006, guid: cf92f64c366a83f42b7636e1086fec18, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.06623554
+      value: -0.44
       objectReference: {fileID: 0}
     - target: {fileID: 4590211134741006, guid: cf92f64c366a83f42b7636e1086fec18, type: 3}
       propertyPath: m_LocalPosition.z
@@ -13717,7 +13752,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4656579744416828, guid: 6108635b0aac04aada0cdeaae825f776, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.43353367
+      value: -0.79
       objectReference: {fileID: 0}
     - target: {fileID: 4656579744416828, guid: 6108635b0aac04aada0cdeaae825f776, type: 3}
       propertyPath: m_LocalPosition.z
@@ -15800,7 +15835,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4590211134741006, guid: cf92f64c366a83f42b7636e1086fec18, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.3062353
+      value: -0.59
       objectReference: {fileID: 0}
     - target: {fileID: 4590211134741006, guid: cf92f64c366a83f42b7636e1086fec18, type: 3}
       propertyPath: m_LocalPosition.z
@@ -18967,41 +19002,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1766082513}
   m_PrefabAsset: {fileID: 0}
---- !u!84 &1769266636
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: WaterDepthMap
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  serializedVersion: 3
-  m_Width: 1024
-  m_Height: 1024
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthFormat: 2
-  m_ColorFormat: 142
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
 --- !u!1001 &1771263226
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19915,7 +19915,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4590211134741006, guid: cf92f64c366a83f42b7636e1086fec18, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.02376461
+      value: -0.609
       objectReference: {fileID: 0}
     - target: {fileID: 4590211134741006, guid: cf92f64c366a83f42b7636e1086fec18, type: 3}
       propertyPath: m_LocalPosition.z
@@ -20046,7 +20046,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4656579744416828, guid: 6108635b0aac04aada0cdeaae825f776, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.35472417
+      value: -0.7
       objectReference: {fileID: 0}
     - target: {fileID: 4656579744416828, guid: 6108635b0aac04aada0cdeaae825f776, type: 3}
       propertyPath: m_LocalPosition.z
@@ -20325,7 +20325,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4656579744416828, guid: 6108635b0aac04aada0cdeaae825f776, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.025275707
+      value: -0.06
       objectReference: {fileID: 0}
     - target: {fileID: 4656579744416828, guid: 6108635b0aac04aada0cdeaae825f776, type: 3}
       propertyPath: m_LocalPosition.z
@@ -23174,6 +23174,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4149961123412369418}
   - component: {fileID: 4149961123412369417}
+  - component: {fileID: 4149961123412369420}
   - component: {fileID: 4149961123412369419}
   - component: {fileID: 5386320338189532496}
   m_Layer: 0
@@ -23251,6 +23252,28 @@ MonoBehaviour:
   timeTheTimeTrialStarted: 0
   pauseBeforeTimeTrialBegins: 5
   numberOfLaps: 3
+--- !u!114 &4149961123412369420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4149961123412369416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents: []
+  viewIdField: 1
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4720597246525608050
 GameObject:
   m_ObjectHideFlags: 0

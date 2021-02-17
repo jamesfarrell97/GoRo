@@ -277,7 +277,7 @@ namespace UnityStandardAssets.Utility
                 // Time, position and race info(amount of laps, track(distance), amount of participants) to be all stored relating to the new highscore obtained for this particular setup->Add with Player data
                 eventDuration = TimeSpan.FromSeconds(Time.timeSinceLevelLoad - currentRace.timeRaceStarted);
                 //currentRace.AddParticipantToCompletedRaceList(target.GetComponent<PlayerController>());
-                currentRace.AddParticipantToCompletedRaceList(player);
+                currentRace.AddPlayerToCompletedRaceList(player);
             }
             else if (target.GetComponent<PlayerController>().participatingInTimeTrial == true)
             {

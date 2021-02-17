@@ -58,24 +58,7 @@ public class RaceManager : MonoBehaviour
         wpt.UpdateLastNodeIndex(race.route.Length - 1);
         wpt.SetRace(race);
 
-        PhotonView playerView = player.GetComponent<PhotonView>();
-        photonView.RPC("RPC_AddPlayerToRace", RpcTarget.All, playerView.ViewID);
-    }
-
-    [PunRPC]
-    void RPC_AddPlayerToRace(int playerID)
-    {
-        // Retrieve race
-        Race race = FindObjectOfType<Race>();
-
-        // Retrieve player view
-        PhotonView playerView = PhotonView.Find(playerID);
-
-        // Retrieve player controller
-        PlayerController player = playerView.gameObject.GetComponent<PlayerController>();
-        
-        // Setup race values
-        race.InitiateRace(1, 2);
-        race.AddParticipantIntoRace(player);
+        // Add player to race
+        race.AddPlayerToRaceList(player);
     }
 }

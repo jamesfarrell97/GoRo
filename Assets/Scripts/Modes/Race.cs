@@ -11,7 +11,7 @@ public class Race : MonoBehaviour
     #region Public Variables   
     [HideInInspector] public Transform[] route;
     [HideInInspector] public List<PlayerController> players;
-    [HideInInspector] public Dictionary<int, PlayerController> participantsCompletedRace;
+    [HideInInspector] public Dictionary<int, PlayerController> playersCompletedRace;
 
     [HideInInspector] public bool raceInitiated = false;
     [HideInInspector] public bool raceInProgress = false;
@@ -42,7 +42,7 @@ public class Race : MonoBehaviour
     private void Awake()
     {
         photonView = GetComponent<PhotonView>();
-        participantsCompletedRace = new Dictionary<int, PlayerController>();
+        playersCompletedRace = new Dictionary<int, PlayerController>();
 
         route = FindObjectOfType<Race>().GetComponentsInChildren<Transform>();
     }
@@ -135,28 +135,70 @@ public class Race : MonoBehaviour
         }
     }
 
-    public void AddParticipantIntoRace(PlayerController player)
+    public void AddPlayerToRaceList(PlayerController player)
     {
         if (players.Count < raceCapacity)
         {
-            players.Add(player);
+            // Retrieve player view
+            PhotonView playerView = player.GetComponent<PhotonView>();
 
+            // Add player to shared race list
+            photonView.RPC("RPC_AddPlayerToRaceList", RpcTarget.AllBuffered, playerView.ViewID);
+
+            // Mark player as participating in race
             player.participatingInRace = true;
 
+            // Retrieve waypoint progress tracker
             WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
 
+            // Update values
             wpt.Reset();
             wpt.UpdateLaps(numberOfLaps);
             wpt.UpdatePosition();
         }
     }
 
-    public void AddParticipantToCompletedRaceList(PlayerController player)
+    [PunRPC]
+    public void RPC_AddPlayerToRaceList(int playerID)
     {
-        participantsCompletedRace.Add(racePositionIndex, player);
-        racePositionIndex++;
+        // Retrieve player view
+        PhotonView playerView = PhotonView.Find(playerID);
+
+        // Retrieve player controller
+        PlayerController player = playerView.gameObject.GetComponent<PlayerController>();
+
+        // Add player to players list
+        players.Add(player);
+    }
+
+    public void AddPlayerToCompletedRaceList(PlayerController player)
+    {
+        // Retrieve player view
+        PhotonView playerView = player.GetComponent<PhotonView>();
+
+        // Add player to shared completed race list
+        photonView.RPC("RPC_AddPlayerToCompletedRaceList", RpcTarget.AllBuffered, playerView.ViewID);
+
+        // Mark player as participating in race
+        player.participatingInRace = false;
 
         CheckIfRaceComplete();
+    }
+
+    [PunRPC]
+    public void RPC_AddPlayerToCompletedRaceList(int playerID)
+    {
+        // Retrieve player view
+        PhotonView playerView = PhotonView.Find(playerID);
+
+        // Retrieve player controller
+        PlayerController player = playerView.gameObject.GetComponent<PlayerController>();
+
+        // Add player to completed race list
+        playersCompletedRace.Add(racePositionIndex, player);
+
+        // Update race position
+        racePositionIndex++;
     }
 
     private void StartRace()
@@ -165,7 +207,7 @@ public class Race : MonoBehaviour
         foreach (PlayerController player in players)
         {
             // Resume player movement
-            player.Unpause();
+            player.Resume();
             
             // Retrieve notification container
             Transform notificationContainer = GameManager.Instance.transform.Find("HUD/Notification Cont");
@@ -182,10 +224,10 @@ public class Race : MonoBehaviour
         raceInProgress = true;
     }
 
+    [PunRPC]
     private void CheckIfRaceComplete()
     {
-        //if(participantsCompletedRace.Count == raceCapacity)
-        if (participantsCompletedRace.Count == players.Count)
+        if (playersCompletedRace.Count == players.Count)
         {
             raceComplete = true;
         }
@@ -216,7 +258,7 @@ public class Race : MonoBehaviour
         timeRaceStarted = Time.timeSinceLevelLoad;
         foreach (PlayerController player in players)
         {
-            player.Unpause();
+            player.Resume();
         }
     }
 
@@ -266,7 +308,7 @@ public class Race : MonoBehaviour
 
     private void DisplayEndOfRaceStats()
     {
-        foreach (KeyValuePair<int, PlayerController> player in participantsCompletedRace)
+        foreach (KeyValuePair<int, PlayerController> player in playersCompletedRace)
         {
             string text = $"Your position within the race: {player.Key}";
             StartCoroutine(GameManager.Instance.DisplayQuickNotificationText(text, 6));
@@ -285,7 +327,7 @@ public class Race : MonoBehaviour
         }
 
         players.Clear();
-        participantsCompletedRace.Clear();
+        playersCompletedRace.Clear();
         raceInitiated = false;
         raceInProgress = false;
         raceComplete = false;
@@ -303,7 +345,6 @@ public class Race : MonoBehaviour
     {
         foreach(PlayerController participant in players)
         {
-            //participant.GetComponent<PlayerController>().participatingInRace = false;
             participant.participatingInRace = false;
         }
     }

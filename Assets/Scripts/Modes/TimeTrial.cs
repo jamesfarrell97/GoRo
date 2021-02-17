@@ -113,7 +113,7 @@ public class TimeTrial : MonoBehaviour
 
     private void StartTimeTrial()
     {
-        player.Unpause();
+        player.Resume();
 
         timeTrialInProgress = true;
         timeTheTimeTrialStarted = Time.timeSinceLevelLoad;
@@ -134,7 +134,7 @@ public class TimeTrial : MonoBehaviour
         gamePaused = false;
         timeTheTimeTrialStarted = Time.timeSinceLevelLoad;
 
-        player.Unpause();
+        player.Resume();
     }
 
     private void DisplayTimeTrialDataToParticipants(string time)

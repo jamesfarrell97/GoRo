@@ -504,7 +504,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             else
             {
                 // Unpause player
-                player.Unpause();
+                player.Resume();
             }
             
             // No need to check any more views, so return

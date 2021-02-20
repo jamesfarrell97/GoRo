@@ -209,6 +209,26 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public void ToggleCameraView()
+    {
+        // Retrieve all players
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
+
+        foreach (PlayerController player in players)
+        {
+            // Retrieve player view
+            PhotonView photonView = player.GetComponent<PhotonView>();
+
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
+
+            player.GetComponent<PlayerController>().ChangeCameraView();
+
+            // No need to check any more views, so return
+            return;
+        }
+    }
+
     public void Stop()
     {
         // Retrieve all players

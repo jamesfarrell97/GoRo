@@ -18,6 +18,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Oar leftOar;
     [SerializeField] private Oar rightOar;
 
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private Camera frontFacingCamera;
+
     [HideInInspector] public Transform[] route;
 
     [HideInInspector] public bool participatingInRace = false;
@@ -42,6 +45,9 @@ public class PlayerController : MonoBehaviour
 
         leftOar.rowing = false;
         rightOar.rowing = false;
+
+        frontFacingCamera.enabled = false;
+        mainCamera.enabled = true;       
     }
 
     private void Start()
@@ -63,9 +69,11 @@ public class PlayerController : MonoBehaviour
     {
         // Retrieve player camera
         Camera playerCamera = transform.Find("Cameras/Main Camera").GetComponent<Camera>();
-
+        
         // Update menu camera
         MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = playerCamera;
+
+        //mainCameraActive = true;
 
         // Display HUD
         MenuManager.Instance.OpenMenu("HUD");
@@ -285,5 +293,21 @@ public class PlayerController : MonoBehaviour
     public float GetVelocity()
     {
         return velocity;
+    }
+
+    public void ChangeCameraView()
+    {
+        if (mainCamera.enabled == true)
+        {
+            
+            frontFacingCamera.enabled = true;
+            mainCamera.enabled = false;
+        }
+        else
+        {
+            
+            mainCamera.enabled = true;
+            frontFacingCamera.enabled = false;
+        }
     }
 }

@@ -82,14 +82,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Destroy waypoint tracker
-        Destroy(GetComponent<WaypointProgressTracker>());
-
-        // Destroy animation
-        Destroy(GetComponent<Animation>());
-    }
-
-    private void DestroyProgressTracker()
-    {
+        Destroy(GetComponent<RouteFollower>());
     }
 
     private void UpdateAppearance()
@@ -144,23 +137,74 @@ public class PlayerController : MonoBehaviour
             UpdateSpeed();
             Animate();
         }
+
+#if UNITY_EDITOR
+
+        UserInput();
+
+#endif
     }
 
-    private int strokeState = 0;
-    private float velocity = 0;
-
-    private float prevSpeed = 0;
-    private float deltSpeed = 0;
-    private float speed = 0;
-
-    private enum StrokeStates
+    private enum StrokeState
     {
         WaitingForWheelToReachMinSpeed,
         WaitingForWheelToAccelerate,
         Driving,
         DwellingAfterDrive,
-        RecoveryState
+        Recovery
     }
+
+    private StrokeState currentState;
+    private StrokeState strokeState;
+
+    private void UserInput()
+    {
+        if (Input.GetKey(KeyCode.Q))
+        {
+            strokeState = StrokeState.WaitingForWheelToReachMinSpeed;
+        }
+        else if (Input.GetKey(KeyCode.W))
+        {
+            strokeState = StrokeState.Driving;
+        }
+        else if (Input.GetKey(KeyCode.E))
+        {
+            strokeState = StrokeState.DwellingAfterDrive;
+        }
+        else if (Input.GetKey(KeyCode.R))
+        {
+            strokeState = StrokeState.Recovery;
+        }
+        else if (Input.GetKey(KeyCode.T))
+        {
+            strokeState = StrokeState.WaitingForWheelToAccelerate;
+        }
+
+        //// If state has changed
+        //if (currentState != strokeState)
+        //{
+            StateChanged();
+        //}
+    }
+
+    private void StateChanged()
+    {
+        // Update current state
+        currentState = strokeState;
+
+        // Update animation
+        foreach (Animator animator in rowingAnimators)
+        {
+            animator.SetInteger("State", (int) strokeState);
+        }
+    }
+
+    private float velocity = 0;
+
+    private float prevSpeed = 0;
+    private float deltSpeed = 0;
+    private float speed = 0;
+    private float power = 0;
 
     private float currTime = 0;
     private void UpdateSpeed()
@@ -204,57 +248,85 @@ public class PlayerController : MonoBehaviour
             currTime = 0;
         }
 
-        if (move)
-        {
-            // Driving
-            strokeState = 2;
-        }
-        else
-        {
-            // Resting
-            strokeState = 0;
-        }
+        //if (move)
+        //{
+        //    // Driving
+        //    strokeState = StrokeState.Driving;
+        //}
+        //else
+        //{
+        //    // Resting
+        //    strokeState = 0;
+        //}
 
 #else
 
         // get speed from erg
         speed = stats.GetSpeed();
 
+        // get power from erg
+        power = stats.GetStrokePower();
+
         // get stroke state from erg
-        strokeState = stats.GetStrokeState();
+        strokeState = (StrokeState) stats.GetStrokeState();
 
 #endif
 
-        // If driving
-        if (strokeState == (int) StrokeStates.Driving)
+        //// If driving
+        if (strokeState == StrokeState.Driving)
         {
             // Apply force
             rigidbody.AddForce(transform.forward * speed * Time.fixedDeltaTime);
         }
 
-        // Update velocity
+        //else if (strokeState == StrokeState.DwellingAfterDrive)
+        //{
+
+        //}
+        //else if (strokeState == StrokeState.Recovery)
+        //{
+
+        //}
+        //else if (strokeState == StrokeState.WaitingForWheelToAccelerate)
+        //{
+
+        //}
+        //else if (strokeState == StrokeState.WaitingForWheelToReachMinSpeed)
+        //{
+
+        //}
+
+        //StateChanged();
+
+        // Upidate velocity
         velocity = rigidbody.velocity.magnitude * boatSpeed;
     }
 
     private void Animate()
     {
+        // Update animation
         foreach (Animator animator in rowingAnimators)
         {
-            if (strokeState == (int) StrokeStates.Driving)
-            {
-                leftOar.rowing = true;
-                rightOar.rowing = true;
-
-                animator.SetBool("Play", true);
-            }
-            else
-            {
-                leftOar.rowing = false;
-                rightOar.rowing = false;
-
-                animator.SetBool("Play", false);
-            }
+            animator.SetInteger("State", (int) strokeState);
         }
+
+        //foreach (Animator animator in rowingAnimators)
+        //{
+        //    if (strokeState == (int) StrokeStates.Driving)
+        //    {
+        //        leftOar.rowing = true;
+        //        rightOar.rowing = true;
+
+        //        animator.SetBool("Play", true);
+        //    }
+        //    else
+        //    {
+        //        leftOar.rowing = false;
+        //        rightOar.rowing = false;
+
+        //        animator.SetBool("Play", false);
+        //    }
+        //}
     }
 
     public void Go()

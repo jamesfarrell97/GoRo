@@ -22,7 +22,7 @@ public class Oar : MonoBehaviour
     {
         transform.LookAt(trackedObject);
         
-        transform.Rotate(new Vector3(0, 0, trackedObject.localEulerAngles.x));
+        transform.Rotate(new Vector3(0, 0, trackedObject.eulerAngles.x));
         transform.position = pivotPoint.position;
     }
 

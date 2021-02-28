@@ -55,7 +55,21 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        SetSleepTimeout();
         ShowConnectionMenu();
+    }
+
+    private void FixedUpdate()
+    {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
+
+    private void SetSleepTimeout()
+    {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     public void ShowConnectionMenu()
@@ -296,7 +310,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(player);
 
                 // Reset track distance
-                player.GetComponent<WaypointProgressTracker>().progressDistance = 0;
+                player.GetComponent<RouteFollower>().progressDistance = 0;
 
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
@@ -327,7 +341,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(player);
                 
                 // Reset track distance
-                player.GetComponent<WaypointProgressTracker>().Reset();
+                player.GetComponent<RouteFollower>().Reset();
 
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
@@ -352,13 +366,13 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (!photonView.IsMine) continue;
 
             // Retrieve progress tracker
-            WaypointProgressTracker waypointProgressTracker = player.GetComponent<WaypointProgressTracker>();
+            RouteFollower waypointProgressTracker = player.GetComponent<RouteFollower>();
 
             // Reset track distance
             waypointProgressTracker.Reset();
 
             // Reset track
-            waypointProgressTracker.Circuit = waypointProgressTracker.Routes[0];
+            waypointProgressTracker.Route = waypointProgressTracker.Routes[0];
 
             // No need to check any more views, so return
             return;
@@ -448,14 +462,14 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (player.participatingInRace == true)
             {
                 // Pause singleplayer race
-                player.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().PauseSingleplayerRace();
+                player.GetComponent<RouteFollower>().currentRace.GetComponent<Race>().PauseSingleplayerRace();
             }
 
             // Else if participating in time trial
             else if (player.participatingInTimeTrial == true)
             {
                 // Pause singleplayer time trial
-                player.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().PauseSingleplayerTimeTrial();
+                player.GetComponent<RouteFollower>().currentTimeTrial.GetComponent<TimeTrial>().PauseSingleplayerTimeTrial();
             }
 
             // Otherwise
@@ -490,14 +504,14 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (player.participatingInRace == true)
             {
                 // Resume singleplayer race
-                player.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().ResumeSingleplayerRace();
+                player.GetComponent<RouteFollower>().currentRace.GetComponent<Race>().ResumeSingleplayerRace();
             }
 
             // Else if participating in time trial
             else if (player.participatingInTimeTrial == true)
             {
                 // Resume singleplayer time trial
-                player.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().ResumeSingleplayerTimeTrial();
+                player.GetComponent<RouteFollower>().currentTimeTrial.GetComponent<TimeTrial>().ResumeSingleplayerTimeTrial();
             }
             
             // Otherwise

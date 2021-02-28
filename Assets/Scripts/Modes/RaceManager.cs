@@ -51,10 +51,10 @@ public class RaceManager : MonoBehaviour
         Race race = FindObjectOfType<Race>();
 
         // Retrieve waypoint progress tracker
-        WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
+        RouteFollower wpt = player.GetComponent<RouteFollower>();
 
         // Setup wpt values
-        wpt.SetCircuit(race.gameObject.GetComponent<WaypointCircuit>());
+        wpt.SetCircuit(race.gameObject.GetComponent<Route>());
         wpt.UpdateLastNodeIndex(race.route.Length - 1);
         wpt.SetRace(race);
 

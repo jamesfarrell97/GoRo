@@ -144,7 +144,7 @@ public class Race : MonoBehaviour
 
             player.participatingInRace = true;
 
-            WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
+            RouteFollower wpt = player.GetComponent<RouteFollower>();
 
             wpt.Reset();
             wpt.UpdateLaps(numberOfLaps);
@@ -229,7 +229,7 @@ public class Race : MonoBehaviour
 
             if (!photonView.IsMine) continue;
 
-            int currentLap = player.GetComponent<WaypointProgressTracker>().currentLap;
+            int currentLap = player.GetComponent<RouteFollower>().currentLap;
 
             GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
 

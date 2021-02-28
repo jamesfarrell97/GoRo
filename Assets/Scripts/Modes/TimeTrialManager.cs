@@ -40,9 +40,9 @@ public class TimeTrialManager : MonoBehaviour
 
         // Changing this just to get it working for the release
         // Will change back to previous implementation later
-        player.GetComponent<WaypointProgressTracker>().Circuit = heroBeachTimeTrial.gameObject.GetComponent<WaypointCircuit>();
-        player.GetComponent<WaypointProgressTracker>().currentTimeTrial = heroBeachTimeTrial;
-        player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachTimeTrial.route.Length - 1;
+        player.GetComponent<RouteFollower>().Route = heroBeachTimeTrial.gameObject.GetComponent<Route>();
+        player.GetComponent<RouteFollower>().currentTimeTrial = heroBeachTimeTrial;
+        player.GetComponent<RouteFollower>().lastIndex = heroBeachTimeTrial.route.Length - 1;
         heroBeachTimeTrial.timeTrialInitiated = true;
         heroBeachTimeTrial.timeTheTimeTrialInitiated = Time.timeSinceLevelLoad;
         heroBeachTimeTrial.numberOfLaps = 3;

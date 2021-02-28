@@ -108,7 +108,7 @@ public class TimeTrial : MonoBehaviour
     public void AddParticipantIntoTimeTrial(PlayerController player)
     {
         this.player = player;
-        player.GetComponent<WaypointProgressTracker>().numberOfLaps = numberOfLaps;
+        player.GetComponent<RouteFollower>().numberOfLaps = numberOfLaps;
     }
 
     private void StartTimeTrial()
@@ -139,7 +139,7 @@ public class TimeTrial : MonoBehaviour
 
     private void DisplayTimeTrialDataToParticipants(string time)
     {
-        int currentLap = player.GetComponent<WaypointProgressTracker>().currentLap;
+        int currentLap = player.GetComponent<RouteFollower>().currentLap;
 
         GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
     }

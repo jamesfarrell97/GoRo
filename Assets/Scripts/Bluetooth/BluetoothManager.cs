@@ -32,6 +32,7 @@ public class BluetoothManager : MonoBehaviour
 
     private DeviceListItem DeviceListItem;
     private string DeviceAddress;
+    private string DeviceName;
 
     private float Timeout = 0f;
 
@@ -155,25 +156,13 @@ public class BluetoothManager : MonoBehaviour
 
         if (device != null)
         {
-            if (deviceListItem.Connected)
-            {
-
                 DeviceListItem = deviceListItem;
                 DeviceAddress = device.Address;
-
-                SetState(States.Disconnect, 3f);
-            }
-            else
-            {
-                DeviceListItem = deviceListItem;
-                DeviceAddress = device.Address;
-
-                SetState(States.Connect, 3f);
-            }
+                DeviceName = device.Name;
         }
         else
         {
-            ErrorMessage = "Error: Device not found";
+            ErrorMessage = "Error: Device not found!";
         }
     }
 
@@ -213,20 +202,20 @@ public class BluetoothManager : MonoBehaviour
 
     private void Connect()
     {
-        StatusMessage = "Connecting...";
+        StatusMessage = "Connecting to \n" + DeviceName + "...";
 
         BluetoothLEHardwareInterface.ConnectToPeripheral(DeviceAddress, null, (address, serviceUUID) => {
 
             BluetoothLEHardwareInterface.StopScan();
 
-            StatusMessage = "Connected";
+            StatusMessage = "Connected to \n" + DeviceName + ".";
 
             DeviceListItem.Connect();
 
             if (IsEqual(serviceUUID, PMDictionary.RowingServiceUUID))
             {
-                //StatusMessage = "Found Service UUID";
-                SetState(States.RequestMTU, 3f);
+                //StatusMessage = "Found Service UUID...";
+                SetState(States.RequestMTU, 5f);
             }
 
         }, null);
@@ -369,7 +358,7 @@ public class BluetoothManager : MonoBehaviour
 
     private void ResetDevices()
     {
-        StatusMessage = "Scanning...";
+        StatusMessage = "Scanning for PM5 Ergs";
         SetState(States.Scan, 1f);
 
         ResetList();

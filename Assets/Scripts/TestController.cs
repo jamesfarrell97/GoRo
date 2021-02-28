@@ -11,21 +11,35 @@ public class TestController : MonoBehaviour
 
     private bool paused;
 
+    public int photonViewID { get; private set; }
+
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
         photonView = GetComponent<PhotonView>();
         camera = GetComponentInChildren<Camera>();
 
-        if (!photonView.IsMine)
+        photonViewID = photonView.ViewID;
+
+        if (photonView.IsMine)
         {
-            camera.gameObject.SetActive(false);
-            Destroy(rigidbody);
+            SetupLocalPlayer();
         }
         else
         {
-            AssignMenuCamera();
+            SetupNetworkedPlayer();
         }
+    }
+
+    private void SetupNetworkedPlayer()
+    {
+        camera.gameObject.SetActive(false);
+        Destroy(rigidbody);
+    }
+
+    private void SetupLocalPlayer()
+    {
+        AssignMenuCamera();
     }
 
     private void AssignMenuCamera()

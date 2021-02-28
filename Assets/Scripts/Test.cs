@@ -28,7 +28,6 @@ public class Test : MonoBehaviour
     private Dictionary<TestController, int> positions;
 
     private int positionIndex;
-
     private float minDistanceToFinish = 1f;
 
     private void Start()
@@ -101,24 +100,43 @@ public class Test : MonoBehaviour
             // Player already finished race
             if (positions.ContainsKey(player)) return;
 
-            // Retrieve current players distance to finish line
-            float distanceToFinish = Vector3.Distance(player.transform.position, finish.position);
+            // Retrieve player view
+            PhotonView playerView = player.GetComponent<PhotonView>();
 
-            // If player has reached the finish line
-            if (distanceToFinish < minDistanceToFinish)
-            {
-                // Assign player to position
-                positions.Add(player, positionIndex++);
+            // Add player to shared race list
+            photonView.RPC("RPC_CheckIfComplete", RpcTarget.AllBufferedViaServer, playerView.ViewID);
+        }
+    }
 
-                // Place player at finish line
-                player.transform.SetPositionAndRotation(finish.position, finish.rotation);
+    [PunRPC]
+    private void RPC_CheckIfComplete(int playerID)
+    {
+        // Retrieve player view
+        PhotonView playerView = PhotonView.Find(playerID);
 
-                // Pause player movement
-                player.Pause();
+        // Retrieve player
+        TestController player = playerView.GetComponent<TestController>();
 
-                // Begin position timeout - Will need to determine way of resetting this timeout for each player across the line
-                StartCoroutine(StartPositionTimeout(positionTimeoutDuration));
-            }
+        // Don't update for finished players
+        if (positions.ContainsKey(player)) return;
+
+        // Retrieve current players distance to finish line
+        float distanceToFinish = Vector3.Distance(player.transform.position, finish.position);
+
+        // If player has reached the finish line
+        if (distanceToFinish < minDistanceToFinish)
+        {
+            // Assign player to position
+            positions.Add(player, positionIndex++);
+
+            // Place player at finish line
+            player.transform.SetPositionAndRotation(finish.position, finish.rotation);
+
+            // Pause player movement
+            player.Pause();
+
+            // Begin position timeout - Will need to determine way of resetting this timeout for each player across the line
+            StartCoroutine(StartPositionTimeout(positionTimeoutDuration));
         }
     }
 
@@ -143,6 +161,16 @@ public class Test : MonoBehaviour
 
     private void ResolveRace()
     {
+        // Resolve race
+        photonView.RPC("RPC_ResolveRace", RpcTarget.AllBufferedViaServer);
+
+        // Set race to inactive
+        SetState(RaceState.Inactive);
+    }
+
+    [PunRPC]
+    private void RPC_ResolveRace()
+    {
         // Display race stats to participants
         StartCoroutine(DisplayEndOfRaceStats());
     }
@@ -161,9 +189,6 @@ public class Test : MonoBehaviour
 
         // End race
         EndRace();
-
-        // Set race to inactive
-        SetState(RaceState.Inactive);
     }
 
     public void AddPlayerToRace(TestController player)
@@ -204,7 +229,7 @@ public class Test : MonoBehaviour
             // Retrieve player view
             PhotonView playerView = player.GetComponent<PhotonView>();
 
-            // Add player to shared race list
+            // Remove player from shared race list
             photonView.RPC("RPC_RemovePlayerFromRace", RpcTarget.AllBufferedViaServer, playerView.ViewID);
         }
     }
@@ -250,11 +275,8 @@ public class Test : MonoBehaviour
         // If multiplayer
         if (!PhotonNetwork.OfflineMode)
         {
-            // Send notification to players that a race is about to begin
-            SendRaceNotification();
-
-            // Start race timeout
-            StartCoroutine(StartRaceTimeout(startTimeoutDuration));
+            // Form race
+            photonView.RPC("RPC_FormRace", RpcTarget.AllBufferedViaServer);
         }
         else
         {
@@ -263,13 +285,30 @@ public class Test : MonoBehaviour
         }
     }
 
+    [PunRPC]
+    private void RPC_FormRace()
+    {
+        // Send notification to players that a race is about to begin
+        SendRaceNotification();
+
+        // Start race timeout
+        StartCoroutine(StartRaceTimeout(startTimeoutDuration));
+
+        // Set state
+        SetState(RaceState.Forming);
+    }
+    
     IEnumerator StartRaceTimeout(float timeout)
     {
         // Wait for other players to join race
         yield return new WaitForSeconds(timeout);
 
-        // Start race countdown
-        StartCoroutine(StartRaceCountdown());
+        // For each player in race
+        foreach (TestController player in players)
+        {
+            // Start race countdown
+            StartCoroutine(StartRaceCountdown());
+        }
     }
 
     IEnumerator StartRaceCountdown()
@@ -325,15 +364,41 @@ public class Test : MonoBehaviour
         // For each active player
         foreach (TestController player in activePlayers)
         {
+            // Don't display for players currently in the race
+            if (players.Contains(player)) continue;
+            
             // Send race notification
-            StartCoroutine(GameManager.Instance.DisplayCountdown("Race Starting", 10));
+            StartCoroutine(GameManager.Instance.DisplayCountdown("Race Starting", 3));
+
+            //*************************************************************************************
+            //
+            // URGENT TODO: StartTimeoutDuration does not take account of the time that the race
+            // started. As such, players who join after the race begins will believe that there
+            // is startTimeoutDuration seconds until the race begins, but there may only actually
+            // be startTimeoutDuration - raceStartTime seconds until the race begins. raceStartTime
+            // must be synced across the networked - Photon.Time
+            //
+            //*************************************************************************************
+
+            // Send race notification
+            //photonView.RPC("RPC_SendRaceNotification", RpcTarget.AllBufferedViaServer, new object[] { 3 });
         }
+    }
+
+    [PunRPC]
+    private void RPC_SendRaceNotification(int countdown)
+    {
+        // Don't display on our own screen
+        if (photonView.IsMine) return;
+
+        // Send race notification
+        StartCoroutine(GameManager.Instance.DisplayCountdown("Race Starting", countdown));
     }
 
     private void SetState(RaceState state)
     {
         // Update race state
-        photonView.RPC("RPC_SetState", RpcTarget.AllBufferedViaServer, (int) state);
+        photonView.RPC("RPC_SetState", RpcTarget.AllBufferedViaServer, new object[] { (int) state });
     }
 
     [PunRPC]

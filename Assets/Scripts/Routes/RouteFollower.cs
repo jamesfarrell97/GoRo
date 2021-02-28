@@ -5,7 +5,7 @@ using UnityEngine.UI;
 #pragma warning disable 649
 namespace UnityStandardAssets.Utility
 {
-    public class WaypointProgressTracker : MonoBehaviour
+    public class RouteFollower : MonoBehaviour
     {
         #region Race/Time Trial Event Variables
         [HideInInspector] public int currentLap = 1;
@@ -29,9 +29,9 @@ namespace UnityStandardAssets.Utility
         // This script manages the amount to look ahead along the route,
         // and keeps track of progress and laps.
 
-        [SerializeField] public WaypointCircuit Circuit; // A reference to the waypoint-based route we should follow
+        [SerializeField] public Route Route; // A reference to the waypoint-based route we should follow
 
-        [SerializeField] public WaypointCircuit[] Routes;
+        [SerializeField] public Route[] Routes;
 
         [SerializeField] private float lookAheadForTargetOffset = 5f;
         // The offset ahead along the route that the we will aim for
@@ -60,9 +60,9 @@ namespace UnityStandardAssets.Utility
         }
 
         // these are public, readable by other objects - i.e. for an AI to know where to head!
-        public WaypointCircuit.RoutePoint targetPoint { get; private set; }
-        public WaypointCircuit.RoutePoint speedPoint { get; private set; }
-        public WaypointCircuit.RoutePoint progressPoint { get; private set; }
+        public Route.RoutePoint targetPoint { get; private set; }
+        public Route.RoutePoint speedPoint { get; private set; }
+        public Route.RoutePoint progressPoint { get; private set; }
 
         [HideInInspector] public float progressDistance; // The progress around the route, used in smooth mode.
 
@@ -72,8 +72,8 @@ namespace UnityStandardAssets.Utility
 
         private void Awake()
         {
-            Routes = FindObjectsOfType<WaypointCircuit>();
-            Circuit = Routes[0];
+            Routes = FindObjectsOfType<Route>();
+            Route = Routes[0];
         }
 
         // setup script properties
@@ -103,9 +103,9 @@ namespace UnityStandardAssets.Utility
 
             if (player.Paused()) return;
 
-            if (Circuit == null) return;
+            if (Route == null) return;
             
-            if (Circuit.GetRoutePoint(0).Equals(null)) return;
+            if (Route.GetRoutePoint(0).Equals(null)) return;
 
             lookAheadForTargetOffset = player.GetVelocity();
 
@@ -131,15 +131,15 @@ namespace UnityStandardAssets.Utility
                 Vector3 targetDelta = target.position - transform.position;
                 if (targetDelta.magnitude < pointToPointThreshold)
                 {
-                    progressNum = (progressNum + 1) % Circuit.Waypoints.Length;
+                    progressNum = (progressNum + 1) % Route.Waypoints.Length;
                     UpdateEventLapCount();
                 }
 
-                target.position = Circuit.Waypoints[progressNum].position;
-                target.rotation = Circuit.Waypoints[progressNum].rotation;
+                target.position = Route.Waypoints[progressNum].position;
+                target.rotation = Route.Waypoints[progressNum].rotation;
 
                 // get our current progress along the route
-                progressPoint = Circuit.GetRoutePoint(progressDistance);
+                progressPoint = Route.GetRoutePoint(progressDistance);
                 Vector3 progressDelta = progressPoint.position - transform.position;
                 if (Vector3.Dot(progressDelta, progressPoint.direction) < 0)
                 {
@@ -156,14 +156,14 @@ namespace UnityStandardAssets.Utility
 
             if (progressStyle == ProgressStyle.PointToPoint)
             {
-                target.position = Circuit.Waypoints[progressNum].position;
-                target.rotation = Circuit.Waypoints[progressNum].rotation;
+                target.position = Route.Waypoints[progressNum].position;
+                target.rotation = Route.Waypoints[progressNum].rotation;
             }
         }
 
-        public void SetCircuit(WaypointCircuit waypointCircuit)
+        public void SetCircuit(Route waypointCircuit)
         {
-            Circuit = waypointCircuit;
+            Route = waypointCircuit;
         }
 
         public void UpdateLastNodeIndex(int lastNodeIndex)
@@ -186,16 +186,16 @@ namespace UnityStandardAssets.Utility
             speed = Mathf.Lerp(speed, (lastPosition - transform.position).magnitude / Time.fixedDeltaTime, Time.fixedDeltaTime);
 
             target.position =
-                Circuit.GetRoutePoint(progressDistance + lookAheadForTargetOffset + lookAheadForTargetFactor * speed)
+                Route.GetRoutePoint(progressDistance + lookAheadForTargetOffset + lookAheadForTargetFactor * speed)
                         .position;
 
             target.rotation =
                 Quaternion.LookRotation(
-                    Circuit.GetRoutePoint(progressDistance + lookAheadForSpeedOffset + lookAheadForSpeedFactor * speed)
+                    Route.GetRoutePoint(progressDistance + lookAheadForSpeedOffset + lookAheadForSpeedFactor * speed)
                             .direction);
 
             // get our current progress along the route
-            progressPoint = Circuit.GetRoutePoint(progressDistance);
+            progressPoint = Route.GetRoutePoint(progressDistance);
             Vector3 progressDelta = progressPoint.position - transform.position;
             if (Vector3.Dot(progressDelta, progressPoint.direction) < 0)
             {
@@ -291,7 +291,7 @@ namespace UnityStandardAssets.Utility
             {
                 Gizmos.color = Color.green;
                 Gizmos.DrawLine(transform.position, target.position);
-                Gizmos.DrawWireSphere(Circuit.GetRoutePosition(progressDistance), 1);
+                Gizmos.DrawWireSphere(Route.GetRoutePosition(progressDistance), 1);
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawLine(target.position, target.position + target.forward);
             }

@@ -9,9 +9,18 @@ using Photon.Pun;
 //
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] public float boatSpeed = 1f;
-    [SerializeField] [Range(0, 1f)] float speedIncreaseFactor = 0.1f;
-    [SerializeField] [Range(0, 1f)] float speedDecayFactor = 0.1f;
+    public enum PlayerState
+    {
+        JustRowing,
+        ParticipatingInTimeTrial,
+        CompletedTimeTrial,
+        ParticipatingInRace,
+        AtRaceStartLine,
+        AtRaceFinishLine,
+        AtBoathouse
+    }
+
+    [SerializeField] [Range(0, 3f)] public float boatSpeed = 1f;
 
     [SerializeField] private Animator[] rowingAnimators;
     [SerializeField] private Material otherPlayerMaterial;
@@ -19,14 +28,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Oar rightOar;
 
     [HideInInspector] public Transform[] route;
+    [HideInInspector] public Trial trial;
+    [HideInInspector] public Race race;
 
-    [HideInInspector] public bool participatingInRace = false;
-    [HideInInspector] public bool participatingInTimeTrial = false;
+    [HideInInspector] public PhotonView photonView { get; private set; }
+    [HideInInspector] public PlayerState state;
 
     private AchievementTracker achievementTracker;
     private BoxCollider boxCollider;
     private Rigidbody rigidbody;
-    private PhotonView photonView;
     private StatsManager stats;
 
     private bool paused = false;
@@ -55,7 +65,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             DestroyComponents();
-            UpdateAppearance();
+            //UpdateAppearance();
         }
     }
 
@@ -73,12 +83,11 @@ public class PlayerController : MonoBehaviour
 
     private void DestroyComponents()
     {
-        // Destroy cameras
+        // Disable cameras
         Camera[] cameras = GetComponentsInChildren<Camera>();
-        foreach (Camera c in cameras)
+        foreach (Camera camera in cameras)
         {
-            Destroy(c.GetComponent<UniversalAdditionalCameraData>());
-            Destroy(c);
+            camera.gameObject.SetActive(false);
         }
 
         // Destroy waypoint tracker

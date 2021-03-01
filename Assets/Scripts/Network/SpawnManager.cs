@@ -13,12 +13,15 @@ public class SpawnManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+    }
 
+    private void Start()
+    {
         spawnPoints = GetComponentsInChildren<SpawnPoint>();
     }
 
     public Transform GetSpawnPoint()
     {
-        return spawnPoints[Random.Range(0, spawnPoints.Length)].transform;
+        return spawnPoints[Random.Range(0, spawnPoints.Length - 1)].transform;
     }
 }

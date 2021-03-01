@@ -1,64 +1,43 @@
-﻿using Photon.Pun;
-using UnityEngine;
-using UnityStandardAssets.Utility;
+﻿using UnityEngine;
+using static Race;
 
 public class RaceManager : MonoBehaviour
 {
-    PhotonView photonView;
-
-    void Awake()
+    private Race[] races;
+    
+    void Start()
     {
-        photonView = GetComponent<PhotonView>();
+        races = FindObjectsOfType<Race>();
     }
 
-    public void TakePartInARace(PlayerController player)
+    public void JoinRace(PlayerController player, string route)
     {
-        //Will initiate Menu Screen to appear where player will be prompted to select race track they wish to take part in
-        //From this interaction the following methods starting with "AddPlayerToXXX" represent the button pressed actions relevant to race selected
-    }
+        // For each race in the races array
+        foreach (Race race in races)
+        {
+            // Skip loop if current race is not equal to the select route
+            if (!race.name.Equals(route)) continue;
 
-    #region Race Initiation Button Responses
-    public void AddPlayerToHeroBeachRace()
-    {
-        // Changing this just to get it working for the release
-        // Will change back to previous implementation later
-        Race heroBeachRace = FindObjectOfType<Race>();
-        if(heroBeachRace.raceInitiated == false)
-        {
-            //BringUpRaceSetupMenu
-            //SetAllRaceParametersBased on the feedback given by player
-            heroBeachRace.raceInitiated = true;
-            //heroBeachRace.numberOfLaps = ?;
-            //heroBeachRace.raceCapacity = ?;
-            //Add player to participants list
-        }
-        else
-        {
-            if(heroBeachRace.players.Count < heroBeachRace.raceCapacity)
+            // Switch based on race state
+            switch(race.state)
             {
-                //Add player to the partcipants list
+                // Race currently inactive
+                case RaceState.Inactive:
+
+                    // Form new race
+                    race.FormRace(player);
+                    break;
+
+                // Race currently forming
+                case RaceState.Forming:
+
+                    // Add player to the race
+                    race.AddPlayerToRace(player);
+                    break;
             }
+
+            // No need to check any more in the loop
+            return;
         }
-    }
-    #endregion Race Initiation Button Responses
-
-    //HardCoded Method to reach simple solution for Base Version of the 
-    //waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
-    //IMPORTANT: Everything being set in this method will need to be set for every player joining game, it is essential 
-    public void AddPlayerToRace(PlayerController player)
-    {
-        // Retrieve race
-        Race race = FindObjectOfType<Race>();
-
-        // Retrieve waypoint progress tracker
-        WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
-
-        // Setup wpt values
-        wpt.SetCircuit(race.gameObject.GetComponent<WaypointCircuit>());
-        wpt.UpdateLastNodeIndex(race.route.Length - 1);
-        wpt.SetRace(race);
-
-        // Add player to race
-        race.AddPlayerToRaceList(player);
     }
 }

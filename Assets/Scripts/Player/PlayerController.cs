@@ -1,5 +1,4 @@
 ﻿using UnityStandardAssets.Utility;
-using UnityEngine.Rendering.Universal;
 using UnityEngine;
 using Photon.Pun;
 
@@ -12,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public enum PlayerState
     {
         JustRowing,
-        ParticipatingInTimeTrial,
+        ParticipatingInTrial,
         CompletedTimeTrial,
         ParticipatingInRace,
         AtRaceStartLine,
@@ -20,15 +19,14 @@ public class PlayerController : MonoBehaviour
         AtBoathouse
     }
 
-    [SerializeField] [Range(0, 3f)] public float boatSpeed = 1f;
+    [SerializeField] [Range(0, 1)] public float boatSpeed = 1f;
 
     [SerializeField] private Animator[] rowingAnimators;
     [SerializeField] private Material otherPlayerMaterial;
     [SerializeField] private Oar leftOar;
     [SerializeField] private Oar rightOar;
 
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private Camera frontFacingCamera;
+    [SerializeField] private Camera[] cameras;
 
     [HideInInspector] public Transform[] route;
     [HideInInspector] public Trial trial;
@@ -45,6 +43,8 @@ public class PlayerController : MonoBehaviour
     private bool paused = false;
     private bool move = false;
 
+    private int cameraIndex = 0;
+
     private void Awake()
     {
         stats = GameManager.Instance.GetComponent<StatsManager>();
@@ -55,9 +55,6 @@ public class PlayerController : MonoBehaviour
 
         leftOar.rowing = false;
         rightOar.rowing = false;
-
-        frontFacingCamera.enabled = false;
-        mainCamera.enabled = true;       
     }
 
     private void Start()
@@ -71,20 +68,18 @@ public class PlayerController : MonoBehaviour
         else
         {
             DestroyComponents();
-            //UpdateAppearance();
+            UpdateAppearance();
         }
     }
 
     private void AssignMenuCamera()
     {
         // Retrieve player camera
-        Camera playerCamera = transform.Find("Cameras/Main Camera").GetComponent<Camera>();
+        Camera playerCamera = transform.Find("Cameras/Rear Camera").GetComponent<Camera>();
         
         // Update menu camera
         MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = playerCamera;
-
-        //mainCameraActive = true;
-
+        
         // Display HUD
         MenuManager.Instance.OpenMenu("HUD");
     }
@@ -99,10 +94,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Destroy waypoint tracker
-        Destroy(GetComponent<WaypointProgressTracker>());
-
-        // Destroy animation
-        Destroy(GetComponent<Animation>());
+        Destroy(GetComponent<RouteFollower>());
     }
 
     private void UpdateAppearance()
@@ -124,12 +116,12 @@ public class PlayerController : MonoBehaviour
                     materials[i].color = Color.red;
                 }
 
-                // Destroy water mask
-                //else if (renderer.gameObject.name.Contains("Mask"))
-                //{
-                //    Destroy(renderer.transform.parent.gameObject.GetComponent<SetRenderQueue>());
-                //    Destroy(renderer.gameObject);
-                //}
+                //Destroy water mask
+                else if (renderer.gameObject.name.Contains("Mask"))
+                {
+                    Destroy(renderer.transform.parent.gameObject.GetComponent<SetRenderQueue>());
+                    Destroy(renderer.gameObject);
+                }
 
                 // Update material
                 else if (!materials[i].color.Equals(null))
@@ -157,29 +149,76 @@ public class PlayerController : MonoBehaviour
             UpdateSpeed();
             Animate();
         }
+
+#if UNITY_EDITOR
+
+        UserInput();
+
+#endif
     }
 
-    private int strokeState = 0;
-    private float velocity = 0;
-
-    private float prevSpeed = 0;
-    private float deltSpeed = 0;
-    private float speed = 0;
-
-    private enum StrokeStates
+    private enum StrokeState
     {
         WaitingForWheelToReachMinSpeed,
         WaitingForWheelToAccelerate,
         Driving,
         DwellingAfterDrive,
-        RecoveryState
+        Recovery
     }
+
+    private StrokeState currentState;
+    private StrokeState strokeState;
+
+    private void UserInput()
+    {
+        if (Input.GetKey(KeyCode.Q))
+        {
+            strokeState = StrokeState.WaitingForWheelToReachMinSpeed;
+        }
+        else if (Input.GetKey(KeyCode.W))
+        {
+            strokeState = StrokeState.Driving;
+        }
+        else if (Input.GetKey(KeyCode.E))
+        {
+            strokeState = StrokeState.DwellingAfterDrive;
+        }
+        else if (Input.GetKey(KeyCode.R))
+        {
+            strokeState = StrokeState.Recovery;
+        }
+        else if (Input.GetKey(KeyCode.T))
+        {
+            strokeState = StrokeState.WaitingForWheelToAccelerate;
+        }
+        
+        StateChanged();
+    }
+
+    private void StateChanged()
+    {
+        // Update current state
+        currentState = strokeState;
+
+        // Update animation
+        foreach (Animator animator in rowingAnimators)
+        {
+            animator.SetInteger("State", (int) strokeState);
+        }
+    }
+
+    private float velocity = 0;
+
+    private float prevSpeed = 0;
+    private float deltSpeed = 0;
+    private float speed = 0;
+    private float power = 0;
 
     private float currTime = 0;
     private void UpdateSpeed()
     {
 
-        #if UNITY_EDITOR
+    #if UNITY_EDITOR
 
         // Increase time
         currTime += Time.fixedDeltaTime;
@@ -194,7 +233,7 @@ public class PlayerController : MonoBehaviour
         if (move)
         {
             // Driving
-            strokeState = 2;
+            strokeState = StrokeState.Driving;
         }
         else
         {
@@ -202,45 +241,36 @@ public class PlayerController : MonoBehaviour
             strokeState = 0;
         }
 
-        #else
+#else
 
         // get speed from erg
         speed = stats.GetSpeed();
 
+        // get power from erg
+        power = stats.GetStrokePower();
+
         // get stroke state from erg
-        strokeState = stats.GetStrokeState();
+        strokeState = (StrokeState) stats.GetStrokeState();
 
-        #endif
+#endif
 
-        // If driving
-        if (strokeState == (int) StrokeStates.Driving)
+        //// If driving
+        if (strokeState == StrokeState.Driving)
         {
             // Apply force
             rigidbody.AddForce(transform.forward * speed * Time.fixedDeltaTime);
         }
 
-        // Update velocity
+        // Upidate velocity
         velocity = rigidbody.velocity.magnitude * boatSpeed;
     }
 
     private void Animate()
     {
+        // Update animation
         foreach (Animator animator in rowingAnimators)
         {
-            if (strokeState == (int) StrokeStates.Driving)
-            {
-                leftOar.rowing = true;
-                rightOar.rowing = true;
-
-                animator.SetBool("Play", true);
-            }
-            else
-            {
-                leftOar.rowing = false;
-                rightOar.rowing = false;
-
-                animator.SetBool("Play", false);
-            }
+            animator.SetInteger("State", (int) strokeState);
         }
     }
 
@@ -276,17 +306,11 @@ public class PlayerController : MonoBehaviour
 
     public void ChangeCameraView()
     {
-        if (mainCamera.enabled == true)
+        cameraIndex = (cameraIndex < cameras.Length - 1) ? cameraIndex + 1 : 0;
+
+        for (int i = 0; i < cameras.Length; i++)
         {
-            
-            frontFacingCamera.enabled = true;
-            mainCamera.enabled = false;
-        }
-        else
-        {
-            
-            mainCamera.enabled = true;
-            frontFacingCamera.enabled = false;
+            cameras[i].gameObject.SetActive(i == cameraIndex);
         }
     }
 }

@@ -8,12 +8,13 @@ using UnityEngine;
 using Photon.Realtime;
 using Photon.Pun;
 using TMPro;
-using static PlayerController;
 
 //Code referenced: https://www.youtube.com/watch?v=zPZK7C5_BQo
 //
 //
 //
+
+using static PlayerController;
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance;
@@ -65,12 +66,26 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         UpdateState();
+        SetSleepTimeout();
         ShowConnectionMenu();
+    }
+
+    private void FixedUpdate()
+    {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 
     private void UpdateState()
     {
         State = GameState.Playing;
+    }
+
+    private void SetSleepTimeout()
+    {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     public void ShowConnectionMenu()
@@ -237,6 +252,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             // If not our view, skip rest of loop
             if (!photonView.IsMine) continue;
 
+            // Change camera view
             player.GetComponent<PlayerController>().ChangeCameraView();
 
             // No need to check any more views, so return
@@ -325,7 +341,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (!photonView.IsMine) continue;
 
             // If player not currently participating in event
-            if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTimeTrial)
+            if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
             {
                 // Add player to race
                 GameObject.Find("Race Manager").GetComponent<RaceManager>().JoinRace(player, "Race Track");
@@ -334,7 +350,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 player.state = PlayerState.ParticipatingInRace;
 
                 // Reset track distance
-                player.GetComponent<WaypointProgressTracker>().progressAlongRoute = 0;
+                player.GetComponent<RouteFollower>().progressAlongRoute = 0;
 
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
@@ -359,16 +375,16 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (!photonView.IsMine) continue;
 
             // If player not currently participating in event
-            if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTimeTrial)
+            if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
             {
                 // Add player to time trial
                 GameObject.Find("Time Trial Manager").GetComponent<TrialManager>().JoinTrial(player, "Race Track");
 
                 // Update player state
-                player.state = PlayerState.ParticipatingInTimeTrial;
+                player.state = PlayerState.ParticipatingInTrial;
 
                 // Reset track distance
-                player.GetComponent<WaypointProgressTracker>().Reset();
+                player.GetComponent<RouteFollower>().Reset();
 
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
@@ -395,14 +411,21 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Update player state
             player.state = PlayerState.JustRowing;
 
+            // Clear player tracks
+            player.trial = null;
+            player.race = null;
+
             // Retrieve progress tracker
-            WaypointProgressTracker waypointProgressTracker = player.GetComponent<WaypointProgressTracker>();
+            RouteFollower routeFollower = player.GetComponent<RouteFollower>();
 
             // Reset track distance
-            waypointProgressTracker.Reset();
+            routeFollower.Reset();
 
-            // Update route
-            waypointProgressTracker.UpdateRoute(waypointProgressTracker.routes[0], 0);
+            // Reset track
+            routeFollower.route = routeFollower.routes[0];
+
+            // Hide time and lap info
+            HideTimeAndLap();
 
             // Open HUD
             MenuManager.Instance.OpenMenu("HUD");

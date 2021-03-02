@@ -17,14 +17,11 @@ public class Trial : MonoBehaviour
 
     public TrialState state;
 
-    [SerializeField] public int numberOfLaps;
-
+    [SerializeField] [Range(0, 10)] public int numberOfLaps;
     [SerializeField] [Range(0, 30)] int resolveTimeoutDuration;
-
-    [HideInInspector] public Transform[] route;
-
-    private PhotonView photonView;
-    private WaypointCircuit waypointCircuit;
+    
+    public PhotonView photonView { get; private set; }
+    public Route route { get; private set; }
 
     private PlayerController player;
 
@@ -40,16 +37,14 @@ public class Trial : MonoBehaviour
     private void Setup()
     {
         photonView = GetComponent<PhotonView>();
-        waypointCircuit = GetComponent<WaypointCircuit>();
+        route = GetComponent<Route>();
     }
 
     private void Reset()
     {
         state = TrialState.Inactive;
-
-        route = GetComponentsInChildren<Transform>();
         player = null;
-        
+
         trialDuration = TimeSpan.Zero;
         trialStartTime = 0;
     }
@@ -98,6 +93,9 @@ public class Trial : MonoBehaviour
         // If player has completed time trial
         if (player.state == PlayerState.CompletedTimeTrial)
         {
+            // Pause player movement
+            player.Pause();
+
             // Display trial stats to participants
             StartCoroutine(DisplayEndOfTrialStats());
 
@@ -108,7 +106,7 @@ public class Trial : MonoBehaviour
 
     private void DisplayDataToParticipants(string time)
     {
-        int currentLap = player.GetComponent<WaypointProgressTracker>().currentLap;
+        int currentLap = player.GetComponent<RouteFollower>().currentLap;
         GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
     }
 
@@ -136,10 +134,10 @@ public class Trial : MonoBehaviour
         this.player.trial = this;
 
         // Retrieve waypoint progress tracker
-        WaypointProgressTracker routeFollower = this.player.GetComponent<WaypointProgressTracker>();
-        
+        RouteFollower routeFollower = this.player.GetComponent<RouteFollower>();
+
         // Update route
-        routeFollower.UpdateRoute(waypointCircuit, numberOfLaps);
+        routeFollower.UpdateRoute(route, numberOfLaps);
     }
 
     IEnumerator StartCountdown()
@@ -176,12 +174,12 @@ public class Trial : MonoBehaviour
         player.Resume();
 
         // Set start time
-        trialStartTime = (float) PhotonNetwork.Time;
+        trialStartTime = (float)PhotonNetwork.Time;
 
         // Update state
         SetState(TrialState.InProgress);
     }
-    
+
     private void EndTrial()
     {
         RemovePlayerFromTrial();
@@ -190,14 +188,8 @@ public class Trial : MonoBehaviour
 
     private void RemovePlayerFromTrial()
     {
-        // Update player state
-        player.state = PlayerState.JustRowing;
-
-        // Reset player trial
-        player.trial = null;
-
-        // Hide time and lap info
-        GameManager.Instance.HideTimeAndLap();
+        // Resume player movement
+        player.Resume();
 
         // Start just row
         GameManager.Instance.StartJustRow();
@@ -205,7 +197,7 @@ public class Trial : MonoBehaviour
 
     private void DisplayTimeTrialDataToParticipants(string time)
     {
-        int currentLap = player.GetComponent<WaypointProgressTracker>().currentLap;
+        int currentLap = player.GetComponent<RouteFollower>().currentLap;
 
         GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
     }

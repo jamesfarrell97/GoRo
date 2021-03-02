@@ -4,7 +4,7 @@ using static Race;
 public class RaceManager : MonoBehaviour
 {
     private Race[] races;
-    
+
     void Start()
     {
         races = FindObjectsOfType<Race>();
@@ -19,7 +19,7 @@ public class RaceManager : MonoBehaviour
             if (!race.name.Equals(route)) continue;
 
             // Switch based on race state
-            switch(race.state)
+            switch (race.state)
             {
                 // Race currently inactive
                 case RaceState.Inactive:

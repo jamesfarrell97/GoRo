@@ -6,7 +6,7 @@ public class PlatformFramerateLock : MonoBehaviour
 {
 	public bool allowUmlimitedFPS = false;
 	public int highEndFPS = 60;
-	public float highEndFixedTimeStep = .02f;
+	public float highEndFixedTimeStep = .033f;
 	public int lowEndFPS = 30;
 	public float lowEndFixedTimeStep = .033f;
 

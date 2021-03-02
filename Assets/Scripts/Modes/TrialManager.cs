@@ -4,7 +4,7 @@ using static Trial;
 public class TrialManager : MonoBehaviour
 {
     private Trial[] trials;
-    
+
     void Start()
     {
         trials = FindObjectsOfType<Trial>();
@@ -29,7 +29,7 @@ public class TrialManager : MonoBehaviour
                     break;
 
                 case TrialState.InProgress:
-                    
+
                     // Do nothing
                     break;
             }

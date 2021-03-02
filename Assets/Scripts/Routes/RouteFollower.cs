@@ -4,10 +4,10 @@ using static PlayerController;
 // Code adapted from the Unity Standard Assets WaypointProgressTracker class
 namespace UnityStandardAssets.Utility
 {
-    public class WaypointProgressTracker : MonoBehaviour
+    public class RouteFollower : MonoBehaviour
     {
-        [SerializeField] public WaypointCircuit route;
-        [SerializeField] public WaypointCircuit[] routes;
+        [SerializeField] public Route route;
+        [SerializeField] public Route[] routes;
 
         [SerializeField] private float translationalVelocity = 5f;
         [SerializeField] private float translationVelocityFactor = .1f;
@@ -22,9 +22,9 @@ namespace UnityStandardAssets.Utility
         [HideInInspector] public int numberOfLaps;
         [HideInInspector] public int currentLap;
         
-        [HideInInspector] public WaypointCircuit.RoutePoint targetPoint { get; private set; }
-        [HideInInspector] public WaypointCircuit.RoutePoint speedPoint { get; private set; }
-        [HideInInspector] public WaypointCircuit.RoutePoint progressPoint { get; private set; }
+        [HideInInspector] public Route.RoutePoint targetPoint { get; private set; }
+        [HideInInspector] public Route.RoutePoint speedPoint { get; private set; }
+        [HideInInspector] public Route.RoutePoint progressPoint { get; private set; }
 
         private PlayerController player;
         private Vector3 previousPosition;
@@ -34,7 +34,7 @@ namespace UnityStandardAssets.Utility
 
         private void Awake()
         {
-            routes = FindObjectsOfType<WaypointCircuit>();
+            routes = FindObjectsOfType<Route>();
             route = routes[0];
         }
         
@@ -92,7 +92,7 @@ namespace UnityStandardAssets.Utility
             speed = 0;
         }
 
-        public void UpdateRoute(WaypointCircuit route, int numberOfLaps)
+        public void UpdateRoute(Route route, int numberOfLaps)
         {
             this.route = route;
             this.numberOfLaps = numberOfLaps;
@@ -127,7 +127,7 @@ namespace UnityStandardAssets.Utility
         public bool CheckIfPointReached(Transform point)
         {
             // Only check for players who are currently participating in a race or time trial
-            if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTimeTrial) return false;
+            if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial) return false;
 
             // Return true if distance to point is less than the minimum threshold
             return (Vector3.Distance(transform.position, point.position) < minimumThreshold);
@@ -138,15 +138,25 @@ namespace UnityStandardAssets.Utility
             // If player participating in race
             if (player.state.Equals(PlayerState.ParticipatingInRace))
             {
-                // Returns true is the player is near the race route half point
-                halfPointReached = (Vector3.Distance(transform.position, player.race.route[player.race.route.Length / 2].position) < minimumThreshold);
+                // True if the player is near the halfway point
+                halfPointReached = (
+                    Vector3.Distance(
+                        transform.position, 
+                        player.race.route.waypointList.items[player.race.route.waypointList.items.Length / 2].position
+                    ) < minimumThreshold
+                );
             }
 
-            // Else if player participating in time trial
-            else if (player.state.Equals(PlayerState.ParticipatingInTimeTrial))
+            // Else if player participating in trial
+            else if (player.state.Equals(PlayerState.ParticipatingInTrial))
             {
-                // Returns true is the player is near the trial route half point
-                halfPointReached = (Vector3.Distance(transform.position, player.trial.route[player.trial.route.Length / 2].position) < minimumThreshold);
+                // True if the player is near the halfway point
+                halfPointReached = (
+                    Vector3.Distance(
+                        transform.position,
+                        player.trial.route.waypointList.items[player.trial.route.waypointList.items.Length / 2].position
+                    ) < minimumThreshold
+                );
             }
         }
 
@@ -156,31 +166,56 @@ namespace UnityStandardAssets.Utility
             if (halfPointReached)
             {
                 float distance = 0;
+                
+                // If player participating in race
                 if (player.state.Equals(PlayerState.ParticipatingInRace))
                 {
-                    distance = Vector3.Distance(transform.position, player.race.route[1].position);
-                }
-                else if (player.state.Equals(PlayerState.ParticipatingInTimeTrial))
-                {
-                    distance = Vector3.Distance(transform.position, player.trial.route[1].position);
+                    // Calculate distance to finish line
+                    // Assumes finish line is at the the start point
+                    distance =
+                        Vector3.Distance(
+                            transform.position,
+                            player.race.route.waypointList.items[0].position
+                        );
                 }
 
+                // Else if player participating in trial
+                else if (player.state.Equals(PlayerState.ParticipatingInTrial))
+                {
+                    // Calculate distance to finish line
+                    // Assumes finish line is at the the start point
+                    distance =
+                        Vector3.Distance(
+                            transform.position,
+                            player.trial.route.waypointList.items[0].position
+                        );
+                }
+
+                // If within range of finish line
                 if (distance < minimumThreshold)
                 {
-                    halfPointReached = false;
-                    UpdateEventLapCount();
+                    // Update lap count
+                    UpdateLapCount();
                 }
             }
         }
 
-        private void UpdateEventLapCount()
+        private void UpdateLapCount()
         {
+            // Reset variable
+            halfPointReached = false;
+
+            // If laps remaining
             if (currentLap < numberOfLaps)
             {
+                // Update lap count
                 currentLap++;
             }
+
+            // Otherwise
             else
             {
+                // Complete event
                 CompleteEvent();
                 Reset();
             }
@@ -192,7 +227,7 @@ namespace UnityStandardAssets.Utility
             {
                 player.state = PlayerState.AtRaceFinishLine;
             }
-            else if (player.state.Equals(PlayerState.ParticipatingInTimeTrial))
+            else if (player.state.Equals(PlayerState.ParticipatingInTrial))
             {
                 player.state = PlayerState.CompletedTimeTrial;
             }

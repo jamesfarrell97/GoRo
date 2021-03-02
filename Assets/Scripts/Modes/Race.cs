@@ -25,16 +25,14 @@ public class Race : MonoBehaviour
     [SerializeField] [Range(0, 30)] int startTimeoutDuration;
     [SerializeField] [Range(0, 30)] int positionTimeoutDuration;
     [SerializeField] [Range(0, 30)] int resolveTimeoutDuration;
-
-    [HideInInspector] public Transform[] route;
-
-    private PhotonView photonView;
-    private WaypointCircuit waypointCircuit;
+    
+    public PhotonView photonView { get; private set; }
+    public Route route { get; private set; }
 
     private List<PlayerController> players;
     private Dictionary<PlayerController, int> positions;
 
-    private int positionIndex;
+    private int position;
 
     private TimeSpan raceDuration;
     private float raceStartTime;
@@ -48,19 +46,17 @@ public class Race : MonoBehaviour
     private void Setup()
     {
         photonView = GetComponent<PhotonView>();
-        waypointCircuit = GetComponent<WaypointCircuit>();
+        route = GetComponent<Route>();
     }
 
     private void Reset()
     {
         state = RaceState.Inactive;
 
-        route = GetComponentsInChildren<Transform>();
-
         players = new List<PlayerController>();
         positions = new Dictionary<PlayerController, int>();
 
-        positionIndex = 0;
+        position = 0;
 
         raceDuration = TimeSpan.Zero;
         raceStartTime = 0;
@@ -124,6 +120,13 @@ public class Race : MonoBehaviour
 
     private void CheckIfComplete()
     {
+        // Check if complete
+        photonView.RPC("RPC_CheckIfComplete", RpcTarget.AllBufferedViaServer);
+    }
+
+    [PunRPC]
+    private void RPC_CheckIfComplete()
+    {
         // If all players have finished the race
         if (positions.Count.Equals(players.Count))
         {
@@ -137,37 +140,27 @@ public class Race : MonoBehaviour
         // For each player in race
         foreach (PlayerController player in players)
         {
-            // Retrieve player view
-            PhotonView playerView = player.GetComponent<PhotonView>();
+            // Only execute on our view
+            if (!player.photonView.IsMine) continue;
 
-            // Check if player complete race
-            photonView.RPC("RPC_CheckIfPlayerComplete", RpcTarget.AllBufferedViaServer, playerView.ViewID);
-        }
-    }
+            // Don't execute for finished players
+            if (positions.ContainsKey(player)) continue;
 
-    [PunRPC]
-    private void RPC_CheckIfPlayerComplete(int playerID)
-    {
-        // Retrieve player view
-        PhotonView playerView = PhotonView.Find(playerID);
+            // If player has reached the finish line
+            if (player.state == PlayerState.AtRaceFinishLine)
+            {
+                // Update position
+                position++;
 
-        // Retrieve player
-        PlayerController player = playerView.GetComponent<PlayerController>();
-        
-        // Don't execute for finished players
-        if (positions.ContainsKey(player)) return;
-        
-        // If player has reached the finish line
-        if (player.state == PlayerState.AtRaceFinishLine)
-        {
-            // Assign player to position
-            positions.Add(player, ++positionIndex);
-            
-            // Pause player movement
-            player.Pause();
+                // Assign player to position
+                positions.Add(player, position);
+                
+                // Pause player movement
+                player.Pause();
 
-            // Begin position timeout - Will need to determine way of resetting this timeout for each player across the line
-            StartCoroutine(StartPositionTimeout(positionTimeoutDuration));
+                // Begin position timeout - Will need to determine way of resetting this timeout for each player across the line
+                StartCoroutine(StartPositionTimeout(positionTimeoutDuration));
+            }
         }
     }
 
@@ -176,12 +169,14 @@ public class Race : MonoBehaviour
         // For each player in race
         foreach (PlayerController player in players)
         {
+            // Only display on our view
+            if (!player.photonView.IsMine) continue;
+
             // Don't display for finished players
-            if (!positions.ContainsKey(player))
-            {
-                // Display race ending message
-                StartCoroutine(GameManager.Instance.DisplayCountdown("Race ending!", 3));
-            }
+            if (positions.ContainsKey(player)) continue;
+            
+            // Display race ending message
+            StartCoroutine(GameManager.Instance.DisplayCountdown("Race ending!", 3));
         }
 
         // Wait for other players to finish race
@@ -193,21 +188,11 @@ public class Race : MonoBehaviour
 
     private void ResolveRace()
     {
-        // Resolve race
-        photonView.RPC("RPC_ResolveRace", RpcTarget.AllBufferedViaServer);
-
-        // Set race to inactive
-        SetState(RaceState.Inactive);
-    }
-
-    [PunRPC]
-    private void RPC_ResolveRace()
-    {
         // Display race stats to participants
         StartCoroutine(DisplayEndOfRaceStats());
 
-        // Remove all players from race
-        RemoveAllPlayersFromRace();
+        // Set race to inactive
+        SetState(RaceState.Inactive);
     }
 
     IEnumerator DisplayEndOfRaceStats()
@@ -215,14 +200,14 @@ public class Race : MonoBehaviour
         // For each player
         foreach (PlayerController player in players)
         {
-            // If not our view, continue
+            // Only display on our view
             if (!player.photonView.IsMine) continue;
 
             // If player finished the race
             if (positions.ContainsKey(player))
             {
                 // Display player position
-                StartCoroutine(GameManager.Instance.DisplayCountdown("Position: " + positions[player], 3)); 
+                StartCoroutine(GameManager.Instance.DisplayCountdown("Position: " + positions[player], 3));
             }
 
             // Otherwise
@@ -256,12 +241,12 @@ public class Race : MonoBehaviour
 
             // Add player to shared race list
             photonView.RPC("RPC_AddPlayerToRace", RpcTarget.AllBufferedViaServer, playerView.ViewID);
-            
+
             // Retrieve waypoint progress tracker
-            WaypointProgressTracker routeFollower = player.GetComponent<WaypointProgressTracker>();
+            RouteFollower routeFollower = player.GetComponent<RouteFollower>();
 
             // Update route
-            routeFollower.UpdateRoute(waypointCircuit, numberOfLaps);
+            routeFollower.UpdateRoute(route, numberOfLaps);
         }
     }
 
@@ -273,7 +258,7 @@ public class Race : MonoBehaviour
 
         // Retrieve player
         PlayerController player = playerView.GetComponent<PlayerController>();
-        
+
         // Add player to list
         players.Add(player);
     }
@@ -294,49 +279,37 @@ public class Race : MonoBehaviour
     [PunRPC]
     private void RPC_RemovePlayerFromRace(int playerID)
     {
+        // Assumes that this is only called from the RemoveAllPlayersFromRace function
+        // A check may need to be added later when we want to remove a single player from a race
+        // For example, for a player who wishes to leave mid-race
+
         // Retrieve player view
         PhotonView playerView = PhotonView.Find(playerID);
 
         // Retrieve player
         PlayerController player = playerView.GetComponent<PlayerController>();
 
-        // Remove player from list
-        players.Remove(player);
-
         // Resume player movement
         player.Resume();
 
-        // Reset player race
-        player.race = null;
-
-        // Hide time and lap info
-        GameManager.Instance.HideTimeAndLap();
-
         // Start just row
         GameManager.Instance.StartJustRow();
-
-        // Update player state
-        player.state = PlayerState.JustRowing;
     }
 
     public void RemoveAllPlayersFromRace()
-    {
-        // Remove all players from race
-        photonView.RPC("RPC_RemoveAllPlayersFromRace", RpcTarget.AllBufferedViaServer);
-    }
-
-    [PunRPC]
-    private void RPC_RemoveAllPlayersFromRace()
     {
         // For each player in the race
         foreach (PlayerController player in players)
         {
             // Only execute for our player
             if (!player.photonView.IsMine) continue;
-
+            
             // Remove player from race
             RemovePlayerFromRace(player);
         }
+
+        // Reset
+        Reset();
     }
 
     public void FormRace(PlayerController player)
@@ -347,29 +320,61 @@ public class Race : MonoBehaviour
         // If multiplayer
         if (!PhotonNetwork.OfflineMode)
         {
-            // Form race
-            photonView.RPC("RPC_FormRace", RpcTarget.AllBufferedViaServer);
+            // Send notification to players that a race is about to begin
+            SendRaceNotification();
+
+            // Start race timeout
+            StartRaceTimeout();
         }
         else
         {
             // Start race countdown
             StartCoroutine(StartCountdown());
         }
-        
+
         // Set state
         SetState(RaceState.Forming);
     }
 
-    [PunRPC]
-    private void RPC_FormRace()
+    public void SendRaceNotification()
     {
         // Send notification to players that a race is about to begin
-        SendRaceNotification();
+        photonView.RPC("RPC_SendRaceNotification", RpcTarget.AllBufferedViaServer);
+    }
 
+    [PunRPC]
+    private void RPC_SendRaceNotification()
+    {
+        // Retrieve all currently active players
+        PlayerController[] activePlayers = FindObjectsOfType<PlayerController>();
+
+        // For each active player
+        foreach (PlayerController player in activePlayers)
+        {
+            // Only display on our view
+            if (!player.photonView.IsMine) continue;
+
+            // Don't display for players currently in the race
+            if (players.Contains(player)) continue;
+
+            // Send race notification
+            StartCoroutine(GameManager.Instance.DisplayCountdown("Race Starting", 3));
+        }
+    }
+
+    public void StartRaceTimeout()
+    {
+        // Start race timeout
+        photonView.RPC("RPC_StartRaceTimeout", RpcTarget.AllBufferedViaServer);
+    }
+
+    [PunRPC]
+    public void RPC_StartRaceTimeout()
+    {
         // Start race timeout
         StartCoroutine(StartRaceTimeout(startTimeoutDuration));
     }
-    
+
     IEnumerator StartRaceTimeout(float timeout)
     {
         // Wait for other players to join race
@@ -378,6 +383,9 @@ public class Race : MonoBehaviour
         // For each player in race
         foreach (PlayerController player in players)
         {
+            // Only display on our view
+            if (!player.photonView.IsMine) continue;
+
             // Start race countdown
             StartCoroutine(StartCountdown());
         }
@@ -431,10 +439,16 @@ public class Race : MonoBehaviour
         }
 
         // Set race start time
-        photonView.RPC("RPC_SetRaceStartTime", RpcTarget.AllBufferedViaServer);
+        SetRaceStartTime();
 
         // Update race state
         SetState(RaceState.InProgress);
+    }
+
+    public void SetRaceStartTime()
+    {
+        // Set race start time
+        photonView.RPC("RPC_SetRaceStartTime", RpcTarget.AllBufferedViaServer);
     }
 
     [PunRPC]
@@ -446,7 +460,6 @@ public class Race : MonoBehaviour
     public void EndRace()
     {
         RemoveAllPlayersFromRace();
-        Reset();
     }
 
     private void DisplayDataToParticipants(string time)
@@ -457,7 +470,7 @@ public class Race : MonoBehaviour
 
             if (!playerView.IsMine) continue;
 
-            int currentLap = player.GetComponent<WaypointProgressTracker>().currentLap;
+            int currentLap = player.GetComponent<RouteFollower>().currentLap;
 
             GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
 
@@ -465,42 +478,16 @@ public class Race : MonoBehaviour
         }
     }
 
-    private void SendRaceNotification()
-    {
-        // Retrieve all currently active players
-        PlayerController[] activePlayers = FindObjectsOfType<PlayerController>();
-
-        // For each active player
-        foreach (PlayerController player in activePlayers)
-        {
-            // Don't display for players currently in the race
-            if (players.Contains(player)) continue;
-            
-            // Send race notification
-            StartCoroutine(GameManager.Instance.DisplayCountdown("Race Starting", 3));
-        }
-    }
-
-    [PunRPC]
-    private void RPC_SendRaceNotification(int countdown)
-    {
-        // Don't display on our own screen
-        if (photonView.IsMine) return;
-
-        // Send race notification
-        StartCoroutine(GameManager.Instance.DisplayCountdown("Race Starting", countdown));
-    }
-
     private void SetState(RaceState state)
     {
         // Update race state
-        photonView.RPC("RPC_SetState", RpcTarget.AllBufferedViaServer, new object[] { (int) state });
+        photonView.RPC("RPC_SetState", RpcTarget.AllBufferedViaServer, (int) state );
     }
 
     [PunRPC]
     private void RPC_SetState(int state)
     {
-        switch(state)
+        switch (state)
         {
             case (int) RaceState.Inactive:
                 this.state = RaceState.Inactive;

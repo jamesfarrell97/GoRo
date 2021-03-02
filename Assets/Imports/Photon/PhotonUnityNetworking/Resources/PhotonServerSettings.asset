@@ -42,6 +42,19 @@ MonoBehaviour:
   - GitParent
   - PlaceAchievement
   - RPC_AddPlayerToRace
+  - CheckIfRaceComplete
+  - RPC_AddPlayerToCompletedRaceList
+  - RPC_AddPlayerToRaceList
+  - RPC_RemovePlayerFromRace
+  - RPC_RemoveAllPlayersFromRace
+  - RPC_SetState
+  - RPC_SendRaceNotification
+  - RPC_EndRace
+  - RPC_FormRace
+  - RPC_ResolveRace
+  - RPC_CheckIfComplete
+  - RPC_SetRaceStartTime
+  - RPC_CheckIfPlayerComplete
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

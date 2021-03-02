@@ -767,8 +767,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boatSpeed: 1.25
-  speedIncreaseFactor: 0.05
-  speedDecayFactor: 0.5
   rowingAnimators:
   - {fileID: 3600222731164475785}
   - {fileID: 5080536393699115378}
@@ -779,8 +777,9 @@ MonoBehaviour:
   mainCamera: {fileID: 4247296895386593728}
   frontFacingCamera: {fileID: 9168832054397419778}
   route: []
-  participatingInRace: 0
-  participatingInTimeTrial: 0
+  trial: {fileID: 0}
+  race: {fileID: 0}
+  state: 0
 --- !u!114 &325384146144076460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -820,23 +819,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5cb22d331ef7d64796f917c6a455a32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLap: 1
-  numberOfLaps: 0
-  halfPointOftrackReached: 0
-  lastIndex: 0
-  currentRace: {fileID: 0}
-  currentTimeTrial: {fileID: 0}
-  timeOfCompletion: 0
-  Circuit: {fileID: 0}
-  Routes: []
-  lookAheadForTargetOffset: 0
-  lookAheadForTargetFactor: 0.1
-  lookAheadForSpeedOffset: 10
-  lookAheadForSpeedFactor: 0.2
-  progressStyle: 0
-  pointToPointThreshold: 4
+  route: {fileID: 0}
+  routes: []
+  translationalVelocity: 5
+  translationVelocityFactor: 0.1
+  rotationalVelocity: 10
+  rotationalVelocityFactor: 0.2
+  minimumThreshold: 1
   target: {fileID: 4206319365989272668}
-  progressDistance: 0
+  progressAlongRoute: 0
+  numberOfLaps: 0
+  currentLap: 1
 --- !u!111 &2322979531693449817
 Animation:
   m_ObjectHideFlags: 0

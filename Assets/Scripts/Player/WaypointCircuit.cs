@@ -1,11 +1,10 @@
-using System;
 using System.Collections;
+using System;
+
 using UnityEngine;
-#if UNITY_EDITOR
 using UnityEditor;
 
-#endif
-
+// Code adapted from the Unity Standard Assets WaypointCircuit class
 namespace UnityStandardAssets.Utility
 {
     public class WaypointCircuit : MonoBehaviour

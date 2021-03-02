@@ -11812,41 +11812,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1017821736}
   m_PrefabAsset: {fileID: 0}
---- !u!84 &1020021745
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: WaterDepthMap
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  serializedVersion: 3
-  m_Width: 1024
-  m_Height: 1024
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthFormat: 2
-  m_ColorFormat: 142
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
 --- !u!1001 &1022607035
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20124,6 +20089,41 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!84 &1847938264
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WaterDepthMap
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  serializedVersion: 3
+  m_Width: 1024
+  m_Height: 1024
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthFormat: 2
+  m_ColorFormat: 142
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
 --- !u!1001 &1863558060
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23196,6 +23196,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4149961123412369418}
+  - component: {fileID: 4149961123412369420}
   - component: {fileID: 4149961123412369417}
   - component: {fileID: 4149961123412369419}
   - component: {fileID: 5386320338189532496}
@@ -23265,15 +23266,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9efbff47af1a644e93aff585f636b1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  route: []
-  player: {fileID: 0}
-  timeTrialInitiated: 0
-  timeTrialInProgress: 0
-  timeTrialComplete: 0
-  timeTheTimeTrialInitiated: 0
-  timeTheTimeTrialStarted: 0
-  pauseBeforeTimeTrialBegins: 5
+  state: 0
   numberOfLaps: 3
+  resolveTimeoutDuration: 3
+  route: []
+--- !u!114 &4149961123412369420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4149961123412369416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents: []
+  viewIdField: 201
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4720597246525608050
 GameObject:
   m_ObjectHideFlags: 0
@@ -23352,16 +23370,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30ae7aae5e13a3a4e93b3f3f30fec818, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  route: []
-  players: []
-  raceInitiated: 0
-  raceInProgress: 0
-  raceComplete: 0
-  waitTimeForOtherPlayersToJoin: 10
-  timeRaceInitiated: 0
-  timeRaceStarted: 0
+  state: 0
   numberOfLaps: 3
-  raceCapacity: 2
+  startTimeoutDuration: 10
+  positionTimeoutDuration: 5
+  resolveTimeoutDuration: 3
+  route: []
 --- !u!4 &7270772974140255013 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7270772974311041296, guid: 9dafb81c9a891344398bb2cf8c41e61c,

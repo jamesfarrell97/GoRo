@@ -9,9 +9,18 @@ using Photon.Pun;
 //
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] public float boatSpeed = 1f;
-    [SerializeField] [Range(0, 1f)] float speedIncreaseFactor = 0.1f;
-    [SerializeField] [Range(0, 1f)] float speedDecayFactor = 0.1f;
+    public enum PlayerState
+    {
+        JustRowing,
+        ParticipatingInTimeTrial,
+        CompletedTimeTrial,
+        ParticipatingInRace,
+        AtRaceStartLine,
+        AtRaceFinishLine,
+        AtBoathouse
+    }
+
+    [SerializeField] [Range(0, 3f)] public float boatSpeed = 1f;
 
     [SerializeField] private Animator[] rowingAnimators;
     [SerializeField] private Material otherPlayerMaterial;
@@ -22,14 +31,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Camera frontFacingCamera;
 
     [HideInInspector] public Transform[] route;
+    [HideInInspector] public Trial trial;
+    [HideInInspector] public Race race;
 
-    [HideInInspector] public bool participatingInRace = false;
-    [HideInInspector] public bool participatingInTimeTrial = false;
+    [HideInInspector] public PhotonView photonView { get; private set; }
+    [HideInInspector] public PlayerState state;
 
     private AchievementTracker achievementTracker;
     private BoxCollider boxCollider;
     private Rigidbody rigidbody;
-    private PhotonView photonView;
     private StatsManager stats;
 
     private bool paused = false;
@@ -61,7 +71,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             DestroyComponents();
-            UpdateAppearance();
+            //UpdateAppearance();
         }
     }
 
@@ -81,12 +91,11 @@ public class PlayerController : MonoBehaviour
 
     private void DestroyComponents()
     {
-        // Destroy cameras
+        // Disable cameras
         Camera[] cameras = GetComponentsInChildren<Camera>();
-        foreach (Camera c in cameras)
+        foreach (Camera camera in cameras)
         {
-            Destroy(c.GetComponent<UniversalAdditionalCameraData>());
-            Destroy(c);
+            camera.gameObject.SetActive(false);
         }
 
         // Destroy waypoint tracker
@@ -94,10 +103,6 @@ public class PlayerController : MonoBehaviour
 
         // Destroy animation
         Destroy(GetComponent<Animation>());
-    }
-
-    private void DestroyProgressTracker()
-    {
     }
 
     private void UpdateAppearance()
@@ -120,11 +125,11 @@ public class PlayerController : MonoBehaviour
                 }
 
                 // Destroy water mask
-                else if (renderer.gameObject.name.Contains("Mask"))
-                {
-                    Destroy(renderer.transform.parent.gameObject.GetComponent<SetRenderQueue>());
-                    Destroy(renderer.gameObject);
-                }
+                //else if (renderer.gameObject.name.Contains("Mask"))
+                //{
+                //    Destroy(renderer.transform.parent.gameObject.GetComponent<SetRenderQueue>());
+                //    Destroy(renderer.gameObject);
+                //}
 
                 // Update material
                 else if (!materials[i].color.Equals(null))
@@ -173,34 +178,8 @@ public class PlayerController : MonoBehaviour
     private float currTime = 0;
     private void UpdateSpeed()
     {
-        //#if UNITY_EDITOR
-        //        if (move)
-        //        {
-        //            speed = (Random.Range(1.5f, 3f));
-        //        }
 
-        //        // Calculate delta speed
-        //        deltSpeed = Mathf.Abs(speed - prevSpeed);
-
-        //        // If the speed hasn't changed, don't add a force
-        //        if (stats)
-        //        {
-        //            rigidbody.AddForce(transform.forward * speed * Time.fixedDeltaTime);
-        //        }
-
-        //        velocity = rigidbody.velocity.magnitude * boatSpeed;
-
-        //        prevSpeed = speed;
-
-        //        return;
-        //#endif
-
-        // Update speed - !!bring back down to end of function!!
-        //prevSpeed = speed;
-
-
-
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
 
         // Increase time
         currTime += Time.fixedDeltaTime;
@@ -223,7 +202,7 @@ public class PlayerController : MonoBehaviour
             strokeState = 0;
         }
 
-#else
+        #else
 
         // get speed from erg
         speed = stats.GetSpeed();
@@ -231,7 +210,7 @@ public class PlayerController : MonoBehaviour
         // get stroke state from erg
         strokeState = stats.GetStrokeState();
 
-#endif
+        #endif
 
         // If driving
         if (strokeState == (int) StrokeStates.Driving)
@@ -280,7 +259,7 @@ public class PlayerController : MonoBehaviour
         this.paused = true;
     }
 
-    public void Unpause()
+    public void Resume()
     {
         this.paused = false;
     }

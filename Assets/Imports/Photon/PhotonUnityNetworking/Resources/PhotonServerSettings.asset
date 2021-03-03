@@ -55,6 +55,8 @@ MonoBehaviour:
   - RPC_CheckIfComplete
   - RPC_SetRaceStartTime
   - RPC_CheckIfPlayerComplete
+  - RPC_StartRaceTimeout
+  - RPC_PlayerCompletedRace
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -226,6 +226,7 @@ namespace UnityStandardAssets.Utility
             if (player.state.Equals(PlayerState.ParticipatingInRace))
             {
                 player.state = PlayerState.AtRaceFinishLine;
+                player.race.PlayerCompletedRace(player);
             }
             else if (player.state.Equals(PlayerState.ParticipatingInTrial))
             {

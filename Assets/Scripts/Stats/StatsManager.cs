@@ -378,10 +378,10 @@ public class StatsManager : MonoBehaviour
     private void Enqueue()
     {
         DistanceData.Enqueue(Distance);
-        SpeedData.Enqueue(Speed);
+        SpeedData.Enqueue(Random.Range(0, 6));
         TimeData.Enqueue(Time);
         
-        SplitTimeData.Enqueue(SplitTime);
+        SplitTimeData.Enqueue(Random.Range(0, 5));
         SplitAvgPaceData.Enqueue(SplitAvgPace);
         SplitAvgPowerData.Enqueue(SplitAvgPower);
 
@@ -389,7 +389,7 @@ public class StatsManager : MonoBehaviour
         ProjectedWorkTimeData.Enqueue(ProjectedWorkTime);
 
         StrokesPerMinData.Enqueue(StrokesPerMin);
-        StrokePowerData.Enqueue(StrokePower);
+        StrokePowerData.Enqueue(Random.Range(0, 400));
 
         DriveLengthData.Enqueue(DriveLength);
         DragFactorData.Enqueue(DragFactor);

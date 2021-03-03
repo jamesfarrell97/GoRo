@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
         AtBoathouse
     }
 
-    [SerializeField] [Range(0, 1)] public float boatSpeed = 1f;
+    [SerializeField] [Range(0, 3)] public float boatSpeed = 1f;
 
     [SerializeField] private Animator[] rowingAnimators;
     [SerializeField] private Material otherPlayerMaterial;

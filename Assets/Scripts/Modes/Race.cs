@@ -131,35 +131,42 @@ public class Race : MonoBehaviour
         {
             // Resolve race
             SetState(RaceState.Resolving);
-
-            // Return
-            return;
         }
+    }
 
-        // For each player in race
-        foreach (PlayerController player in players)
+    public void PlayerCompletedRace(PlayerController player)
+    {
+        // Retrieve player view
+        PhotonView playerView = player.GetComponent<PhotonView>();
+
+        // Add player to completed race list
+        photonView.RPC("RPC_PlayerCompletedRace", RpcTarget.AllBufferedViaServer, playerView.ViewID);
+    }
+
+    [PunRPC]
+    public void RPC_PlayerCompletedRace(int playerID)
+    {
+        // Retrieve player view
+        PhotonView playerView = PhotonView.Find(playerID);
+
+        // Retrieve player
+        PlayerController player = playerView.GetComponent<PlayerController>();
+
+        // Update position
+        position++;
+
+        // Assign player to position
+        positions.Add(player, position);
+
+        // Pause player movement
+        player.Pause();
+        
+        // If first player to finish the race
+        if (positions.Count.Equals(1))
         {
-            // Only execute on our view
-            if (!player.photonView.IsMine) continue;
-
-            // Don't execute for finished players
-            if (positions.ContainsKey(player)) continue;
-
-            // If player has reached the finish line
-            if (player.state == PlayerState.AtRaceFinishLine)
-            {
-                // Update position
-                position++;
-
-                // Assign player to position
-                positions.Add(player, position);
-                
-                // Pause player movement
-                player.Pause();
-
-                // Begin position timeout - Will need to determine way of resetting this timeout for each player across the line
-                StartCoroutine(StartPositionTimeout(positionTimeoutDuration));
-            }
+            // Begin position timeout
+            // Will need to determine way of resetting this timeout later for each player across the line
+            StartCoroutine(StartPositionTimeout(positionTimeoutDuration));
         }
     }
 

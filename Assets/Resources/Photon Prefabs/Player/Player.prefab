@@ -637,7 +637,6 @@ GameObject:
   m_Component:
   - component: {fileID: 893812682407196298}
   - component: {fileID: 3821981568174155192}
-  - component: {fileID: 6342354559217398697}
   m_Layer: 14
   m_Name: Right Hand
   m_TagString: Untagged
@@ -669,7 +668,7 @@ Animator:
   m_GameObject: {fileID: 2791581381748170493}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: e2368cd1f2030124b9bd253f38902c92, type: 2}
+  m_Controller: {fileID: 9100000, guid: 8eb90d6f99dcb654b860820c435fe9f0, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -678,26 +677,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!111 &6342354559217398697
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2791581381748170493}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 6b2af6e1300004c41b9e901a62bc35f3, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: a3680553b079166439cb30958c422658, type: 2}
-  - {fileID: 7400000, guid: 46d1f26ce0bc4794399a5f7d976d725f, type: 2}
-  - {fileID: 7400000, guid: 6b2af6e1300004c41b9e901a62bc35f3, type: 2}
-  - {fileID: 7400000, guid: 4d4163f6bcd96c2489be33e8d0bf10c0, type: 2}
-  - {fileID: 7400000, guid: 92ff132ce681f7b49a5bcd49eeda20b6, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!1 &3128037215741786078
 GameObject:
   m_ObjectHideFlags: 0
@@ -1379,7 +1358,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8569736625666101000}
   - component: {fileID: 1940535963882314593}
-  - component: {fileID: 6615332839159450964}
   m_Layer: 14
   m_Name: Left Hand
   m_TagString: Untagged
@@ -1420,26 +1398,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!111 &6615332839159450964
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5572139152039953293}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 6b2af6e1300004c41b9e901a62bc35f3, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: a3680553b079166439cb30958c422658, type: 2}
-  - {fileID: 7400000, guid: 46d1f26ce0bc4794399a5f7d976d725f, type: 2}
-  - {fileID: 7400000, guid: 6b2af6e1300004c41b9e901a62bc35f3, type: 2}
-  - {fileID: 7400000, guid: 4d4163f6bcd96c2489be33e8d0bf10c0, type: 2}
-  - {fileID: 7400000, guid: 92ff132ce681f7b49a5bcd49eeda20b6, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!1 &5912502331185027001
 GameObject:
   m_ObjectHideFlags: 0
@@ -1918,7 +1876,7 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: 3b7593afd8ac32f46bd8ad1ddd488fc2, type: 2}
   - {fileID: 2100000, guid: b02a97007412fab40a5592272b2759a5, type: 2}
-  - {fileID: 2100000, guid: 5d51ba4796e28e04b997d633f552708b, type: 2}
+  - {fileID: 2100000, guid: a02c0fd7d6949a64686a18ee4cfbc06b, type: 2}
   - {fileID: 2100000, guid: b02a97007412fab40a5592272b2759a5, type: 2}
   - {fileID: 2100000, guid: b02a97007412fab40a5592272b2759a5, type: 2}
   m_StaticBatchInfo:
@@ -2157,7 +2115,7 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: 3b7593afd8ac32f46bd8ad1ddd488fc2, type: 2}
   - {fileID: 2100000, guid: b02a97007412fab40a5592272b2759a5, type: 2}
-  - {fileID: 2100000, guid: 5d51ba4796e28e04b997d633f552708b, type: 2}
+  - {fileID: 2100000, guid: a02c0fd7d6949a64686a18ee4cfbc06b, type: 2}
   - {fileID: 2100000, guid: b02a97007412fab40a5592272b2759a5, type: 2}
   - {fileID: 2100000, guid: b02a97007412fab40a5592272b2759a5, type: 2}
   m_StaticBatchInfo:

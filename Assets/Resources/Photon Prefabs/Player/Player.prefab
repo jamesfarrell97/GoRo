@@ -636,6 +636,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 893812682407196298}
+  - component: {fileID: 6968396400522848566}
   - component: {fileID: 3821981568174155192}
   m_Layer: 14
   m_Name: Right Hand
@@ -658,6 +659,22 @@ Transform:
   m_Father: {fileID: 5384435183220964188}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6968396400522848566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2791581381748170493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters: []
+  m_SynchronizeLayers: []
 --- !u!95 &3821981568174155192
 Animator:
   serializedVersion: 3
@@ -668,7 +685,7 @@ Animator:
   m_GameObject: {fileID: 2791581381748170493}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 8eb90d6f99dcb654b860820c435fe9f0, type: 2}
+  m_Controller: {fileID: 9100000, guid: b6ddd369c72e7ed4ca492104306447fb, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -691,7 +708,6 @@ GameObject:
   - component: {fileID: 4259230975704193365}
   - component: {fileID: 271775186333819703}
   - component: {fileID: 325384146144076460}
-  - component: {fileID: 2322979531693449817}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -831,21 +847,6 @@ MonoBehaviour:
   time1_Target: 1
   time2_Target: 5
   time3_Target: 10
---- !u!111 &2322979531693449817
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3128037215741786078}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 0}
-  m_Animations: []
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!1 &3144772773450883436
 GameObject:
   m_ObjectHideFlags: 0
@@ -1067,7 +1068,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 464915405916913495}
-  - component: {fileID: 8573507583750045196}
   m_Layer: 14
   m_Name: Torso
   m_TagString: Untagged
@@ -1089,25 +1089,6 @@ Transform:
   m_Father: {fileID: 5384435183220964188}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &8573507583750045196
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4000476623766450154}
-  m_Enabled: 0
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 01361b802948ad240a80ff7bc46c2f75, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &4192506341616795202
 GameObject:
   m_ObjectHideFlags: 0
@@ -1357,6 +1338,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8569736625666101000}
+  - component: {fileID: 1505829044007964374}
   - component: {fileID: 1940535963882314593}
   m_Layer: 14
   m_Name: Left Hand
@@ -1379,6 +1361,22 @@ Transform:
   m_Father: {fileID: 5384435183220964188}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1505829044007964374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5572139152039953293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters: []
+  m_SynchronizeLayers: []
 --- !u!95 &1940535963882314593
 Animator:
   serializedVersion: 3

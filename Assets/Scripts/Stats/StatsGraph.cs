@@ -46,9 +46,9 @@ public class StatsGraph : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Instance = this;
 
-        graphContainer1 = graph.Find("Graph Container 1").GetComponent<RectTransform>();
-        graphContainer2 = graph.Find("Graph Container 2").GetComponent<RectTransform>();
-        graphContainer3 = graph.Find("Graph Container 3").GetComponent<RectTransform>();
+        graphContainer1 = graph.Find("Graph 1").GetComponent<RectTransform>();
+        graphContainer2 = graph.Find("Graph 2").GetComponent<RectTransform>();
+        graphContainer3 = graph.Find("Graph 3").GetComponent<RectTransform>();
     }
 
     private List<float> data1 = new List<float>();
@@ -214,7 +214,7 @@ public class StatsGraph : MonoBehaviour
             RectTransform labelY = Instantiate(labelTemplateY);
             labelY.SetParent(graphContainer, false);
             labelY.gameObject.SetActive(true);
-            labelY.anchoredPosition = new Vector2(-45f, normalisedValue * graphHeight);
+            labelY.anchoredPosition = new Vector2(-50f, normalisedValue * graphHeight);
             labelY.GetComponent<TMP_Text>().text = getAxisLabelY(normalisedValue * (yMaximum - yMinimum));
         }
     }
@@ -227,7 +227,7 @@ public class StatsGraph : MonoBehaviour
         gameObject.SetActive(true);
 
         // Update line color
-        gameObject.GetComponent<Image>().color = new Color(color.r, color.g, color.b, 0.5f);
+        gameObject.GetComponent<Image>().color = color;
 
         // Determine line orientation
         var direction = (dotPositionB - dotPositionA).normalized;

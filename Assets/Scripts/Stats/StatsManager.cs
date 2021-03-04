@@ -379,9 +379,11 @@ public class StatsManager : MonoBehaviour
     {
         DistanceData.Enqueue(Distance);
         SpeedData.Enqueue(Random.Range(0, 6));
+        //SpeedData.Enqueue(Speed);
         TimeData.Enqueue(Time);
-        
+
         SplitTimeData.Enqueue(Random.Range(0, 5));
+        //SplitTimeData.Enqueue(SplitTime);
         SplitAvgPaceData.Enqueue(SplitAvgPace);
         SplitAvgPowerData.Enqueue(SplitAvgPower);
 
@@ -390,6 +392,7 @@ public class StatsManager : MonoBehaviour
 
         StrokesPerMinData.Enqueue(StrokesPerMin);
         StrokePowerData.Enqueue(Random.Range(0, 400));
+        //StrokePowerData.Enqueue(StrokePower);
 
         DriveLengthData.Enqueue(DriveLength);
         DragFactorData.Enqueue(DragFactor);
@@ -399,14 +402,14 @@ public class StatsManager : MonoBehaviour
     {
         if (!DistanceDisplay.enabled) return;
 
-        DistanceDisplay.text = (int) distance + "m";
+        DistanceDisplay.text = ((int) distance).ToString();
     }
 
     private void SetSpeedDisplay(float speed)
     {
         if (!SpeedDisplay.enabled) return;
 
-        SpeedDisplay.text = string.Format("{0:0.00}", speed) + "m/s";
+        SpeedDisplay.text = string.Format("{0:0.00}", speed);
     }
 
     private void SetTimeDisplay(float seconds)
@@ -450,28 +453,28 @@ public class StatsManager : MonoBehaviour
     {
         if (!SplitAvgPowerDisplay.enabled) return;
 
-        SplitAvgPowerDisplay.text = splitAvgPower + "w";
+        SplitAvgPowerDisplay.text = splitAvgPower.ToString();
     }
 
     private void SetStrokesPerMinDisplay(int strokesPerMin)
     {
         if (!StrokesPerMinDisplay.enabled) return;
 
-        StrokesPerMinDisplay.text = strokesPerMin + " s/m";
+        StrokesPerMinDisplay.text = strokesPerMin.ToString();
     }
 
     private void SetPowerDisplay(int power)
     {
         if (!StrokePowerDisplay.enabled) return;
 
-        StrokePowerDisplay.text = power + "w";
+        StrokePowerDisplay.text = power.ToString();
     }
 
     private void SetDriveLengthDisplay(float driveLength)
     {
         if (!DriveLengthDisplay.enabled) return;
 
-        DriveLengthDisplay.text = (driveLength / 100) + "m";
+        DriveLengthDisplay.text = (driveLength / 100).ToString();
     }
 
     private void SetDragFactorDisplay(float dragFactor)
@@ -485,14 +488,14 @@ public class StatsManager : MonoBehaviour
     {
         if (!ProjectedWorkTimeDisplay.enabled) return;
 
-        ProjectedWorkTimeDisplay.text = projectedWorkTime + "s";
+        ProjectedWorkTimeDisplay.text = projectedWorkTime.ToString();
     }
 
     private void SetProjectedWorkDistanceDisplay(float projectedWorkDist)
     {
         if (!ProjectedWorkDistanceDisplay.enabled) return;
 
-        ProjectedWorkDistanceDisplay.text = projectedWorkDist + "m";
+        ProjectedWorkDistanceDisplay.text = projectedWorkDist.ToString();
     }
 
     public int GetMetersRowed()

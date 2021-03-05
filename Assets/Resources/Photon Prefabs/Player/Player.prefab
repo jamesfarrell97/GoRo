@@ -325,7 +325,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3115435526261651104}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 12.5, y: 180, z: 0}
 --- !u!20 &9168832054397419778
 Camera:
@@ -480,6 +480,7 @@ GameObject:
   - component: {fileID: 4861678737240098229}
   - component: {fileID: 5351488142275987783}
   - component: {fileID: 3056375462983036416}
+  - component: {fileID: 802966344159450766}
   m_Layer: 14
   m_Name: Boat
   m_TagString: Untagged
@@ -534,6 +535,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_queues: c4090000
+--- !u!95 &802966344159450766
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2178233397470441811}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3a0dd096c91254547aa93c5f72019243, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &2603743276884938908
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,7 +678,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5384435183220964188}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!114 &6968396400522848566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -673,8 +693,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLayerWeightsInspector: 1
   ShowParameterInspector: 1
-  m_SynchronizeParameters: []
-  m_SynchronizeLayers: []
+  m_SynchronizeParameters:
+  - Type: 3
+    SynchronizeType: 0
+    Name: State
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
 --- !u!95 &3821981568174155192
 Animator:
   serializedVersion: 3
@@ -752,6 +777,8 @@ MonoBehaviour:
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: 7771470643653934034}
+  - {fileID: 1505829044007964374}
+  - {fileID: 6968396400522848566}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -790,9 +817,9 @@ MonoBehaviour:
   leftOar: {fileID: 1663084803347507068}
   rightOar: {fileID: 1844220128084765602}
   cameras:
+  - {fileID: 915089336231163165}
   - {fileID: 4247296895386593728}
   - {fileID: 9168832054397419778}
-  - {fileID: 915089336231163165}
   route: []
   trial: {fileID: 0}
   race: {fileID: 0}
@@ -1107,7 +1134,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &990302954263391747
 Transform:
   m_ObjectHideFlags: 0
@@ -1120,7 +1147,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3115435526261651104}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: -4, y: 0, z: 0}
 --- !u!20 &915089336231163165
 Camera:
@@ -1375,8 +1402,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLayerWeightsInspector: 1
   ShowParameterInspector: 1
-  m_SynchronizeParameters: []
-  m_SynchronizeLayers: []
+  m_SynchronizeParameters:
+  - Type: 3
+    SynchronizeType: 0
+    Name: State
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
 --- !u!95 &1940535963882314593
 Animator:
   serializedVersion: 3
@@ -1619,7 +1651,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6365710815314463996
 Transform:
   m_ObjectHideFlags: 0
@@ -1632,7 +1664,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3115435526261651104}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 12.5, y: 0, z: 0}
 --- !u!20 &4247296895386593728
 Camera:
@@ -2426,9 +2458,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 5150129850964393389}
+  - {fileID: 990302954263391747}
   - {fileID: 6365710815314463996}
   - {fileID: 2523349473371085709}
-  - {fileID: 990302954263391747}
   m_Father: {fileID: 4206319365989272668}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}

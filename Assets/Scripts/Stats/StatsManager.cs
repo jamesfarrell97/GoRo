@@ -11,7 +11,7 @@ public class StatsManager : MonoBehaviour
     public static readonly float KILOMETERS_METER = 1000;
     public static readonly float SECS_MINUTE = 60;
 
-    private const int MAX_DATA_POINTS = 2000;
+    private const int MAX_DATA_POINTS = 200;
 
     // Basic Data
     [SerializeField] private TMP_Text TimeDisplay;
@@ -36,6 +36,9 @@ public class StatsManager : MonoBehaviour
     // Drag Data
     [SerializeField] private TMP_Text DragFactorDisplay;
 
+    // Debug
+    [SerializeField] private TMP_Text DebugDisplay;
+
     // Live Data
     private float Distance;
     private float Time;
@@ -49,9 +52,10 @@ public class StatsManager : MonoBehaviour
     private int ProjectedWorkTime;
     private int ProjectedWorkDistance;
 
-    private int StrokesPerMin;
-    private int StrokePower;
     private int StrokeState;
+
+    private float StrokePower;
+    private float StrokesPerMin;
     private float DriveLength;
 
     private float DragFactor;
@@ -64,10 +68,10 @@ public class StatsManager : MonoBehaviour
     public static Queue<float> SplitAvgPaceData { get; private set; }
     public static Queue<float> SplitAvgPowerData { get; private set; }
 
-    public static Queue<int> ProjectedWorkTimeData { get; private set; }
-    public static Queue<int> ProjectedWorkDistanceData { get; private set; }
+    public static Queue<float> ProjectedWorkTimeData { get; private set; }
+    public static Queue<float> ProjectedWorkDistanceData { get; private set; }
 
-    public static Queue<int> StrokesPerMinData { get; private set; }
+    public static Queue<float> StrokesPerMinData { get; private set; }
     public static Queue<float> StrokePowerData { get; private set; }
 
     public static Queue<float> DriveLengthData { get; private set; }
@@ -78,8 +82,11 @@ public class StatsManager : MonoBehaviour
         ResetDisplay();
         BuildDataStores();
 
-        // Update stats every 0.1 seconds
+        // Update stats every 0.5 seconds
         InvokeRepeating("UpdateStats", 0f, 0.5f);
+
+        // Update stroke state every 0.01 seconds
+        InvokeRepeating("UpdateStrokeState", 0f, 0.01f);
     }
 
     private void ResetDisplay()
@@ -98,19 +105,26 @@ public class StatsManager : MonoBehaviour
         SplitAvgPaceData = new Queue<float>();
         SplitAvgPowerData = new Queue<float>();
 
-        ProjectedWorkTimeData = new Queue<int>();
-        ProjectedWorkDistanceData = new Queue<int>();
+        ProjectedWorkTimeData = new Queue<float>();
+        ProjectedWorkDistanceData = new Queue<float>();
 
-        StrokesPerMinData = new Queue<int>();
+        StrokesPerMinData = new Queue<float>();
         StrokePowerData = new Queue<float>();
 
         DriveLengthData = new Queue<float>();
         DragFactorData = new Queue<float>();
     }
 
+
     private void UpdateStats()
     {
         RetrieveStats();
+    }
+
+    private void UpdateStrokeState()
+    {
+        // Update often to sync rowing animation with user stroke state
+        StrokeState = BluetoothManager.RowingStatusData[10];
     }
 
     // Measured as 0.1 meters per least-significant bit
@@ -214,13 +228,13 @@ public class StatsManager : MonoBehaviour
         ElapsedTimeM = BluetoothManager.RowingStatusData[1];        // Elapsed Time Mid
         ElapsedTimeH = BluetoothManager.RowingStatusData[2];        // Elapsed Time Hi
 
-        Time = (ElapsedTimeH * ELAPSED_TIME_H_S_VALUE)
-                   + (ElapsedTimeM * ELAPSED_TIME_M_S_VALUE)
-                   + (ElapsedTimeL * ELAPSED_TIME_L_S_VALUE);
+        Time = (ElapsedTimeL * ELAPSED_TIME_L_S_VALUE)
+             + (ElapsedTimeM * ELAPSED_TIME_M_S_VALUE)
+             + (ElapsedTimeH * ELAPSED_TIME_H_S_VALUE);
 
         // Return if no sizeable change since last update
         // Prevents unnecessary calculations (such as when the user is stationary)
-        //if ((DistanceMeters == PreviousDistance) && (TimeSeconds == PreviousTime)) return;
+        if ((Distance == PreviousDistance) && (Time == PreviousTime)) return;
 
         // Otherwise, update values
         PreviousDistance = Distance;
@@ -292,7 +306,6 @@ public class StatsManager : MonoBehaviour
 
         // Stroke data
         DragFactor = BluetoothManager.RowingStatusData[18];         // Drag Factor
-        StrokeState = BluetoothManager.RowingStatusData[10];        // Stroke State
         StrokesPerMin = BluetoothManager.RowingStatusData1[5];      // Stroke Rate
         DriveLength = BluetoothManager.StrokeData[6];               // Drive Length
 
@@ -378,23 +391,30 @@ public class StatsManager : MonoBehaviour
     private void Enqueue()
     {
         DistanceData.Enqueue(Distance);
-        SpeedData.Enqueue(Random.Range(0, 6));
-        //SpeedData.Enqueue(Speed);
+
+        //SpeedData.Enqueue(Random.Range(0, 6));
+        SpeedData.Enqueue(Speed);
+
         TimeData.Enqueue(Time);
 
-        SplitTimeData.Enqueue(Random.Range(0, 5));
-        //SplitTimeData.Enqueue(SplitTime);
+        //SplitTimeData.Enqueue(Random.Range(0, 95));
+        SplitTimeData.Enqueue(SplitTime * 10);
+
         SplitAvgPaceData.Enqueue(SplitAvgPace);
         SplitAvgPowerData.Enqueue(SplitAvgPower);
 
         ProjectedWorkDistanceData.Enqueue(ProjectedWorkDistance);
         ProjectedWorkTimeData.Enqueue(ProjectedWorkTime);
 
+        //StrokesPerMinData.Enqueue(Random.Range(0, 45));
         StrokesPerMinData.Enqueue(StrokesPerMin);
-        StrokePowerData.Enqueue(Random.Range(0, 400));
-        //StrokePowerData.Enqueue(StrokePower);
+
+        //StrokePowerData.Enqueue(Random.Range(0, 400));
+        StrokePowerData.Enqueue(StrokePower);
 
         DriveLengthData.Enqueue(DriveLength);
+
+        //DragFactorData.Enqueue(Random.Range(0, 300));
         DragFactorData.Enqueue(DragFactor);
     }
 
@@ -402,7 +422,7 @@ public class StatsManager : MonoBehaviour
     {
         if (!DistanceDisplay.enabled) return;
 
-        DistanceDisplay.text = ((int) distance).ToString();
+        DistanceDisplay.text = (int) distance + "m";
     }
 
     private void SetSpeedDisplay(float speed)
@@ -435,7 +455,7 @@ public class StatsManager : MonoBehaviour
     {
         if (!SplitTimeDisplay.enabled) return;
 
-        int[] hms = HelperFunctions.SecondsToHMS((int)seconds);
+        int[] hms = HelperFunctions.SecondsToHMS((int) seconds);
 
         SplitTimeDisplay.text = hms[1] + ":" + hms[2].ToString("D2") + " /";
     }
@@ -444,7 +464,7 @@ public class StatsManager : MonoBehaviour
     {
         if (!SplitAvgPaceDisplay.enabled) return;
 
-        int[] hms = HelperFunctions.SecondsToHMS((int)splitAvgPace);
+        int[] hms = HelperFunctions.SecondsToHMS((int) splitAvgPace);
 
         SplitAvgPaceDisplay.text = hms[1].ToString("D2") + ":" + hms[2].ToString("D2");
     }
@@ -456,14 +476,14 @@ public class StatsManager : MonoBehaviour
         SplitAvgPowerDisplay.text = splitAvgPower.ToString();
     }
 
-    private void SetStrokesPerMinDisplay(int strokesPerMin)
+    private void SetStrokesPerMinDisplay(float strokesPerMin)
     {
         if (!StrokesPerMinDisplay.enabled) return;
 
         StrokesPerMinDisplay.text = strokesPerMin.ToString();
     }
 
-    private void SetPowerDisplay(int power)
+    private void SetPowerDisplay(float power)
     {
         if (!StrokePowerDisplay.enabled) return;
 

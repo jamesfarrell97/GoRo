@@ -205,13 +205,13 @@ public class BluetoothManager : MonoBehaviour
 
     private void Connect()
     {
-        StatusMessage = "Connecting to \n" + DeviceName + "...";
+        StatusMessage = "Connecting to... \n\n" + DeviceName + ".";
 
         BluetoothLEHardwareInterface.ConnectToPeripheral(DeviceAddress, null, (address, serviceUUID) => {
 
             BluetoothLEHardwareInterface.StopScan();
 
-            StatusMessage = "Connected to \n" + DeviceName + ".";
+            StatusMessage = "Connected to... \n\n" + DeviceName + ".";
 
             DeviceListItem.Connect();
 

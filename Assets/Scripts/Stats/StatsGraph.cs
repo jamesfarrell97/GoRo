@@ -20,6 +20,7 @@ public class StatsGraph : MonoBehaviour
     private const int X_SEPERATOR = 5;
 
     [SerializeField] private Transform graph;
+    [SerializeField] private TMP_Text graphLabel;
 
     [SerializeField] private Image graphPoint;
     [SerializeField] private Image graphConnection;
@@ -30,10 +31,13 @@ public class StatsGraph : MonoBehaviour
     [SerializeField] private RectTransform dashTemplateX;
     [SerializeField] private RectTransform dashTemplateY;
 
+    private RectTransform graph1;
+    private RectTransform graph2;
+    private RectTransform graph3;
+    private RectTransform graph4;
+    private RectTransform graph5;
 
-    private RectTransform graphContainer1;
-    private RectTransform graphContainer2;
-    private RectTransform graphContainer3;
+    private List<RectTransform> graphs;
 
     private void Awake()
     {
@@ -46,79 +50,103 @@ public class StatsGraph : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Instance = this;
 
-        graphContainer1 = graph.Find("Graph 1").GetComponent<RectTransform>();
-        graphContainer2 = graph.Find("Graph 2").GetComponent<RectTransform>();
-        graphContainer3 = graph.Find("Graph 3").GetComponent<RectTransform>();
+        graph1 = graph.Find("Graph 1").GetComponent<RectTransform>();
+        graph2 = graph.Find("Graph 2").GetComponent<RectTransform>();
+        graph3 = graph.Find("Graph 3").GetComponent<RectTransform>();
+        graph4 = graph.Find("Graph 4").GetComponent<RectTransform>();
+        graph5 = graph.Find("Graph 5").GetComponent<RectTransform>();
+
+        graphs = new List<RectTransform>() { graph1, graph2, graph3, graph4, graph5 };
     }
 
     private List<float> data1 = new List<float>();
     private List<float> data2 = new List<float>();
     private List<float> data3 = new List<float>();
-    
+    private List<float> data4 = new List<float>();
+    private List<float> data5 = new List<float>();
+
+    private int count1 = 0;
+    private int count2 = 0;
+    private int count3 = 0;
+    private int count4 = 0;
+    private int count5 = 0;
+
     public void UpdateGraph()
     {
-        int count1 = (MAX_POINTS < StatsManager.StrokePowerData.Count) ? MAX_POINTS : StatsManager.StrokePowerData.Count;
-        data1 = StatsManager.StrokePowerData.ToList().GetRange(
-            StatsManager.StrokePowerData.Count - count1, 
+        count1 = (MAX_POINTS < StatsManager.DragFactorData.Count) ? MAX_POINTS : StatsManager.DragFactorData.Count;
+        data1 = StatsManager.DragFactorData.ToList().GetRange(
+            StatsManager.DragFactorData.Count - count1,
             count1
         );
 
-        int count2 = (MAX_POINTS < StatsManager.SpeedData.Count) ? MAX_POINTS : StatsManager.SpeedData.Count;
+        count2 = (MAX_POINTS < StatsManager.SpeedData.Count) ? MAX_POINTS : StatsManager.SpeedData.Count;
         data2 = StatsManager.SpeedData.ToList().GetRange(
             StatsManager.SpeedData.Count - count2,
             count2
         );
 
-        int count3 = (MAX_POINTS < StatsManager.SplitTimeData.Count) ? MAX_POINTS : StatsManager.SplitTimeData.Count;
-        data3 = StatsManager.SplitTimeData.ToList().GetRange(
-            StatsManager.SplitTimeData.Count - count3, 
+        count3 = (MAX_POINTS < StatsManager.StrokePowerData.Count) ? MAX_POINTS : StatsManager.StrokePowerData.Count;
+        data3 = StatsManager.StrokePowerData.ToList().GetRange(
+            StatsManager.StrokePowerData.Count - count3, 
             count3
         );
-        
-        //data1.Add(Random.Range(0, 200));
-        //data1 = (StatsManager.DistanceData.Count > MAX_POINTS)
-        //        ? Enumerable.Range(0, MAX_POINTS).Select(i => StatsManager.DistanceData.Dequeue()).ToList()
-        //        : new List<float>() { 0 };
 
-        //data2.Add(Random.Range(0, 5));
-        //data2 = (StatsManager.SpeedData.Count > MAX_POINTS)
-        //        ? Enumerable.Range(0, MAX_POINTS).Select(i => StatsManager.SpeedData.Dequeue()).ToList()
-        //        : new List<float>() { 0 };
+        count4 = (MAX_POINTS < StatsManager.SplitAvgPaceData.Count) ? MAX_POINTS : StatsManager.SplitTimeData.Count;
+        data4 = StatsManager.SplitAvgPaceData.ToList().GetRange(
+            StatsManager.SplitAvgPaceData.Count - count4, 
+            count4
+        );
 
-        //data3.Add(Random.Range(0, 3));
-        //data3 = (StatsManager.TimeData.Count > MAX_POINTS)
-        //        ? Enumerable.Range(0, MAX_POINTS).Select(i => StatsManager.TimeData.Dequeue()).ToList()
-        //        : new List<float>() { 0 };
+        count5 = (MAX_POINTS < StatsManager.StrokesPerMinData.Count) ? MAX_POINTS : StatsManager.StrokesPerMinData.Count;
+        data5 = StatsManager.StrokesPerMinData.ToList().GetRange(
+            StatsManager.StrokesPerMinData.Count - count5,
+            count5
+        );
 
-        //Enumerable.Range(0, MAX_POINTS).Select(i => StatsManager.SpeedData.Dequeue()).ToList();
-        //Enumerable.Range(0, MAX_POINTS).Select(i => StatsManager.TimeData.Dequeue()).ToList();
-
-        ClearGraph(graphContainer1);
-        ClearGraph(graphContainer2);
-        ClearGraph(graphContainer3);
+        ClearGraph(graph1);
+        ClearGraph(graph2);
+        ClearGraph(graph3);
+        ClearGraph(graph4);
+        ClearGraph(graph5);
 
         PlotDataOnGraph(
             data1, 
-            graphContainer1, 
+            graph1,
             Color.green,
             (int i) => i + " s",
-            (float f) => Mathf.RoundToInt(f).ToString() + " w"
+            (float f) => Mathf.RoundToInt(f).ToString()
         );
 
         PlotDataOnGraph(
             data2, 
-            graphContainer2, 
+            graph2,
             Color.magenta,
-            (int i) => i + " s", 
-            (float f) => Mathf.RoundToInt(f).ToString() + " m/s"
+            (int i) => i + " s",
+            (float f) => string.Format("{0:0.00}", f)
         );
 
         PlotDataOnGraph(
             data3, 
-            graphContainer3, 
+            graph3,
             Color.red,
             (int i) => i + " s",
-            (float f) => string.Format("{0:0.00}", f) + "/500"
+            (float f) => Mathf.RoundToInt(f).ToString()
+        );
+
+        PlotDataOnGraph(
+            data4,
+            graph4,
+            Color.yellow,
+            (int i) => i + " s",
+            (float f) => HelperFunctions.SecondsToHMS((int) f)[1] + ":" + HelperFunctions.SecondsToHMS((int) f)[2].ToString("D2")
+        );
+
+        PlotDataOnGraph(
+            data5,
+            graph5,
+            Color.cyan,
+            (int i) => i + " s",
+            (float f) => ((int) f).ToString()
         );
     }
 
@@ -161,8 +189,8 @@ public class StatsGraph : MonoBehaviour
             getAxisLabelY = delegate (float f) { return Mathf.RoundToInt(f).ToString(); };
         }
 
-        float graphHeight = graphContainer1.sizeDelta.y;
-        float graphWidth = graphContainer1.sizeDelta.x;
+        float graphHeight = graph1.sizeDelta.y;
+        float graphWidth = graph1.sizeDelta.x;
 
         float unitWidth = graphWidth / ((dataPoints.Count != 0) ? dataPoints.Count : 1);
         float unitHeight = graphHeight / ((dataPoints.Max() != 0) ? dataPoints.Max() : 1);
@@ -214,8 +242,8 @@ public class StatsGraph : MonoBehaviour
             RectTransform labelY = Instantiate(labelTemplateY);
             labelY.SetParent(graphContainer, false);
             labelY.gameObject.SetActive(true);
-            labelY.anchoredPosition = new Vector2(-50f, normalisedValue * graphHeight);
-            labelY.GetComponent<TMP_Text>().text = getAxisLabelY(normalisedValue * (yMaximum - yMinimum));
+            labelY.anchoredPosition = new Vector2(-65f, normalisedValue * graphHeight);
+            labelY.GetComponent<TMP_Text>().text = getAxisLabelY((yMaximum / seperatorCount) * i);
         }
     }
 
@@ -241,5 +269,21 @@ public class StatsGraph : MonoBehaviour
 
         rectTransform.anchoredPosition = dotPositionA + direction * distance * 0.5f;
         rectTransform.localEulerAngles = new Vector3(0, 0, HelperFunctions.GetAngleFromVectorFloat(direction));
+    }
+
+    public void ActivateGraph(string name)
+    {
+        // Set graph correlating to graph name to active
+        // Set all others graphs to inactive
+        foreach (RectTransform graph in graphs)
+        {
+            graph.gameObject.SetActive(graph.name.Equals(name));
+        }
+    }
+
+    public void UpdateLabel(string label)
+    {
+        // Update label
+        graphLabel.text = label;
     }
 }

@@ -67,8 +67,6 @@ namespace UnityStandardAssets.Utility
             if (route == null) return;
             
             if (route.GetRoutePoint(0).Equals(null)) return;
-
-            translationalVelocity = player.GetVelocity();
              
             // determine the position we should currently be aiming for
             // (this is different to the current progress position, it is a a certain amount ahead along the route)
@@ -90,6 +88,11 @@ namespace UnityStandardAssets.Utility
             progressAlongRoute = 0;
             currentLap = 1;
             speed = 0;
+        }
+
+        public void UpdateVelocity(float velocity)
+        {
+            this.translationalVelocity = velocity;
         }
 
         public void UpdateRoute(Route route, int numberOfLaps)

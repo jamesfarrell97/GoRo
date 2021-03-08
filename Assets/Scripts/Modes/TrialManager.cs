@@ -25,7 +25,7 @@ public class TrialManager : MonoBehaviour
                 case TrialState.Inactive:
 
                     // Form trial
-                    trial.FormTrial(player);
+                    trial.FormTrial(player, route);
                     break;
 
                 case TrialState.InProgress:

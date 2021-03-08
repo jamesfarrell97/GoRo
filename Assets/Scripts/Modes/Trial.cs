@@ -24,6 +24,8 @@ public class Trial : MonoBehaviour
     public Route route { get; private set; }
 
     private PlayerController player;
+    private GhostController ghost;
+    private GameObject trialGhost;
 
     private TimeSpan trialDuration;
     private float trialStartTime;
@@ -110,10 +112,13 @@ public class Trial : MonoBehaviour
         GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
     }
 
-    public void FormTrial(PlayerController player)
+    public void FormTrial(PlayerController player, string route)
     {
-        // Add player to race
+        // Add player to trial
         AddPlayerToTrial(player);
+
+        // Retrieve trial information
+        RetrieveTrialInformation(route);
 
         // Start countdown
         StartCoroutine(StartCountdown());
@@ -138,6 +143,38 @@ public class Trial : MonoBehaviour
 
         // Update route
         routeFollower.UpdateRoute(route, numberOfLaps);
+    }
+
+    private const string TRIAL_GHOST_FILEPATH = "trial-ghost-data";
+
+    private void RetrieveTrialInformation(string route)
+    {
+        // Retrieve trial file
+        string file = HelperFunctions.ReadStringFromFile(TRIAL_GHOST_FILEPATH);
+
+        // Split file into lines
+        string[] lines = file.Split('\n');
+
+        foreach (string line in lines)
+        {
+            string[] data = line.Split(',');
+
+            string name = data[0];
+
+            if (name.Equals(route))
+            {
+                int speed = int.Parse(data[1]);
+
+                Instantiate(trialGhost);
+
+                ghost = trialGhost.GetComponent<GhostController>();
+
+                trialGhost.SendMessage("InstantiateGhostTrial", this);
+                trialGhost.SendMessage("InstantiateGhostSpeed", speed);
+
+                return;
+            }
+        }
     }
 
     IEnumerator StartCountdown()
@@ -170,8 +207,11 @@ public class Trial : MonoBehaviour
 
     private void StartTrial()
     {
-        // Resume movement
+        // Resume player movement
         player.Resume();
+
+        // Resume ghost movement
+        ghost.Resume();
 
         // Set start time
         trialStartTime = (float)PhotonNetwork.Time;
@@ -191,8 +231,17 @@ public class Trial : MonoBehaviour
         // Resume player movement
         player.Resume();
 
+        // Destroy ghost
+        DestroyGhost();
+
         // Start just row
         GameManager.Instance.StartJustRow();
+    }
+
+    private void DestroyGhost()
+    {
+        Destroy(ghost);
+        Destroy(trialGhost);
     }
 
     private void DisplayTimeTrialDataToParticipants(string time)

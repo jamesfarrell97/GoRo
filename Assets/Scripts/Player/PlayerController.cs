@@ -19,6 +19,18 @@ public class PlayerController : MonoBehaviour
         AtBoathouse
     }
 
+    public enum StrokeState
+    {
+        WaitingForWheelToReachMinSpeed,
+        WaitingForWheelToAccelerate,
+        Driving,
+        DwellingAfterDrive,
+        Recovery
+    }
+
+    private StrokeState currentState;
+    private StrokeState strokeState;
+
     [SerializeField] [Range(0, 3)] public float boatSpeed = 1f;
 
     [SerializeField] private Animator[] rowingAnimators;
@@ -28,16 +40,17 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Camera[] cameras;
 
-    [HideInInspector] public Transform[] route;
     [HideInInspector] public Trial trial;
     [HideInInspector] public Race race;
 
     [HideInInspector] public PhotonView photonView { get; private set; }
     [HideInInspector] public PlayerState state;
 
-    private AchievementTracker achievementTracker;
-    private BoxCollider boxCollider;
     private Rigidbody rigidbody;
+    private BoxCollider boxCollider;
+
+    private AchievementTracker achievementTracker;
+    private RouteFollower routeFollower;
     private StatsManager stats;
 
     private bool paused = false;
@@ -45,11 +58,15 @@ public class PlayerController : MonoBehaviour
 
     private int cameraIndex = 0;
 
+    private float rowingSpeed = 0;
+    private float playerVelocity = 0;
+
     private void Awake()
     {
         stats = GameManager.Instance.GetComponent<StatsManager>();
 
         achievementTracker = GetComponent<AchievementTracker>();
+        routeFollower = GetComponent<RouteFollower>();
         boxCollider = GetComponent<BoxCollider>();
         photonView = GetComponent<PhotonView>();
 
@@ -62,13 +79,32 @@ public class PlayerController : MonoBehaviour
         if (photonView.IsMine)
         {
             AssignMenuCamera();
-
-            rigidbody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
+            AssignRigidbody();
         }
         else
         {
             DestroyComponents();
             UpdateAppearance();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!photonView.IsMine) return;
+
+        achievementTracker.TrackAchievements(photonView);
+
+        if (!paused)
+        {
+            if (PhotonNetwork.OfflineMode)
+            {
+                routeFollower.UpdateVelocity(0);
+            }
+        }
+        else
+        {
+            UpdateSpeed();
+            Animate();
         }
     }
 
@@ -82,6 +118,12 @@ public class PlayerController : MonoBehaviour
         
         // Display HUD
         MenuManager.Instance.OpenMenu("HUD");
+    }
+
+    private void AssignRigidbody()
+    {
+        // Retrieve rigidbody from scene
+        rigidbody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
     }
 
     private void DestroyComponents()
@@ -134,135 +176,23 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        if (!photonView.IsMine) return;
-
-        achievementTracker.TrackAchievements(photonView);
-
-        if (paused)
-        {
-            velocity = 0;
-        }
-        else
-        {
-            UpdateSpeed();
-            Animate();
-        }
-
-#if UNITY_EDITOR
-
-        UserInput();
-
-#endif
-    }
-
-    private enum StrokeState
-    {
-        WaitingForWheelToReachMinSpeed,
-        WaitingForWheelToAccelerate,
-        Driving,
-        DwellingAfterDrive,
-        Recovery
-    }
-
-    private StrokeState currentState;
-    private StrokeState strokeState;
-
-    private void UserInput()
-    {
-        if (Input.GetKey(KeyCode.Q))
-        {
-            strokeState = StrokeState.WaitingForWheelToReachMinSpeed;
-        }
-        else if (Input.GetKey(KeyCode.W))
-        {
-            strokeState = StrokeState.Driving;
-        }
-        else if (Input.GetKey(KeyCode.E))
-        {
-            strokeState = StrokeState.DwellingAfterDrive;
-        }
-        else if (Input.GetKey(KeyCode.R))
-        {
-            strokeState = StrokeState.Recovery;
-        }
-        else if (Input.GetKey(KeyCode.T))
-        {
-            strokeState = StrokeState.WaitingForWheelToAccelerate;
-        }
-        
-        StateChanged();
-    }
-
-    private void StateChanged()
-    {
-        // Update current state
-        currentState = strokeState;
-
-        // Update animation
-        foreach (Animator animator in rowingAnimators)
-        {
-            animator.SetInteger("State", (int) strokeState);
-        }
-    }
-
-    private float velocity = 0;
-
-    private float prevSpeed = 0;
-    private float deltSpeed = 0;
-    private float speed = 0;
-    private float power = 0;
-
-    private float currTime = 0;
     private void UpdateSpeed()
     {
+        // Get speed from erg
+        rowingSpeed = stats.GetSpeed();
 
-    #if UNITY_EDITOR
-
-        // Increase time
-        currTime += Time.fixedDeltaTime;
-
-        // Simlating concpet2 update speed
-        if (currTime > 0.5f)
-        {
-            speed = (Random.Range(1.75f, 2.25f));
-            currTime = 0;
-        }
-
-        if (move)
-        {
-            // Driving
-            strokeState = StrokeState.Driving;
-        }
-        else
-        {
-            // Resting
-            strokeState = 0;
-        }
-
-#else
-
-        // get speed from erg
-        speed = stats.GetSpeed();
-
-        // get power from erg
-        power = stats.GetStrokePower();
-
-        // get stroke state from erg
+        // Get stroke state from erg
         strokeState = (StrokeState) stats.GetStrokeState();
 
-#endif
-
-        //// If driving
+        // If the user is currently driving
         if (strokeState == StrokeState.Driving)
         {
-            // Apply force
-            rigidbody.AddForce(transform.forward * speed * Time.fixedDeltaTime);
+            // Apply force to rigidbody
+            rigidbody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
         }
 
-        // Upidate velocity
-        velocity = rigidbody.velocity.magnitude * boatSpeed;
+        // Upidate velocity based on rigibody current speed
+        routeFollower.UpdateVelocity(rigidbody.velocity.magnitude * boatSpeed);
     }
 
     private void Animate()
@@ -301,7 +231,7 @@ public class PlayerController : MonoBehaviour
 
     public float GetVelocity()
     {
-        return velocity;
+        return playerVelocity;
     }
 
     public void ChangeCameraView()

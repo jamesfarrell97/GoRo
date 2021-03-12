@@ -49,7 +49,19 @@ public static class HelperFunctions
 
     }
 
-    public static string ReadStringFromFile(string filename)//, int lineIndex )
+    public static void WriteArrayToFile(string[] str, string filename)
+    {
+
+#if !WEB_BUILD
+
+        string path = PathForDocumentsFile(filename);
+        File.WriteAllLines(path, str);
+
+#endif
+
+    }
+
+    public static string ReadStringFromFile(string filename)
     {
 
 #if !WEB_BUILD

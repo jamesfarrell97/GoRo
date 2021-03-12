@@ -505,6 +505,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         // Retrieve all players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
 
+        // Retrieve all ghosts
+        GhostController[] ghosts = FindObjectsOfType<GhostController>();
+
         // For each loaded player
         foreach (PlayerController player in players)
         {
@@ -520,14 +523,33 @@ public class GameManager : MonoBehaviourPunCallbacks
             // No need to check any more views, so return
             return;
         }
+
+        // For each loaded ghost
+        foreach (GhostController ghost in ghosts)
+        {
+            // Retrieve player view
+            PhotonView photonView = ghost.GetComponent<PhotonView>();
+
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
+
+            // Pause movement
+            ghost.Pause();
+
+            // No need to check any more views, so return
+            return;
+        }
     }
 
     public void UnpauseGame()
     {
         if (!PhotonNetwork.OfflineMode) return;
 
-        // Retrieve all players
+        // Retrieve all loaded players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
+
+        // Retrieve all loaded ghosts
+        GhostController[] ghosts = FindObjectsOfType<GhostController>();
 
         // For each loaded player
         foreach (PlayerController player in players)
@@ -539,7 +561,23 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (!photonView.IsMine) continue;
 
             // Resume movement
-            player.Pause();
+            player.Resume();
+
+            // No need to check any more views, so return
+            return;
+        }
+
+        // For each loaded ghost
+        foreach (GhostController ghost in ghosts)
+        {
+            // Retrieve player view
+            PhotonView photonView = ghost.GetComponent<PhotonView>();
+
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
+
+            // Resume movement
+            ghost.Resume();
 
             // No need to check any more views, so return
             return;

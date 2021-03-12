@@ -7,12 +7,12 @@ using UnityEngine;
 //
 public class GhostController : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
+    [SerializeField] private Animator[] animators;
+
+    [HideInInspector] public Trial trial;
 
     private Rigidbody rigidbody;
     private RouteFollower routeFollower;
-
-    private Trial trial;
 
     private float averageSpeed = 0;
     private bool paused = true;
@@ -22,12 +22,12 @@ public class GhostController : MonoBehaviour
         routeFollower = GetComponent<RouteFollower>();
     }
 
-    private void InstantiateGhostTrial(Trial trial)
+    public void InstantiateGhostTrial(Trial trial)
     {
         this.trial = trial;
     }
 
-    private void InstantiateGhostSpeed(float averageSpeed)
+    public void InstantiateGhostSpeed(float averageSpeed)
     {
         this.averageSpeed = averageSpeed;
     }
@@ -41,11 +41,15 @@ public class GhostController : MonoBehaviour
     private void UpdateSpeed()
     {
         routeFollower.UpdateVelocity(averageSpeed);
+        //routeFollower.UpdateVelocity(0.55f);
     }
 
     private void Animate()
     {
-        animator.SetBool("Paused", paused);
+        //foreach (Animator animator in animators)
+        //{
+        //    animator.SetBool("Paused", paused);
+        //}
     }
 
     public void Pause()

@@ -18,6 +18,8 @@ namespace UnityStandardAssets.Utility
         public float editorVisualisationSubsteps = 100;
         public float Length { get; private set; }
 
+        public float routeDistance = 0;
+
         public Transform[] Waypoints
         {
             get { return waypointList.items; }
@@ -55,7 +57,6 @@ namespace UnityStandardAssets.Utility
             return new RoutePoint(p1, delta.normalized);
         }
 
-
         public Vector3 GetRoutePosition(float dist)
         {
             int point = 0;
@@ -71,7 +72,6 @@ namespace UnityStandardAssets.Utility
             {
                 ++point;
             }
-
 
             // get nearest two points, ensuring points wrap-around start & end of circuit
             p1n = ((point - 1) + numPoints)%numPoints;
@@ -146,6 +146,8 @@ namespace UnityStandardAssets.Utility
                     accumulateDistance += (p1 - p2).magnitude;
                 }
             }
+
+            routeDistance = accumulateDistance;
         }
 
 

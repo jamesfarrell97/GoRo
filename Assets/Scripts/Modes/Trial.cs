@@ -19,13 +19,14 @@ public class Trial : MonoBehaviour
 
     [SerializeField] [Range(0, 10)] public int numberOfLaps;
     [SerializeField] [Range(0, 30)] int resolveTimeoutDuration;
+
+    [SerializeField] GameObject trialGhost;
     
     public PhotonView photonView { get; private set; }
     public Route route { get; private set; }
 
     private PlayerController player;
     private GhostController ghost;
-    private GameObject trialGhost;
 
     private TimeSpan trialDuration;
     private float trialStartTime;
@@ -138,7 +139,7 @@ public class Trial : MonoBehaviour
         // Update player trial
         this.player.trial = this;
 
-        // Retrieve waypoint progress tracker
+        // Retrieve route follower
         RouteFollower routeFollower = this.player.GetComponent<RouteFollower>();
 
         // Update route
@@ -152,6 +153,9 @@ public class Trial : MonoBehaviour
         // Retrieve trial file
         string file = HelperFunctions.ReadStringFromFile(TRIAL_GHOST_FILEPATH);
 
+        // If no file present, return
+        if (file == null) return;
+
         // Split file into lines
         string[] lines = file.Split('\n');
 
@@ -163,17 +167,81 @@ public class Trial : MonoBehaviour
 
             if (name.Equals(route))
             {
-                int speed = int.Parse(data[1]);
+                float speed = float.Parse(data[1]);
 
-                Instantiate(trialGhost);
-
-                ghost = trialGhost.GetComponent<GhostController>();
-
-                trialGhost.SendMessage("InstantiateGhostTrial", this);
-                trialGhost.SendMessage("InstantiateGhostSpeed", speed);
-
+                LoadGhost(speed);
+                
                 return;
             }
+        }
+    }
+
+    GameObject spawnedGhost;
+    private void LoadGhost(float speed)
+    {
+        // Instantiate prefab
+        spawnedGhost = Instantiate(trialGhost) as GameObject;
+        
+        // Instantiate values
+        spawnedGhost.SendMessage("InstantiateGhostTrial", this);
+        spawnedGhost.SendMessage("InstantiateGhostSpeed", speed);
+        
+        // Assign ghost
+        ghost = spawnedGhost.GetComponent<GhostController>();
+
+        // Pause movement
+        ghost.Pause();
+
+        // Assign trial
+        ghost.trial = this;
+
+        // Retrieve route follower
+        RouteFollower routeFollower = ghost.GetComponent<RouteFollower>();
+
+        // Update route
+        routeFollower.UpdateRoute(route, numberOfLaps);
+    }
+
+    // Record Best time
+    private void RecordTrialInformation(string route, float distance, double time)
+    {
+        // Retrieve trial file
+        string file = HelperFunctions.ReadStringFromFile(TRIAL_GHOST_FILEPATH);
+
+        if (file != null)
+        {
+            // Split file into lines
+            string[] lines = file.Split('\n');
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+
+                string[] data = line.Split(',');
+
+                string name = data[0];
+
+                if (name.Equals(route))
+                {
+                    float routeSpeed = float.Parse(data[1]);
+                    float playerSpeed = distance / (float) time;
+
+                    if (playerSpeed > routeSpeed)
+                    {
+                        data[i] = name + "," + playerSpeed;
+                        HelperFunctions.WriteArrayToFile(data, TRIAL_GHOST_FILEPATH);
+                    }
+
+                    return;
+                }
+            }
+        }
+        else
+        {
+            float playerSpeed = distance / (float) time;
+            string[] data = new string[] { name + "," + playerSpeed };
+
+            HelperFunctions.WriteArrayToFile(data, TRIAL_GHOST_FILEPATH);
         }
     }
 
@@ -211,10 +279,10 @@ public class Trial : MonoBehaviour
         player.Resume();
 
         // Resume ghost movement
-        ghost.Resume();
+        if (ghost != null) ghost.Resume();
 
         // Set start time
-        trialStartTime = (float)PhotonNetwork.Time;
+        trialStartTime = (float) PhotonNetwork.Time;
 
         // Update state
         SetState(TrialState.InProgress);
@@ -222,7 +290,9 @@ public class Trial : MonoBehaviour
 
     private void EndTrial()
     {
+        RecordTrialInformation(name, route.routeDistance, trialDuration.TotalSeconds);
         RemovePlayerFromTrial();
+        RemoveGhostFromTrial();
         Reset();
     }
 
@@ -231,17 +301,14 @@ public class Trial : MonoBehaviour
         // Resume player movement
         player.Resume();
 
-        // Destroy ghost
-        DestroyGhost();
-
         // Start just row
         GameManager.Instance.StartJustRow();
     }
 
-    private void DestroyGhost()
+    private void RemoveGhostFromTrial()
     {
         Destroy(ghost);
-        Destroy(trialGhost);
+        Destroy(spawnedGhost);
     }
 
     private void DisplayTimeTrialDataToParticipants(string time)

@@ -26,7 +26,8 @@ namespace UnityStandardAssets.Utility
         [HideInInspector] public Route.RoutePoint speedPoint { get; private set; }
         [HideInInspector] public Route.RoutePoint progressPoint { get; private set; }
 
-        private PlayerController player;
+        private PlayerController playerController;
+        private GhostController ghostController;
         private Vector3 previousPosition;
 
         private bool halfPointReached;
@@ -40,7 +41,15 @@ namespace UnityStandardAssets.Utility
         
         private void Start()
         {
-            player = GetComponent<PlayerController>();
+            if (GetComponent<PlayerController>() != null)
+            {
+                playerController = GetComponent<PlayerController>();
+            }
+
+            if (GetComponent<GhostController>() != null)
+            {
+                ghostController = GetComponent<GhostController>();
+            }
 
             previousPosition = transform.position;
 
@@ -62,7 +71,9 @@ namespace UnityStandardAssets.Utility
         {
             CheckIfLapComplete();
 
-            if (player.Paused()) return;
+            if (playerController != null && playerController.Paused()) return;
+
+            if (ghostController != null && ghostController.Paused()) return;
 
             if (route == null) return;
             
@@ -106,58 +117,101 @@ namespace UnityStandardAssets.Utility
 
         public void UpdatePosition()
         {
-            speed = Mathf.Lerp(speed, (previousPosition - transform.position).magnitude / Time.fixedDeltaTime, Time.fixedDeltaTime);
-
-            target.position =
-                route.GetRoutePoint(progressAlongRoute + translationalVelocity + translationVelocityFactor * speed).position;
-
-            target.rotation =
-                Quaternion.LookRotation(
-                    route.GetRoutePoint(progressAlongRoute + rotationalVelocity + rotationalVelocityFactor * speed).direction
-                );
-            
-            // Calculate progress along route
-            progressPoint = route.GetRoutePoint(progressAlongRoute);
-            Vector3 progressDelta = progressPoint.position - transform.position;
-            if (Vector3.Dot(progressDelta, progressPoint.direction) < 0)
+            // If player controller
+            if (playerController != null)
             {
-                progressAlongRoute += progressDelta.magnitude * 0.5f;
+                speed = Mathf.Lerp(speed, (previousPosition - transform.position).magnitude / Time.fixedDeltaTime, Time.fixedDeltaTime);
+
+                target.position =
+                    route.GetRoutePoint(progressAlongRoute + translationalVelocity + translationVelocityFactor * speed).position;
+
+                target.rotation =
+                    Quaternion.LookRotation(
+                        route.GetRoutePoint(progressAlongRoute + rotationalVelocity + rotationalVelocityFactor * speed).direction
+                    );
+
+                // Calculate progress along route
+                progressPoint = route.GetRoutePoint(progressAlongRoute);
+                Vector3 progressDelta = progressPoint.position - transform.position;
+                if (Vector3.Dot(progressDelta, progressPoint.direction) < 0)
+                {
+                    progressAlongRoute += progressDelta.magnitude * 0.5f;
+                }
+
+                previousPosition = transform.position;
             }
 
-            previousPosition = transform.position;
+            // If ghost controller
+            else if (ghostController != null) {
+
+                target.position =
+                    route.GetRoutePoint(progressAlongRoute).position;
+
+                target.rotation =
+                    Quaternion.LookRotation(
+                        route.GetRoutePoint(progressAlongRoute).direction
+                    );
+
+                progressAlongRoute += (translationalVelocity / (1 / Time.fixedDeltaTime));
+            }
         }
 
         public bool CheckIfPointReached(Transform point)
         {
-            // Only check for players who are currently participating in a race or time trial
-            if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial) return false;
+            if (playerController != null)
+            {
+                // Only check for players who are currently participating in a race or time trial
+                if (playerController.state != PlayerState.ParticipatingInRace && playerController.state != PlayerState.ParticipatingInTrial) return false;
 
-            // Return true if distance to point is less than the minimum threshold
-            return (Vector3.Distance(transform.position, point.position) < minimumThreshold);
+                // Return true if distance to point is less than the minimum threshold
+                return (Vector3.Distance(transform.position, point.position) < minimumThreshold);
+            }
+
+            else if (ghostController != null)
+            {
+                // Return true if distance to point is less than the minimum threshold
+                return (Vector3.Distance(transform.position, point.position) < minimumThreshold);
+            }
+
+            return false;
         }
 
         private void CheckIfHalfPointReached()
         {
-            // If player participating in race
-            if (player.state.Equals(PlayerState.ParticipatingInRace))
+            if (playerController != null)
             {
-                // True if the player is near the halfway point
-                halfPointReached = (
-                    Vector3.Distance(
-                        transform.position, 
-                        player.race.route.waypointList.items[player.race.route.waypointList.items.Length / 2].position
-                    ) < minimumThreshold
-                );
+                // If player participating in race
+                if (playerController.state.Equals(PlayerState.ParticipatingInRace))
+                {
+                    // True if the player is near the halfway point
+                    halfPointReached = (
+                        Vector3.Distance(
+                            transform.position, 
+                            playerController.race.route.waypointList.items[playerController.race.route.waypointList.items.Length / 2].position
+                        ) < minimumThreshold
+                    );
+                }
+
+                // Else if player participating in trial
+                else if (playerController.state.Equals(PlayerState.ParticipatingInTrial))
+                {
+                    // True if the player is near the halfway point
+                    halfPointReached = (
+                        Vector3.Distance(
+                            transform.position,
+                            playerController.trial.route.waypointList.items[playerController.trial.route.waypointList.items.Length / 2].position
+                        ) < minimumThreshold
+                    );
+                }
             }
 
-            // Else if player participating in trial
-            else if (player.state.Equals(PlayerState.ParticipatingInTrial))
+            else if (ghostController != null)
             {
-                // True if the player is near the halfway point
+                // True if the ghost is near the halfway point
                 halfPointReached = (
                     Vector3.Distance(
                         transform.position,
-                        player.trial.route.waypointList.items[player.trial.route.waypointList.items.Length / 2].position
+                        ghostController.trial.route.waypointList.items[ghostController.trial.route.waypointList.items.Length / 2].position
                     ) < minimumThreshold
                 );
             }
@@ -169,28 +223,42 @@ namespace UnityStandardAssets.Utility
             if (halfPointReached)
             {
                 float distance = 0;
-                
-                // If player participating in race
-                if (player.state.Equals(PlayerState.ParticipatingInRace))
+
+                if (playerController != null)
                 {
-                    // Calculate distance to finish line
-                    // Assumes finish line is at the the start point
-                    distance =
-                        Vector3.Distance(
-                            transform.position,
-                            player.race.route.waypointList.items[0].position
-                        );
+                    // If player participating in race
+                    if (playerController.state.Equals(PlayerState.ParticipatingInRace))
+                    {
+                        // Calculate distance to finish line
+                        // Assumes finish line is at the the start point
+                        distance =
+                            Vector3.Distance(
+                                transform.position,
+                                playerController.race.route.waypointList.items[0].position
+                            );
+                    }
+
+                    // Else if player participating in trial
+                    else if (playerController.state.Equals(PlayerState.ParticipatingInTrial))
+                    {
+                        // Calculate distance to finish line
+                        // Assumes finish line is at the the start point
+                        distance =
+                            Vector3.Distance(
+                                transform.position,
+                                playerController.trial.route.waypointList.items[0].position
+                            );
+                    }
                 }
 
-                // Else if player participating in trial
-                else if (player.state.Equals(PlayerState.ParticipatingInTrial))
+                if (ghostController != null)
                 {
                     // Calculate distance to finish line
                     // Assumes finish line is at the the start point
                     distance =
                         Vector3.Distance(
                             transform.position,
-                            player.trial.route.waypointList.items[0].position
+                            ghostController.trial.route.waypointList.items[0].position
                         );
                 }
 
@@ -226,14 +294,22 @@ namespace UnityStandardAssets.Utility
 
         private void CompleteEvent()
         {
-            if (player.state.Equals(PlayerState.ParticipatingInRace))
+            if (playerController != null)
             {
-                player.state = PlayerState.AtRaceFinishLine;
-                player.race.PlayerCompletedRace(player);
+                if (playerController.state.Equals(PlayerState.ParticipatingInRace))
+                {
+                    playerController.state = PlayerState.AtRaceFinishLine;
+                    playerController.race.PlayerCompletedRace(playerController);
+                }
+                else if (playerController.state.Equals(PlayerState.ParticipatingInTrial))
+                {
+                    playerController.state = PlayerState.CompletedTimeTrial;
+                }
             }
-            else if (player.state.Equals(PlayerState.ParticipatingInTrial))
+
+            else if (ghostController != null)
             {
-                player.state = PlayerState.CompletedTimeTrial;
+                ghostController.Pause();
             }
         }
 

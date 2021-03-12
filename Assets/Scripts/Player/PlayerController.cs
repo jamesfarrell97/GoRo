@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour
 
         achievementTracker.TrackAchievements(photonView);
 
-        if (!paused)
+        if (paused)
         {
             if (PhotonNetwork.OfflineMode)
             {
@@ -190,6 +190,15 @@ public class PlayerController : MonoBehaviour
             // Apply force to rigidbody
             rigidbody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
         }
+
+#if UNITY_EDITOR
+        
+        if (move)
+        {
+            rigidbody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
+        }
+
+#endif
 
         // Upidate velocity based on rigibody current speed
         routeFollower.UpdateVelocity(rigidbody.velocity.magnitude * boatSpeed);

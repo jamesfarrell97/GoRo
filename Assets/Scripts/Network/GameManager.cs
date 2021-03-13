@@ -584,6 +584,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public void MuteAudio()
+    {
+
+    }
+
     public void DisplayTimeAndLap(string time, string lap)
     {
         timePanel.SetActive(true);

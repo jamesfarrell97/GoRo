@@ -84,9 +84,11 @@ public class StatsManager : MonoBehaviour
 
         // Update stats every 0.5 seconds
         InvokeRepeating("UpdateStats", 0f, 0.5f);
+    }
 
-        // Update stroke state every 0.01 seconds
-        InvokeRepeating("UpdateStrokeState", 0f, 0.01f);
+    private void Update()
+    {
+        UpdateStrokeState();
     }
 
     private void ResetDisplay()
@@ -125,6 +127,9 @@ public class StatsManager : MonoBehaviour
     {
         // Update often to sync rowing animation with user stroke state
         StrokeState = BluetoothManager.RowingStatusData[10];
+
+        // Update stroke state
+        DebugDisplay.text = StrokeState + "";
     }
 
     // Measured as 0.1 meters per least-significant bit

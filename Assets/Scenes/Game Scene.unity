@@ -24929,6 +24929,7 @@ MonoBehaviour:
     - {fileID: 839885600}
   smoothRoute: 1
   editorVisualisationSubsteps: 100
+  routeDistance: 745.21686
 --- !u!1 &1537005253633735177
 GameObject:
   m_ObjectHideFlags: 0
@@ -26171,6 +26172,7 @@ MonoBehaviour:
     - {fileID: 1789215061}
   smoothRoute: 1
   editorVisualisationSubsteps: 100
+  routeDistance: 689.0621
 --- !u!4 &4149961123412369418
 Transform:
   m_ObjectHideFlags: 0
@@ -26206,8 +26208,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  numberOfLaps: 3
+  numberOfLaps: 1
   resolveTimeoutDuration: 3
+  trialGhost: {fileID: 3128037215741786078, guid: 50eaad33eb632574599abb702f6cb308,
+    type: 3}
 --- !u!114 &4149961123412369420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26542,7 +26546,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  numberOfLaps: 3
+  numberOfLaps: 1
   startTimeoutDuration: 10
   positionTimeoutDuration: 10
   resolveTimeoutDuration: 5

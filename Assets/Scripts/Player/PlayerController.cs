@@ -128,10 +128,13 @@ public class PlayerController : MonoBehaviour
 
     private void DestroyComponents()
     {
-        // Disable cameras
+        // Store list of cameras
         Camera[] cameras = GetComponentsInChildren<Camera>();
+
+        // For each camera
         foreach (Camera camera in cameras)
         {
+            // Disable camera
             camera.gameObject.SetActive(false);
         }
 
@@ -175,7 +178,7 @@ public class PlayerController : MonoBehaviour
             renderer.materials = materials;
         }
     }
-
+    
     private void UpdateSpeed()
     {
         // Get speed from erg
@@ -187,21 +190,26 @@ public class PlayerController : MonoBehaviour
         // If the user is currently driving
         if (strokeState == StrokeState.Driving)
         {
-            // Apply force to rigidbody
+            // Apply force to the rigidbody
             rigidbody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
         }
 
 #if UNITY_EDITOR
         
+        // If debug 'move' button pressed
         if (move)
         {
+            // Apply force to the rigibody
             rigidbody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
         }
 
 #endif
 
-        // Upidate velocity based on rigibody current speed
-        routeFollower.UpdateVelocity(rigidbody.velocity.magnitude * boatSpeed);
+        // Calculate velocity based on rigibody current speed
+        playerVelocity = rigidbody.velocity.magnitude * boatSpeed;
+        
+        // Update velocity
+        routeFollower.UpdateVelocity(playerVelocity);
     }
 
     private void Animate()

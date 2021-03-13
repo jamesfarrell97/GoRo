@@ -6,6 +6,8 @@ using UnityEngine;
 using Photon.Pun;
 
 using static PlayerController;
+using System.Collections.Generic;
+
 public class Trial : MonoBehaviour
 {
     public enum TrialState
@@ -31,6 +33,11 @@ public class Trial : MonoBehaviour
     private TimeSpan trialDuration;
     private float trialStartTime;
 
+
+    private float sampleTime = 0;
+    private float sampleRate = 0.5f;
+    private List<float> samples;
+
     private void Start()
     {
         Setup();
@@ -45,6 +52,9 @@ public class Trial : MonoBehaviour
 
     private void Reset()
     {
+        sampleTime = 0;
+        samples = new List<float>();
+
         state = TrialState.Inactive;
         player = null;
 
@@ -80,6 +90,7 @@ public class Trial : MonoBehaviour
     private void MonitorTrial()
     {
         UpdateStopWatch();
+        SamplePlayerVelocity();
         CheckIfComplete();
     }
 
@@ -89,6 +100,22 @@ public class Trial : MonoBehaviour
 
         trialDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - trialStartTime);
         DisplayDataToParticipants(trialDuration.ToString(@"mm\:ss"));
+    }
+
+    private void SamplePlayerVelocity()
+    {
+        // Update sample time
+        sampleTime += Time.fixedDeltaTime;
+
+        // If time since last sample exceeds sample rate
+        if (sampleTime > sampleRate)
+        {
+            // Sample player velocity
+            samples.Add(player.GetVelocity());
+
+            // Reset sample time
+            sampleTime = 0;
+        }
     }
 
     private void CheckIfComplete()
@@ -152,39 +179,57 @@ public class Trial : MonoBehaviour
     {
         // Retrieve trial file
         string file = HelperFunctions.ReadStringFromFile(TRIAL_GHOST_FILEPATH);
-
+        
         // If no file present, return
         if (file == null) return;
 
         // Split file into lines
         string[] lines = file.Split('\n');
 
+        // For each line in the file
         foreach (string line in lines)
         {
-            string[] data = line.Split(',');
+            // Split each line into data cells
+            string[] data = line.Split('|');
 
+            // Extract route name
             string name = data[0];
 
+            // If the route's name is equal to the current route
             if (name.Equals(route))
             {
-                float speed = float.Parse(data[1]);
+                // Retrieve sample size
+                int sampleSize = int.Parse(data[2]);
 
-                LoadGhost(speed);
-                
+                // Retrieve samples
+                string[] samples = data[3].Split(',');
+
+                // Create samples array
+                float[] speedSamples = new float[sampleSize];
+
+                // Loop through samples
+                for (int i = 0; i < sampleSize; i++)
+                {
+                    // Construct samples array
+                    speedSamples[i] = float.Parse(samples[i]);
+                }
+
+                // Load ghost
+                LoadGhost(speedSamples);
                 return;
             }
         }
     }
 
     GameObject spawnedGhost;
-    private void LoadGhost(float speed)
+    private void LoadGhost(float[] speedSamples)
     {
         // Instantiate prefab
         spawnedGhost = Instantiate(trialGhost) as GameObject;
         
         // Instantiate values
         spawnedGhost.SendMessage("InstantiateGhostTrial", this);
-        spawnedGhost.SendMessage("InstantiateGhostSpeed", speed);
+        spawnedGhost.SendMessage("InstantiateGhostSamples", speedSamples);
         
         // Assign ghost
         ghost = spawnedGhost.GetComponent<GhostController>();
@@ -203,44 +248,58 @@ public class Trial : MonoBehaviour
     }
 
     // Record Best time
-    private void RecordTrialInformation(string route, float distance, double time)
+    private void RecordTrialInformation(string route, double time)
     {
         // Retrieve trial file
         string file = HelperFunctions.ReadStringFromFile(TRIAL_GHOST_FILEPATH);
 
+        // IF file present
         if (file != null)
         {
             // Split file into lines
             string[] lines = file.Split('\n');
 
+            // For each line in the file
             for (int i = 0; i < lines.Length; i++)
             {
+                // Retrieve each line
                 string line = lines[i];
 
-                string[] data = line.Split(',');
+                // Split each line into data cells
+                string[] data = line.Split('|');
 
+                // Extract route name
                 string name = data[0];
 
+                // If the route's name is equal to the current route
                 if (name.Equals(route))
                 {
-                    float routeSpeed = float.Parse(data[1]);
-                    float playerSpeed = distance / (float) time;
+                    // Extract the stored time
+                    float storedTime = float.Parse(data[1]);
 
-                    if (playerSpeed > routeSpeed)
+                    // If player time is less than the stored time
+                    if (time < storedTime)
                     {
-                        data[i] = name + "," + playerSpeed;
+                        // Update data array
+                        data[i] = name + "|" + time + "|" + samples.Count + "|" + string.Join(",", samples) + "\n";
+
+                        // Overwrite file
                         HelperFunctions.WriteArrayToFile(data, TRIAL_GHOST_FILEPATH);
                     }
 
+                    // No need to check any more! Return
                     return;
                 }
             }
         }
+
+        // File must not be created yet
         else
         {
-            float playerSpeed = distance / (float) time;
-            string[] data = new string[] { name + "," + playerSpeed };
+            // Create data array
+            string[] data = new string[] { name + "|" + time + "|" + samples.Count + "|" + string.Join(",", samples) + "\n" };
 
+            // Write data array to file
             HelperFunctions.WriteArrayToFile(data, TRIAL_GHOST_FILEPATH);
         }
     }
@@ -290,7 +349,7 @@ public class Trial : MonoBehaviour
 
     private void EndTrial()
     {
-        RecordTrialInformation(name, route.routeDistance, trialDuration.TotalSeconds);
+        RecordTrialInformation(name, trialDuration.TotalSeconds);
         RemovePlayerFromTrial();
         RemoveGhostFromTrial();
         Reset();

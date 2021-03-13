@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using static PlayerController;
 
@@ -115,45 +117,37 @@ namespace UnityStandardAssets.Utility
             UpdatePosition();
         }
 
+        private float translation;
+        private Quaternion rotation;
+
         public void UpdatePosition()
         {
-            // If player controller
-            if (playerController != null)
+            // Calculate speed
+            speed = Mathf.Lerp(speed, (previousPosition - transform.position).magnitude / Time.fixedDeltaTime, Time.fixedDeltaTime);
+
+            // Calculate translation
+            translation = progressAlongRoute + translationalVelocity + translationVelocityFactor * speed;
+
+            // Calculate rotation
+            rotation = Quaternion.LookRotation(
+                    route.GetRoutePoint(progressAlongRoute + rotationalVelocity + rotationalVelocityFactor * speed).direction
+                );
+
+            // Update position
+            target.position = route.GetRoutePoint(translation).position;
+
+            // Update rotation
+            target.rotation = rotation;
+
+            // Calculate progress along route
+            progressPoint = route.GetRoutePoint(progressAlongRoute);
+            Vector3 progressDelta = progressPoint.position - transform.position;
+            if (Vector3.Dot(progressDelta, progressPoint.direction) < 0)
             {
-                speed = Mathf.Lerp(speed, (previousPosition - transform.position).magnitude / Time.fixedDeltaTime, Time.fixedDeltaTime);
-
-                target.position =
-                    route.GetRoutePoint(progressAlongRoute + translationalVelocity + translationVelocityFactor * speed).position;
-
-                target.rotation =
-                    Quaternion.LookRotation(
-                        route.GetRoutePoint(progressAlongRoute + rotationalVelocity + rotationalVelocityFactor * speed).direction
-                    );
-
-                // Calculate progress along route
-                progressPoint = route.GetRoutePoint(progressAlongRoute);
-                Vector3 progressDelta = progressPoint.position - transform.position;
-                if (Vector3.Dot(progressDelta, progressPoint.direction) < 0)
-                {
-                    progressAlongRoute += progressDelta.magnitude * 0.5f;
-                }
-
-                previousPosition = transform.position;
+                progressAlongRoute += progressDelta.magnitude * 0.5f;
             }
 
-            // If ghost controller
-            else if (ghostController != null) {
-
-                target.position =
-                    route.GetRoutePoint(progressAlongRoute).position;
-
-                target.rotation =
-                    Quaternion.LookRotation(
-                        route.GetRoutePoint(progressAlongRoute).direction
-                    );
-
-                progressAlongRoute += (translationalVelocity / (1 / Time.fixedDeltaTime));
-            }
+            previousPosition = transform.position;
         }
 
         public bool CheckIfPointReached(Transform point)

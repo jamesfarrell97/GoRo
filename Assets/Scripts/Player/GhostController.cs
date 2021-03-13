@@ -10,16 +10,29 @@ public class GhostController : MonoBehaviour
     [SerializeField] private Animator[] animators;
 
     [HideInInspector] public Trial trial;
-
-    private Rigidbody rigidbody;
+    
     private RouteFollower routeFollower;
 
-    private float averageSpeed = 0;
-    private bool paused = true;
+    private float[] speedSamples;
+    private int sampleIndex;
+
+    private bool paused;
 
     private void Awake()
     {
         routeFollower = GetComponent<RouteFollower>();
+    }
+
+    private void Start()
+    {
+        Reset();
+        InvokeRepeating("UpdateSpeed", 0, 0.5f);
+    }
+
+    private void Reset()
+    {
+        sampleIndex = 0;
+        paused = true;
     }
 
     public void InstantiateGhostTrial(Trial trial)
@@ -27,21 +40,27 @@ public class GhostController : MonoBehaviour
         this.trial = trial;
     }
 
-    public void InstantiateGhostSpeed(float averageSpeed)
+    public void InstantiateGhostSamples(float[] speedSamples)
     {
-        this.averageSpeed = averageSpeed;
+        this.speedSamples = speedSamples;
+
+        routeFollower.UpdateVelocity(speedSamples[++sampleIndex]);
     }
 
-    private void FixedUpdate()
-    {
-        UpdateSpeed();
-        Animate();
-    }
-    
     private void UpdateSpeed()
     {
-        routeFollower.UpdateVelocity(averageSpeed);
-        //routeFollower.UpdateVelocity(0.55f);
+        if (paused) return;
+
+        // Select next sample in the speed samples array
+        sampleIndex = (sampleIndex < speedSamples.Length - 1) 
+            ? sampleIndex + 1 
+            : 0;
+        
+        // Update velocity
+        routeFollower.UpdateVelocity(speedSamples[sampleIndex]);
+
+        // Animate
+        Animate();
     }
 
     private void Animate()

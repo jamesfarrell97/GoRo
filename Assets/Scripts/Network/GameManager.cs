@@ -31,7 +31,9 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] TMP_Text roomNameText;
 
     [SerializeField] GameObject startGameButton;
+
     [SerializeField] TMP_InputField roomNameInputField;
+    [SerializeField] TMP_InputField playerNameInputField;
 
     [SerializeField] Transform roomListContent;
     [SerializeField] GameObject roomListItemPrefab;
@@ -48,6 +50,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     private int buildIndex;
     private int singleplayerIndex = 1;
     private int multiplayerIndex = 1;
+
+    private string nickname;
 
     private void Awake()
     {
@@ -154,9 +158,18 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
+        if (nickname == null)
+        {
+            AssignDefaultNickname();
+        }
+
         MenuManager.Instance.OpenMenu("Multiplayer");
-        PhotonNetwork.NickName = "Player" + UnityEngine.Random.Range(0, 1000).ToString("0000");
         Debug.Log("Joined Lobby");
+    }
+
+    public void AssignDefaultNickname()
+    {
+        PhotonNetwork.NickName = "Player " + Random.Range(0, 1000);
     }
 
     public override void OnMasterClientSwitched(Player newMasterClient)
@@ -188,6 +201,21 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void StartGame()
     {
         PhotonNetwork.LoadLevel(buildIndex);
+    }
+
+    public void UpdateName()
+    {
+        if (string.IsNullOrEmpty(playerNameInputField.text))
+        {
+            MenuManager.Instance.OpenMenu("Multiplayer");
+        }
+        else
+        {
+            nickname = playerNameInputField.text;
+
+            PhotonNetwork.NickName = nickname;
+            MenuManager.Instance.OpenMenu("Multiplayer");
+        }
     }
 
     public void CreateRoom()

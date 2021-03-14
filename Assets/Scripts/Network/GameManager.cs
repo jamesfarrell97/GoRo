@@ -207,6 +207,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         errorText.text = "A room with that name already exists!";
+
         PhotonNetwork.Disconnect();
         PhotonNetwork.OfflineMode = true;
         MenuManager.Instance.OpenMenu("Error");

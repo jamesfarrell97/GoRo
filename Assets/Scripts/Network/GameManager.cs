@@ -14,9 +14,19 @@ using TMPro;
 //
 //
 //
+
+using static PlayerController;
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance;
+
+    public enum GameState
+    {
+        Paused,
+        Playing
+    }
+
+    public static GameState State;
 
     [SerializeField] TMP_Text errorText;
     [SerializeField] TMP_Text roomNameText;
@@ -59,7 +69,27 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        UpdateState();
+        SetSleepTimeout();
         ShowConnectionMenu();
+    }
+
+    private void FixedUpdate()
+    {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
+
+    private void UpdateState()
+    {
+        State = GameState.Playing;
+    }
+
+    private void SetSleepTimeout()
+    {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     public void ShowConnectionMenu()
@@ -226,6 +256,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             // If not our view, skip rest of loop
             if (!photonView.IsMine) continue;
 
+            // Change camera view
             player.GetComponent<PlayerController>().ChangeCameraView();
 
             // No need to check any more views, so return
@@ -313,8 +344,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             // If not our view, skip rest of loop
             if (!photonView.IsMine) continue;
 
-            // Check if player currently participating in event
-            if (player.participatingInTimeTrial == false && player.participatingInRace == false)
+            // If player not currently participating in event
+            if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
             {
 
                 MenuManager.Instance.OpenMenu("Race Choice");
@@ -323,12 +354,23 @@ public class GameManager : MonoBehaviourPunCallbacks
 
                 //// Add player to race
                 //GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(player);
+                // Update player state
+                ////////////////////////////////////////////player.state = PlayerState.ParticipatingInRace;
+                //////////////////////////////////////////// Reset track distance
+                //////////////////////////////////////////// player.GetComponent<RouteFollower>().progressAlongRoute = 0;
 
                 //// Reset track distance
-                player.GetComponent<WaypointProgressTracker>().progressDistance = 0;
+                player.GetComponent<RouteFollower>().progressAlongRoute = 0f;
 
-                //// Open HUD
-                //MenuManager.Instance.OpenMenu("HUD");
+//=======
+//                // Add player to race
+//                GameObject.Find("Race Manager").GetComponent<RaceManager>().JoinRace(player, "Race Track");
+//                // Reset track distance
+//                player.GetComponent<RouteFollower>().progressAlongRoute = 0;
+//>>>>>>> origin/master
+
+                //////////// Open HUD
+                ////////////MenuManager.Instance.OpenMenu("HUD");
             }
 
             // No need to check any more views, so return
@@ -349,13 +391,19 @@ public class GameManager : MonoBehaviourPunCallbacks
             // If not our view, skip rest of loop
             if (!photonView.IsMine) continue;
 
-            // Check if player currently participating in event
-            if (player.participatingInTimeTrial == false && player.participatingInRace == false)
+            // If player not currently participating in event
+            if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
             {
 
                 OpenRouteSelectionMenu(true);
                 EventOrganizer.Instance.eventType = EventOrganizer.EventType.Trial;
                 EventOrganizer.Instance.eventInitiator = player;
+
+                // Update player state
+                /////////////////////////////////////////player.state = PlayerState.ParticipatingInTrial;
+
+                // Reset track distance
+                /////////////////////////////////////////player.GetComponent<RouteFollower>().Reset();
 
                 //// Add player to time trial
                 //GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(player);
@@ -365,6 +413,19 @@ public class GameManager : MonoBehaviourPunCallbacks
 
                 //// Open HUD
                 //MenuManager.Instance.OpenMenu("HUD");
+//=======
+//                // Add player to time trial
+//                GameObject.Find("Time Trial Manager").GetComponent<TrialManager>().JoinTrial(player, "Race Track");
+
+//                // Update player state
+//                player.state = PlayerState.ParticipatingInTrial;
+
+//                // Reset track distance
+//                player.GetComponent<RouteFollower>().Reset();
+
+//                // Open HUD
+//                MenuManager.Instance.OpenMenu("HUD");
+//>>>>>>> origin/master
             }
 
             // No need to check any more views, so return
@@ -385,14 +446,27 @@ public class GameManager : MonoBehaviourPunCallbacks
             // If not our view, skip rest of loop
             if (!photonView.IsMine) continue;
 
+            // Update player state
+            player.state = PlayerState.JustRowing;
+
+            // Clear player tracks
+            player.trial = null;
+            player.race = null;
+
             // Retrieve progress tracker
-            WaypointProgressTracker waypointProgressTracker = player.GetComponent<WaypointProgressTracker>();
+            RouteFollower routeFollower = player.GetComponent<RouteFollower>();
 
             // Reset track distance
-            waypointProgressTracker.Reset();
+            routeFollower.Reset();
 
             // Reset track
-            waypointProgressTracker.Circuit = waypointProgressTracker.Routes[0];
+            routeFollower.route = routeFollower.routes[0];
+
+            // Hide time and lap info
+            HideTimeAndLap();
+
+            // Open HUD
+            MenuManager.Instance.OpenMenu("HUD");
 
             // No need to check any more views, so return
             return;
@@ -469,6 +543,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         // Retrieve all players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
 
+        // Retrieve all ghosts
+        GhostController[] ghosts = FindObjectsOfType<GhostController>();
+
         // For each loaded player
         foreach (PlayerController player in players)
         {
@@ -478,26 +555,24 @@ public class GameManager : MonoBehaviourPunCallbacks
             // If not our view, skip rest of loop
             if (!photonView.IsMine) continue;
 
-            // If participating in race
-            if (player.participatingInRace == true)
-            {
-                // Pause singleplayer race
-                player.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().PauseSingleplayerRace();
-            }
+            // Pause movement
+            player.Pause();
 
-            // Else if participating in time trial
-            else if (player.participatingInTimeTrial == true)
-            {
-                // Pause singleplayer time trial
-                player.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().PauseSingleplayerTimeTrial();
-            }
+            // No need to check any more views, so return
+            return;
+        }
 
-            // Otherwise
-            else
-            {
-                // Pause player
-                player.Pause();
-            }
+        // For each loaded ghost
+        foreach (GhostController ghost in ghosts)
+        {
+            // Retrieve player view
+            PhotonView photonView = ghost.GetComponent<PhotonView>();
+
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
+
+            // Pause movement
+            ghost.Pause();
 
             // No need to check any more views, so return
             return;
@@ -508,8 +583,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.OfflineMode) return;
 
-        // Retrieve all players
+        // Retrieve all loaded players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
+
+        // Retrieve all loaded ghosts
+        GhostController[] ghosts = FindObjectsOfType<GhostController>();
 
         // For each loaded player
         foreach (PlayerController player in players)
@@ -520,30 +598,33 @@ public class GameManager : MonoBehaviourPunCallbacks
             // If not our view, skip rest of loop
             if (!photonView.IsMine) continue;
 
-            // If participating in race
-            if (player.participatingInRace == true)
-            {
-                // Resume singleplayer race
-                player.GetComponent<WaypointProgressTracker>().currentRace.GetComponent<Race>().ResumeSingleplayerRace();
-            }
+            // Resume movement
+            player.Resume();
 
-            // Else if participating in time trial
-            else if (player.participatingInTimeTrial == true)
-            {
-                // Resume singleplayer time trial
-                player.GetComponent<WaypointProgressTracker>().currentTimeTrial.GetComponent<TimeTrial>().ResumeSingleplayerTimeTrial();
-            }
-            
-            // Otherwise
-            else
-            {
-                // Unpause player
-                player.Unpause();
-            }
-            
             // No need to check any more views, so return
             return;
         }
+
+        // For each loaded ghost
+        foreach (GhostController ghost in ghosts)
+        {
+            // Retrieve player view
+            PhotonView photonView = ghost.GetComponent<PhotonView>();
+
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
+
+            // Resume movement
+            ghost.Resume();
+
+            // No need to check any more views, so return
+            return;
+        }
+    }
+
+    public void MuteAudio()
+    {
+
     }
 
     public void DisplayTimeAndLap(string time, string lap)
@@ -553,6 +634,12 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         lapPanel.SetActive(true);
         lapPanel.GetComponentInChildren<TMP_Text>().text = lap;
+    }
+
+    public void HideTimeAndLap()
+    {
+        timePanel.SetActive(false);
+        lapPanel.SetActive(false);
     }
 
     public void DisplayNotificationText(string text)

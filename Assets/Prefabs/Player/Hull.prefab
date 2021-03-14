@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2470031409619900948}
   - component: {fileID: 4405970141038452204}
   - component: {fileID: 2730376259513002994}
-  - component: {fileID: 4368899312403793600}
   m_Layer: 0
   m_Name: Seat
   m_TagString: Untagged
@@ -85,21 +84,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &4368899312403793600
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1247169628448672740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 323c1f27e2abaed498e0b2390cf37573, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  trackedObject: {fileID: 0}
-  maxPoint: {fileID: 5993725088105602750}
-  minPoint: {fileID: 8419135846545404370}
 --- !u!1 &3954450470212156552
 GameObject:
   m_ObjectHideFlags: 0
@@ -193,7 +177,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: a02c0fd7d6949a64686a18ee4cfbc06b, type: 2}
-  - {fileID: 2100000, guid: 5596414ece8e460448283097471c075d, type: 2}
+  - {fileID: 2100000, guid: daef718f533b45943b9cbe38ccb408d4, type: 2}
   - {fileID: 2100000, guid: 85323f3d05dacbc4fa58bc5eb22e05de, type: 2}
   - {fileID: 2100000, guid: 85323f3d05dacbc4fa58bc5eb22e05de, type: 2}
   - {fileID: 2100000, guid: b02a97007412fab40a5592272b2759a5, type: 2}

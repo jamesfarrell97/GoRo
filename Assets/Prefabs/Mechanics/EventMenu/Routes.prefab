@@ -281,7 +281,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4052002059547873623}
-  - component: {fileID: 4052002059547873622}
   - component: {fileID: 4052002059547873617}
   - component: {fileID: 4052002059547873619}
   - component: {fileID: 4052002059547873616}
@@ -315,7 +314,7 @@ Transform:
   m_Father: {fileID: 4052002061192629126}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4052002059547873622
+--- !u!114 &4052002059547873617
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -324,11 +323,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002059547873620}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70852dc981465ea48bb527b9e33a87fd, type: 3}
+  m_Script: {fileID: 11500000, guid: 59eb6276800a16e44b230002a4029886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  routeName: Heaven Beach
+  routeStatus: 0
+  routeType: 1
+  routeLength: 1
   waypointList:
-    circuit: {fileID: 4052002059547873622}
+    circuit: {fileID: 4052002059547873617}
     items:
     - {fileID: 4052002059376081430}
     - {fileID: 4052002060256481733}
@@ -341,22 +344,7 @@ MonoBehaviour:
     - {fileID: 4052002059703179108}
   smoothRoute: 1
   editorVisualisationSubsteps: 100
---- !u!114 &4052002059547873617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4052002059547873620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e70db59c4b2dea4c8d3f3c62fb28082, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  routeName: Heaven Beach
-  routeStatus: 0
-  routeType: 1
-  routeLength: 80
+  routeDistance: 1438.704
 --- !u!114 &4052002059547873619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -366,20 +354,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002059547873620}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30ae7aae5e13a3a4e93b3f3f30fec818, type: 3}
+  m_Script: {fileID: 11500000, guid: 65e10dbc428dc5e47a7bbb01f24ec2e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   track: []
-  players: []
   raceInitiated: 0
   raceInProgress: 0
   raceComplete: 0
   waitTimeForOtherPlayersToJoin: 5
   timeRaceInitiated: 0
   timeRaceStarted: 0
-  route: {fileID: 4052002059547873617}
-  numberOfLaps: 1
-  raceCapacity: 1
+  raceCapacity: 0
+  state: 0
+  numberOfLaps: 0
+  startTimeoutDuration: 0
+  positionTimeoutDuration: 0
+  resolveTimeoutDuration: 0
 --- !u!114 &4052002059547873616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -389,19 +379,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002059547873620}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9efbff47af1a644e93aff585f636b1f, type: 3}
+  m_Script: {fileID: 11500000, guid: b6f39b1b914bb1847b87d46e2b235790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
+  numberOfLaps: 0
+  resolveTimeoutDuration: 0
+  trialGhost: {fileID: 0}
   track: []
-  player: {fileID: 0}
-  timeTrialInitiated: 0
-  timeTrialInProgress: 0
-  timeTrialComplete: 0
-  timeTheTimeTrialInitiated: 0
-  timeTheTimeTrialStarted: 0
-  pauseBeforeTimeTrialBegins: 5
-  route: {fileID: 4052002059547873617}
-  numberOfLaps: 1
 --- !u!1 &4052002059573579240
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,10 +426,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4052002059630144592}
-  - component: {fileID: 4052002059630144594}
-  - component: {fileID: 4052002059630144595}
-  - component: {fileID: 4052002059630144556}
+  - component: {fileID: 1667713730692440167}
   - component: {fileID: 4052002059630144557}
+  - component: {fileID: 4052002059630144556}
   m_Layer: 0
   m_Name: Ocean Gate Route
   m_TagString: Untagged
@@ -468,7 +452,7 @@ Transform:
   m_Father: {fileID: 4052002059232682913}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4052002059630144594
+--- !u!114 &1667713730692440167
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -477,55 +461,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002059630144593}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70852dc981465ea48bb527b9e33a87fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  waypointList:
-    circuit: {fileID: 4052002059630144594}
-    items:
-    - {fileID: 4052002059767295529}
-    - {fileID: 4052002059070537338}
-  smoothRoute: 0
-  editorVisualisationSubsteps: 100
---- !u!114 &4052002059630144595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4052002059630144593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e70db59c4b2dea4c8d3f3c62fb28082, type: 3}
+  m_Script: {fileID: 11500000, guid: 59eb6276800a16e44b230002a4029886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   routeName: Ocean Gate
   routeStatus: 0
   routeType: 0
-  routeLength: 200
---- !u!114 &4052002059630144556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4052002059630144593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30ae7aae5e13a3a4e93b3f3f30fec818, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  track: []
-  players: []
-  raceInitiated: 0
-  raceInProgress: 0
-  raceComplete: 0
-  waitTimeForOtherPlayersToJoin: 5
-  timeRaceInitiated: 0
-  timeRaceStarted: 0
-  route: {fileID: 4052002059630144595}
-  numberOfLaps: 1
-  raceCapacity: 1
+  routeLength: 1
+  waypointList:
+    circuit: {fileID: 1667713730692440167}
+    items:
+    - {fileID: 4052002059767295529}
+    - {fileID: 4052002059070537338}
+  smoothRoute: 1
+  editorVisualisationSubsteps: 100
+  routeDistance: 255.49188
 --- !u!114 &4052002059630144557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -535,19 +485,39 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002059630144593}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9efbff47af1a644e93aff585f636b1f, type: 3}
+  m_Script: {fileID: 11500000, guid: 65e10dbc428dc5e47a7bbb01f24ec2e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   track: []
-  player: {fileID: 0}
-  timeTrialInitiated: 0
-  timeTrialInProgress: 0
-  timeTrialComplete: 0
-  timeTheTimeTrialInitiated: 0
-  timeTheTimeTrialStarted: 0
-  pauseBeforeTimeTrialBegins: 5
-  route: {fileID: 4052002059630144595}
-  numberOfLaps: 1
+  raceInitiated: 0
+  raceInProgress: 0
+  raceComplete: 0
+  waitTimeForOtherPlayersToJoin: 5
+  timeRaceInitiated: 0
+  timeRaceStarted: 0
+  raceCapacity: 0
+  state: 0
+  numberOfLaps: 0
+  startTimeoutDuration: 0
+  positionTimeoutDuration: 0
+  resolveTimeoutDuration: 0
+--- !u!114 &4052002059630144556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4052002059630144593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6f39b1b914bb1847b87d46e2b235790, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  state: 0
+  numberOfLaps: 0
+  resolveTimeoutDuration: 0
+  trialGhost: {fileID: 0}
+  track: []
 --- !u!1 &4052002059691615394
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,7 +707,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4052002060072686078}
-  - component: {fileID: 4052002060072686072}
   - component: {fileID: 4052002060072686073}
   - component: {fileID: 4052002060072686074}
   - component: {fileID: 4052002060072686075}
@@ -769,7 +738,7 @@ Transform:
   m_Father: {fileID: 4052002061192629126}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4052002060072686072
+--- !u!114 &4052002060072686073
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -778,11 +747,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002060072686079}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70852dc981465ea48bb527b9e33a87fd, type: 3}
+  m_Script: {fileID: 11500000, guid: 59eb6276800a16e44b230002a4029886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  routeName: Cliff Fissure
+  routeStatus: 0
+  routeType: 1
+  routeLength: 1
   waypointList:
-    circuit: {fileID: 4052002060072686072}
+    circuit: {fileID: 4052002060072686073}
     items:
     - {fileID: 4052002060277183816}
     - {fileID: 4052002060346890688}
@@ -793,22 +766,7 @@ MonoBehaviour:
     - {fileID: 4052002060118316324}
   smoothRoute: 1
   editorVisualisationSubsteps: 100
---- !u!114 &4052002060072686073
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4052002060072686079}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e70db59c4b2dea4c8d3f3c62fb28082, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  routeName: Cliff Fissure
-  routeStatus: 0
-  routeType: 1
-  routeLength: 120
+  routeDistance: 1644.2543
 --- !u!114 &4052002060072686074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -818,20 +776,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002060072686079}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30ae7aae5e13a3a4e93b3f3f30fec818, type: 3}
+  m_Script: {fileID: 11500000, guid: 65e10dbc428dc5e47a7bbb01f24ec2e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   track: []
-  players: []
   raceInitiated: 0
   raceInProgress: 0
   raceComplete: 0
   waitTimeForOtherPlayersToJoin: 5
   timeRaceInitiated: 0
   timeRaceStarted: 0
-  route: {fileID: 4052002060072686073}
-  numberOfLaps: 1
-  raceCapacity: 1
+  raceCapacity: 0
+  state: 0
+  numberOfLaps: 0
+  startTimeoutDuration: 0
+  positionTimeoutDuration: 0
+  resolveTimeoutDuration: 0
 --- !u!114 &4052002060072686075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -841,19 +801,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002060072686079}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9efbff47af1a644e93aff585f636b1f, type: 3}
+  m_Script: {fileID: 11500000, guid: b6f39b1b914bb1847b87d46e2b235790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
+  numberOfLaps: 0
+  resolveTimeoutDuration: 0
+  trialGhost: {fileID: 0}
   track: []
-  player: {fileID: 0}
-  timeTrialInitiated: 0
-  timeTrialInProgress: 0
-  timeTrialComplete: 0
-  timeTheTimeTrialInitiated: 0
-  timeTheTimeTrialStarted: 0
-  pauseBeforeTimeTrialBegins: 5
-  route: {fileID: 4052002060072686073}
-  numberOfLaps: 1
 --- !u!1 &4052002060118316325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1104,7 +1059,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4052002060654381590}
   - component: {fileID: 4052002060654381586}
-  - component: {fileID: 4052002060654381585}
   - component: {fileID: 4052002060654381587}
   - component: {fileID: 4052002060654381584}
   m_Layer: 0
@@ -1139,32 +1093,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002060654381591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70852dc981465ea48bb527b9e33a87fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  waypointList:
-    circuit: {fileID: 4052002060654381586}
-    items:
-    - {fileID: 4052002059691615421}
-    - {fileID: 4052002060350241766}
-  smoothRoute: 0
-  editorVisualisationSubsteps: 100
---- !u!114 &4052002060654381585
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4052002060654381591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e70db59c4b2dea4c8d3f3c62fb28082, type: 3}
+  m_Script: {fileID: 11500000, guid: 59eb6276800a16e44b230002a4029886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   routeName: Heaven Overpass
   routeStatus: 0
   routeType: 0
-  routeLength: 300
+  routeLength: 1
+  waypointList:
+    circuit: {fileID: 4052002060654381586}
+    items:
+    - {fileID: 4052002059691615421}
+    - {fileID: 4052002060350241766}
+  smoothRoute: 1
+  editorVisualisationSubsteps: 100
+  routeDistance: 4133.1
 --- !u!114 &4052002060654381587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1174,20 +1117,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002060654381591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30ae7aae5e13a3a4e93b3f3f30fec818, type: 3}
+  m_Script: {fileID: 11500000, guid: 65e10dbc428dc5e47a7bbb01f24ec2e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   track: []
-  players: []
   raceInitiated: 0
   raceInProgress: 0
   raceComplete: 0
   waitTimeForOtherPlayersToJoin: 5
   timeRaceInitiated: 0
   timeRaceStarted: 0
-  route: {fileID: 4052002060654381585}
-  numberOfLaps: 1
-  raceCapacity: 1
+  raceCapacity: 0
+  state: 0
+  numberOfLaps: 0
+  startTimeoutDuration: 0
+  positionTimeoutDuration: 0
+  resolveTimeoutDuration: 0
 --- !u!114 &4052002060654381584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1197,19 +1142,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002060654381591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9efbff47af1a644e93aff585f636b1f, type: 3}
+  m_Script: {fileID: 11500000, guid: b6f39b1b914bb1847b87d46e2b235790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
+  numberOfLaps: 0
+  resolveTimeoutDuration: 0
+  trialGhost: {fileID: 0}
   track: []
-  player: {fileID: 0}
-  timeTrialInitiated: 0
-  timeTrialInProgress: 0
-  timeTrialComplete: 0
-  timeTheTimeTrialInitiated: 0
-  timeTheTimeTrialStarted: 0
-  pauseBeforeTimeTrialBegins: 5
-  route: {fileID: 4052002060654381585}
-  numberOfLaps: 1
 --- !u!1 &4052002060828637739
 GameObject:
   m_ObjectHideFlags: 0
@@ -1374,7 +1314,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4052002061198167926}
-  - component: {fileID: 4052002061198167922}
   - component: {fileID: 4052002061198167921}
   - component: {fileID: 4052002061198167923}
   - component: {fileID: 4052002061198167920}
@@ -1405,29 +1344,6 @@ Transform:
   m_Father: {fileID: 4052002061192629126}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4052002061198167922
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4052002061198167927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70852dc981465ea48bb527b9e33a87fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  waypointList:
-    circuit: {fileID: 4052002061198167922}
-    items:
-    - {fileID: 4052002060504717309}
-    - {fileID: 4052002059343610577}
-    - {fileID: 4052002060224725778}
-    - {fileID: 4052002059720245387}
-    - {fileID: 4052002061099203249}
-    - {fileID: 4052002060977800068}
-  smoothRoute: 1
-  editorVisualisationSubsteps: 100
 --- !u!114 &4052002061198167921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1437,13 +1353,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002061198167927}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e70db59c4b2dea4c8d3f3c62fb28082, type: 3}
+  m_Script: {fileID: 11500000, guid: 59eb6276800a16e44b230002a4029886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   routeName: Crescent
   routeStatus: 0
   routeType: 1
-  routeLength: 100
+  routeLength: 1
+  waypointList:
+    circuit: {fileID: 4052002061198167921}
+    items:
+    - {fileID: 4052002060504717309}
+    - {fileID: 4052002059343610577}
+    - {fileID: 4052002060224725778}
+    - {fileID: 4052002059720245387}
+    - {fileID: 4052002061099203249}
+    - {fileID: 4052002060977800068}
+  smoothRoute: 1
+  editorVisualisationSubsteps: 100
+  routeDistance: 1607.1516
 --- !u!114 &4052002061198167923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1453,20 +1381,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002061198167927}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30ae7aae5e13a3a4e93b3f3f30fec818, type: 3}
+  m_Script: {fileID: 11500000, guid: 65e10dbc428dc5e47a7bbb01f24ec2e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   track: []
-  players: []
   raceInitiated: 0
   raceInProgress: 0
   raceComplete: 0
   waitTimeForOtherPlayersToJoin: 5
   timeRaceInitiated: 0
   timeRaceStarted: 0
-  route: {fileID: 4052002061198167921}
-  numberOfLaps: 1
-  raceCapacity: 1
+  raceCapacity: 0
+  state: 0
+  numberOfLaps: 0
+  startTimeoutDuration: 0
+  positionTimeoutDuration: 0
+  resolveTimeoutDuration: 0
 --- !u!114 &4052002061198167920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1476,16 +1406,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4052002061198167927}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9efbff47af1a644e93aff585f636b1f, type: 3}
+  m_Script: {fileID: 11500000, guid: b6f39b1b914bb1847b87d46e2b235790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
+  numberOfLaps: 0
+  resolveTimeoutDuration: 0
+  trialGhost: {fileID: 0}
   track: []
-  player: {fileID: 0}
-  timeTrialInitiated: 0
-  timeTrialInProgress: 0
-  timeTrialComplete: 0
-  timeTheTimeTrialInitiated: 0
-  timeTheTimeTrialStarted: 0
-  pauseBeforeTimeTrialBegins: 5
-  route: {fileID: 4052002061198167921}
-  numberOfLaps: 1

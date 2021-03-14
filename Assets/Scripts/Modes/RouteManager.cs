@@ -2,22 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RouteManager : MonoBehaviour
+namespace UnityStandardAssets.Utility
 {
-    public static RouteManager Instance;
-
-    [SerializeField] public Route[] listOfStraightRoutes;
-    [SerializeField] public Route[] listOfLoopedRoutes;
-
-    private void Awake()
+    public class RouteManager : MonoBehaviour
     {
-        if (Instance)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        public static RouteManager Instance;
 
-        DontDestroyOnLoad(gameObject);
-        Instance = this;
+        [SerializeField] public Route[] listOfStraightRoutes;
+        [SerializeField] public Route[] listOfLoopedRoutes;
+
+        private void Awake()
+        {
+            if (Instance)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            DontDestroyOnLoad(gameObject);
+            Instance = this;
+        }
     }
 }

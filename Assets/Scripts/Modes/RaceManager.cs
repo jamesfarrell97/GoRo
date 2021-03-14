@@ -1,15 +1,14 @@
-﻿using Photon.Pun;
-using UnityEngine;
-using UnityStandardAssets.Utility;
+﻿using UnityEngine;
+using static Race;
 
 public class RaceManager : MonoBehaviour
 {
-    PhotonView photonView;
+    //PhotonView photonView;
     public static RaceManager Instance;
 
     private void Awake()
     {
-        photonView = GetComponent<PhotonView>();
+        //photonView = GetComponent<PhotonView>();
 
         if (Instance)
         {
@@ -22,60 +21,68 @@ public class RaceManager : MonoBehaviour
     }
 
     //Create a race and add the player who created it, into the race
-    public void CreateRace(PlayerController player, Route chosenRoute, float secondsForWait, int numberOfLaps, int raceCapacity)
+    public void CreateRace(PlayerController player, UnityStandardAssets.Utility.Route chosenRoute, float secondsForWait, int numberOfLaps, int raceCapacity)
     {
         chosenRoute.GetComponent<Race>().InitiateRace(secondsForWait, numberOfLaps, raceCapacity);
         AddPlayerToRace(player, chosenRoute);
     }
 
     //Add a player into an existing race which has not began yet
-    public void AddPlayerToRace(PlayerController player, Route chosenRoute)
+    public void AddPlayerToRace(PlayerController player, UnityStandardAssets.Utility.Route chosenRoute)
     {
         Race race = chosenRoute.GetComponent<Race>();
 
         // Retrieve waypoint progress tracker
-        WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
+        UnityStandardAssets.Utility.RouteFollower routeFollower = player.GetComponent<UnityStandardAssets.Utility.RouteFollower>();
 
         // Setup wpt values
-        wpt.SetCircuit(race.gameObject.GetComponent<WaypointCircuit>());
-        wpt.UpdateLastNodeIndex(race.track.Length - 1);
-        wpt.SetRace(race);
-        wpt.routeType = chosenRoute.routeType;
+        //////////wpt.SetCircuit(race.gameObject.GetComponent<WaypointCircuit>());
+        //////////wpt.UpdateLastNodeIndex(race.track.Length - 1);
+        //////////wpt.SetRace(race);
+        //////////wpt.routeType = chosenRoute.routeType;
+        routeFollower.UpdateRoute(chosenRoute, race.numberOfLaps);
+        routeFollower.UpdateLastNodeIndex(race.track.Length - 1);
+        routeFollower.routeType = chosenRoute.routeType;
 
-        chosenRoute.GetComponent<Race>().AddParticipantIntoRace(player);
+        chosenRoute.GetComponent<Race>().AddPlayerToRace(player);
     }
 
-    //public void AddPlayerToRace(PlayerController player)
+    //private Race[] races;
+
+    //void Start()
     //{
-    //    // Retrieve race
-    //    Race race = FindObjectOfType<Race>();
-
-    //    // Retrieve waypoint progress tracker
-    //    WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
-
-    //    // Setup wpt values
-    //    wpt.SetCircuit(race.gameObject.GetComponent<WaypointCircuit>());
-    //    wpt.UpdateLastNodeIndex(race.track.Length - 1);
-    //    wpt.SetRace(race);
-
-    //    PhotonView playerView = player.GetComponent<PhotonView>();
-    //    photonView.RPC("RPC_AddPlayerToRace", RpcTarget.All, playerView.ViewID);
+    //    races = FindObjectsOfType<Race>();
     //}
 
-    //[PunRPC]
-    //void RPC_AddPlayerToRace(int playerID)
+    //public void JoinRace(PlayerController player, string route)
     //{
-    //    // Retrieve race
-    //    Race race = FindObjectOfType<Race>();
+    //    // For each race in the races array
+    //    foreach (Race race in races)
+    //    {
+    //        // Skip loop if current race is not equal to the select route
+    //        if (!race.name.Equals(route)) continue;
 
-    //    // Retrieve player view
-    //    PhotonView playerView = PhotonView.Find(playerID);
+    //        // Switch based on race state
+    //        switch (race.state)
+    //        {
+    //            // Race currently inactive
+    //            case RaceState.Inactive:
 
-    //    // Retrieve player controller
-    //    PlayerController player = playerView.gameObject.GetComponent<PlayerController>();
+    //                // Form new race
+    //                race.FormRace(player);
+    //                break;
 
-    //    // Setup race values
-    //    race.InitiateRace(1, 2);
-    //    race.AddParticipantIntoRace(player);
+    //            // Race currently forming
+    //            case RaceState.Forming:
+
+    //                // Add player to the race
+    //                race.AddPlayerToRace(player);
+    //                break;
+    //        }
+
+    //        // No need to check any more in the loop
+    //        return;
+    //    }
     //}
 }
+

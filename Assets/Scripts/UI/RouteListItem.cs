@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class RouteListItem : MonoBehaviour
+namespace UnityStandardAssets.Utility
 {
-    [SerializeField] TMP_Text text;
-    private Route route;
-
-    public void SetUp(Route _route)
+    public class RouteListItem : MonoBehaviour
     {
-        route = _route;
-        text.text = route.name;
-    }
+        [SerializeField] TMP_Text text;
+        private Route route;
 
-    public void OnClick()
-    {
-        EventOrganizer.Instance.SetRoute(route);
+        public void SetUp(Route _route)
+        {
+            route = _route;
+            text.text = route.name;
+        }
+
+        public void OnClick()
+        {
+            EventOrganizer.Instance.SetRoute(route);
+        }
     }
 }

@@ -17,61 +17,91 @@ public class TimeTrialManager : MonoBehaviour
         Instance = this;
     }
 
-    public void CreateTrialAndAddPlayer(PlayerController player, Route chosenRoute, int numberOfLaps)
+    public void JoinTrial(PlayerController player, string route)
     {
-        player.participatingInTimeTrial = true;
+        //Trial trial = route.
+        //// Skip loop if current trial is not equal to the select route
+        //if (!trial.name.Equals(route)) continue;
 
-        TimeTrial trial = chosenRoute.GetComponent<TimeTrial>();
+        //// Switch based on trial state
+        //switch (trial.state)
+        //{
+        //    // trial currently inactive
+        //    case TrialState.Inactive:
 
-        // Retrieve waypoint progress tracker
-        WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
+        //        // Form trial
+        //        trial.FormTrial(player, route);
+        //        break;
 
-        // Setup wpt values
-        wpt.SetCircuit(trial.gameObject.GetComponent<WaypointCircuit>());
-        wpt.UpdateLastNodeIndex(trial.track.Length - 1);
-        wpt.currentTimeTrial = trial;
-        wpt.routeType = chosenRoute.routeType;
+        //    case TrialState.InProgress:
 
-        trial.timeTrialInitiated = true;
-        trial.timeTheTimeTrialInitiated = Time.timeSinceLevelLoad;
-        trial.numberOfLaps = numberOfLaps;
-        trial.AddParticipantIntoTimeTrial(player);
+        //        // Do nothing
+        //        break;
+        //}
+
+        //// No need to check any more in the loop
+        //return;
+
     }
 
-    //public void AddPlayerToHeroBeachTimeTrial()
-    //{
-    //    // Changing this just to get it working for the release
-    //    // Will change back to previous implementation later
-    //    TimeTrial heroBeachTimeTrial = FindObjectOfType<TimeTrial>();
-    //    if (heroBeachTimeTrial.timeTrialInitiated == false)
-    //    {
-    //        //BringUpRaceSetupMenu
-    //        //SetAllRaceParametersBased on the feedback given by player
-    //        heroBeachTimeTrial.timeTrialInitiated = true;
-    //        //heroBeachRace.numberOfLaps = ?;
-    //        //heroBeachRace.raceCapacity = ?;
-    //        //Add player to participants list
-    //    }
-    //}
+    public void CreateTrialAndAddPlayer(PlayerController player, Route chosenRoute, int numberOfLaps)
+    {
+        player.GetComponent<PlayerController>().state = PlayerController.PlayerState.ParticipatingInTrial;
 
-    //// Hard coded method to reach simple solution for Base Version of the 
-    //// waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
-    //public void AddPlayerToTimeTrial(PlayerController player)
-    //{
-    //    player.participatingInTimeTrial = true;
+        Trial trial = chosenRoute.GetComponent<Trial>();
 
-    //    // Changing this just to get it working for the release
-    //    // Will change back to previous implementation later
-    //    TimeTrial heroBeachTimeTrial = FindObjectOfType<TimeTrial>();
+        RouteFollower routeFollower = player.GetComponent<RouteFollower>();
 
-    //    // Changing this just to get it working for the release
-    //    // Will change back to previous implementation later
-    //    player.GetComponent<WaypointProgressTracker>().Circuit = heroBeachTimeTrial.gameObject.GetComponent<WaypointCircuit>();
-    //    player.GetComponent<WaypointProgressTracker>().currentTimeTrial = heroBeachTimeTrial;
-    //    player.GetComponent<WaypointProgressTracker>().lastIndex = heroBeachTimeTrial.track.Length - 1;
-    //    heroBeachTimeTrial.timeTrialInitiated = true;
-    //    heroBeachTimeTrial.timeTheTimeTrialInitiated = Time.timeSinceLevelLoad;
-    //    heroBeachTimeTrial.numberOfLaps = 3;
-    //    heroBeachTimeTrial.AddParticipantIntoTimeTrial(player);
-    //}
+        routeFollower.UpdateRoute(chosenRoute, numberOfLaps);
+        routeFollower.UpdateLastNodeIndex(trial.track.Length - 1);
+        routeFollower.routeType = chosenRoute.routeType;
+        trial.FormTrial(player, chosenRoute.name);
+
+        //trial.timeTrialInitiated = true;
+        //trial.timeTheTimeTrialInitiated = Time.timeSinceLevelLoad;
+        //trial.numberOfLaps = numberOfLaps;
+        //trial.AddParticipantIntoTimeTrial(player);
+    }
+
 }
+
+//using static Trial;
+//public class TrialManager : MonoBehaviour
+//{
+//    private Trial[] trials;
+
+//    void Start()
+//    {
+//        trials = FindObjectsOfType<Trial>();
+//    }
+
+//    public void JoinTrial(PlayerController player, string route)
+//    {
+//        // For each trial in the trials array
+//        foreach (Trial trial in trials)
+//        {
+//            // Skip loop if current trial is not equal to the select route
+//            if (!trial.name.Equals(route)) continue;
+
+//            // Switch based on trial state
+//            switch (trial.state)
+//            {
+//                // trial currently inactive
+//                case TrialState.Inactive:
+
+//                    // Form trial
+//                    trial.FormTrial(player, route);
+//                    break;
+
+//                case TrialState.InProgress:
+
+//                    // Do nothing
+//                    break;
+//            }
+
+//            // No need to check any more in the loop
+//            return;
+//        }
+//    }
+//}
+

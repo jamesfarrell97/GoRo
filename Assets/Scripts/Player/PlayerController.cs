@@ -1,7 +1,7 @@
 ﻿using UnityStandardAssets.Utility;
-using UnityEngine.Rendering.Universal;
 using UnityEngine;
 using Photon.Pun;
+using System;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -9,45 +9,70 @@ using Photon.Pun;
 //
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] public float boatSpeed = 1f;
-    [SerializeField] [Range(0, 1f)] float speedIncreaseFactor = 0.1f;
-    [SerializeField] [Range(0, 1f)] float speedDecayFactor = 0.1f;
+    public enum PlayerState
+    {
+        JustRowing,
+        ParticipatingInTrial,
+        CompletedTimeTrial,
+        ParticipatingInRace,
+        AtRaceStartLine,
+        AtRaceFinishLine,
+        AtBoathouse
+    }
+
+    public enum StrokeState
+    {
+        WaitingForWheelToReachMinSpeed,
+        WaitingForWheelToAccelerate,
+        Driving,
+        DwellingAfterDrive,
+        Recovery
+    }
+
+    private StrokeState currentState;
+    private StrokeState strokeState;
+
+    [SerializeField] [Range(0, 3)] public float boatSpeed = 1f;
 
     [SerializeField] private Animator[] rowingAnimators;
     [SerializeField] private Material otherPlayerMaterial;
     [SerializeField] private Oar leftOar;
     [SerializeField] private Oar rightOar;
 
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private Camera frontFacingCamera;
+    [SerializeField] private Camera[] cameras;
 
-    [HideInInspector] public Transform[] route;
+    [HideInInspector] public Trial trial;
+    [HideInInspector] public Race race;
 
-    [HideInInspector] public bool participatingInRace = false;
-    [HideInInspector] public bool participatingInTimeTrial = false;
+    [HideInInspector] public PhotonView photonView { get; private set; }
+    [HideInInspector] public PlayerState state;
+
+    private Rigidbody rigidbody;
+    private BoxCollider boxCollider;
 
     private AchievementTracker achievementTracker;
-    private BoxCollider boxCollider;
-    private Rigidbody rigidbody;
-    private PhotonView photonView;
+    private RouteFollower routeFollower;
     private StatsManager stats;
 
     private bool paused = false;
     private bool move = false;
+
+    private int cameraIndex = 0;
+
+    private float rowingSpeed = 0;
+    private float playerVelocity = 0;
 
     private void Awake()
     {
         stats = GameManager.Instance.GetComponent<StatsManager>();
 
         achievementTracker = GetComponent<AchievementTracker>();
+        routeFollower = GetComponent<RouteFollower>();
         boxCollider = GetComponent<BoxCollider>();
         photonView = GetComponent<PhotonView>();
 
         leftOar.rowing = false;
         rightOar.rowing = false;
-
-        frontFacingCamera.enabled = false;
-        mainCamera.enabled = true;       
     }
 
     private void Start()
@@ -55,8 +80,7 @@ public class PlayerController : MonoBehaviour
         if (photonView.IsMine)
         {
             AssignMenuCamera();
-
-            rigidbody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
+            AssignRigidbody();
         }
         else
         {
@@ -65,39 +89,58 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        if (!photonView.IsMine) return;
+
+        achievementTracker.TrackAchievements(photonView);
+
+        if (paused)
+        {
+            if (PhotonNetwork.OfflineMode)
+            {
+                routeFollower.UpdateVelocity(0);
+            }
+        }
+        else
+        {
+            UpdateSpeed();
+            Animate();
+        }
+    }
+
     private void AssignMenuCamera()
     {
         // Retrieve player camera
-        Camera playerCamera = transform.Find("Cameras/Main Camera").GetComponent<Camera>();
+        Camera playerCamera = transform.Find("Cameras/Rear Camera").GetComponent<Camera>();
         
         // Update menu camera
         MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = playerCamera;
-
-        //mainCameraActive = true;
-
+        
         // Display HUD
         MenuManager.Instance.OpenMenu("HUD");
     }
 
+    private void AssignRigidbody()
+    {
+        // Retrieve rigidbody from scene
+        rigidbody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
+    }
+
     private void DestroyComponents()
     {
-        // Destroy cameras
+        // Store list of cameras
         Camera[] cameras = GetComponentsInChildren<Camera>();
-        foreach (Camera c in cameras)
+
+        // For each camera
+        foreach (Camera camera in cameras)
         {
-            Destroy(c.GetComponent<UniversalAdditionalCameraData>());
-            Destroy(c);
+            // Disable camera
+            camera.gameObject.SetActive(false);
         }
 
         // Destroy waypoint tracker
-        Destroy(GetComponent<WaypointProgressTracker>());
-
-        // Destroy animation
-        Destroy(GetComponent<Animation>());
-    }
-
-    private void DestroyProgressTracker()
-    {
+        Destroy(GetComponent<RouteFollower>());
     }
 
     private void UpdateAppearance()
@@ -119,7 +162,7 @@ public class PlayerController : MonoBehaviour
                     materials[i].color = Color.red;
                 }
 
-                // Destroy water mask
+                //Destroy water mask
                 else if (renderer.gameObject.name.Contains("Mask"))
                 {
                     Destroy(renderer.transform.parent.gameObject.GetComponent<SetRenderQueue>());
@@ -137,131 +180,50 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    internal void Unpause()
     {
-        if (!photonView.IsMine) return;
-
-        achievementTracker.TrackAchievements(photonView);
-
-        if (paused)
-        {
-            velocity = 0;
-        }
-        else
-        {
-            UpdateSpeed();
-            Animate();
-        }
+        throw new NotImplementedException();
     }
 
-    private int strokeState = 0;
-    private float velocity = 0;
-
-    private float prevSpeed = 0;
-    private float deltSpeed = 0;
-    private float speed = 0;
-
-    private enum StrokeStates
-    {
-        WaitingForWheelToReachMinSpeed,
-        WaitingForWheelToAccelerate,
-        Driving,
-        DwellingAfterDrive,
-        RecoveryState
-    }
-
-    private float currTime = 0;
     private void UpdateSpeed()
     {
-        //#if UNITY_EDITOR
-        //        if (move)
-        //        {
-        //            speed = (Random.Range(1.5f, 3f));
-        //        }
+        // Get speed from erg
+        rowingSpeed = stats.GetSpeed();
 
-        //        // Calculate delta speed
-        //        deltSpeed = Mathf.Abs(speed - prevSpeed);
+        // Get stroke state from erg
+        strokeState = (StrokeState) stats.GetStrokeState();
 
-        //        // If the speed hasn't changed, don't add a force
-        //        if (stats)
-        //        {
-        //            rigidbody.AddForce(transform.forward * speed * Time.fixedDeltaTime);
-        //        }
-
-        //        velocity = rigidbody.velocity.magnitude * boatSpeed;
-
-        //        prevSpeed = speed;
-
-        //        return;
-        //#endif
-
-        // Update speed - !!bring back down to end of function!!
-        //prevSpeed = speed;
-
-
+        // If the user is currently driving
+        if (strokeState == StrokeState.Driving)
+        {
+            // Apply force to the rigidbody
+            rigidbody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
+        }
 
 #if UNITY_EDITOR
-
-        // Increase time
-        currTime += Time.fixedDeltaTime;
-
-        // Simlating concpet2 update speed
-        if (currTime > 0.5f)
-        {
-            speed = (Random.Range(1.75f, 2.25f));
-            currTime = 0;
-        }
-
+        
+        // If debug 'move' button pressed
         if (move)
         {
-            // Driving
-            strokeState = 2;
+            // Apply force to the rigibody
+            rigidbody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
         }
-        else
-        {
-            // Resting
-            strokeState = 0;
-        }
-
-#else
-
-        // get speed from erg
-        speed = stats.GetSpeed();
-
-        // get stroke state from erg
-        strokeState = stats.GetStrokeState();
 
 #endif
 
-        // If driving
-        if (strokeState == (int) StrokeStates.Driving)
-        {
-            // Apply force
-            rigidbody.AddForce(transform.forward * speed * Time.fixedDeltaTime);
-        }
-
+        // Calculate velocity based on rigibody current speed
+        playerVelocity = rigidbody.velocity.magnitude * boatSpeed;
+        
         // Update velocity
-        velocity = rigidbody.velocity.magnitude * boatSpeed;
+        routeFollower.UpdateVelocity(playerVelocity);
     }
 
     private void Animate()
     {
+        // Update animation
         foreach (Animator animator in rowingAnimators)
         {
-            if (strokeState == (int) StrokeStates.Driving)
-            {
-                leftOar.rowing = true;
-                rightOar.rowing = true;
-
-                animator.SetBool("Play", true);
-            }
-            else
-            {
-                leftOar.rowing = false;
-                rightOar.rowing = false;
-
-                animator.SetBool("Play", false);
-            }
+            animator.SetInteger("State", (int) strokeState);
         }
     }
 
@@ -280,7 +242,12 @@ public class PlayerController : MonoBehaviour
         this.paused = true;
     }
 
-    public void Unpause()
+    public void UnPause()
+    {
+        this.paused = false;
+    }
+
+    public void Resume()
     {
         this.paused = false;
     }
@@ -292,22 +259,16 @@ public class PlayerController : MonoBehaviour
 
     public float GetVelocity()
     {
-        return velocity;
+        return playerVelocity;
     }
 
     public void ChangeCameraView()
     {
-        if (mainCamera.enabled == true)
+        cameraIndex = (cameraIndex < cameras.Length - 1) ? cameraIndex + 1 : 0;
+
+        for (int i = 0; i < cameras.Length; i++)
         {
-            
-            frontFacingCamera.enabled = true;
-            mainCamera.enabled = false;
-        }
-        else
-        {
-            
-            mainCamera.enabled = true;
-            frontFacingCamera.enabled = false;
+            cameras[i].gameObject.SetActive(i == cameraIndex);
         }
     }
 }

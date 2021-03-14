@@ -28,10 +28,10 @@ public class BluetoothManager : MonoBehaviour
 {
     [SerializeField] Transform DeviceListContent;
     [SerializeField] GameObject DeviceListItemPrefab;
-    [SerializeField] GameManager Launcher;
 
     private DeviceListItem DeviceListItem;
     private string DeviceAddress;
+    private string DeviceName;
 
     private float Timeout = 0f;
 
@@ -47,13 +47,13 @@ public class BluetoothManager : MonoBehaviour
         }
     }
 
-    [SerializeField] TMP_Text ErrorText;
-    private string ErrorMessage
+    [SerializeField] TMP_Text InfoText;
+    private string InfoMessage
     {
         set
         {
             BluetoothLEHardwareInterface.Log(value);
-            ErrorText.text = value;
+            InfoText.text = value;
         }
     }
 
@@ -151,29 +151,21 @@ public class BluetoothManager : MonoBehaviour
 
     public void OnConnectClick(DeviceListItem deviceListItem)
     {
+        InfoMessage = "Don't row yet...";
+
         DeviceObject device = FoundDeviceListScript.DeviceAddressList[deviceListItem.DeviceID];
 
         if (device != null)
         {
-            if (deviceListItem.Connected)
-            {
-
                 DeviceListItem = deviceListItem;
                 DeviceAddress = device.Address;
-
-                SetState(States.Disconnect, 3f);
-            }
-            else
-            {
-                DeviceListItem = deviceListItem;
-                DeviceAddress = device.Address;
+                DeviceName = device.Name;
 
                 SetState(States.Connect, 3f);
-            }
         }
         else
         {
-            ErrorMessage = "Error: Device not found";
+            InfoMessage = "Error: Device not found!";
         }
     }
 
@@ -185,7 +177,7 @@ public class BluetoothManager : MonoBehaviour
 
         }, (error) => {
 
-            ErrorMessage = "Initialize Error: " + error;
+            InfoMessage = "Initialize Error: " + error;
         });
     }
 
@@ -213,20 +205,20 @@ public class BluetoothManager : MonoBehaviour
 
     private void Connect()
     {
-        StatusMessage = "Connecting...";
+        StatusMessage = "Connecting to... \n\n" + DeviceName + ".";
 
         BluetoothLEHardwareInterface.ConnectToPeripheral(DeviceAddress, null, (address, serviceUUID) => {
 
             BluetoothLEHardwareInterface.StopScan();
 
-            StatusMessage = "Connected";
+            StatusMessage = "Connected to... \n\n" + DeviceName + ".";
 
             DeviceListItem.Connect();
 
             if (IsEqual(serviceUUID, PMDictionary.RowingServiceUUID))
             {
-                //StatusMessage = "Found Service UUID";
-                SetState(States.RequestMTU, 3f);
+                //StatusMessage = "Found Service UUID...";
+                SetState(States.RequestMTU, 5f);
             }
 
         }, null);
@@ -315,7 +307,7 @@ public class BluetoothManager : MonoBehaviour
 
         BluetoothLEHardwareInterface.DisconnectPeripheral(DeviceAddress, (disconnectAddress) => {
 
-            StatusMessage = "Disconnected";
+            StatusMessage = "Disconnected.";
 
             BluetoothLEHardwareInterface.DeInitialize(() => {
 
@@ -369,7 +361,7 @@ public class BluetoothManager : MonoBehaviour
 
     private void ResetDevices()
     {
-        StatusMessage = "Scanning...";
+        StatusMessage = "Scanning for PM5 Ergs...";
         SetState(States.Scan, 1f);
 
         ResetList();

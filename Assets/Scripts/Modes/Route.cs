@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RouteEM : MonoBehaviour
+public class Route : MonoBehaviour
 {
     [SerializeField] public string routeName;
     [SerializeField] public RouteStatus routeStatus;

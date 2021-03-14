@@ -4,6 +4,7 @@ using System.Collections;
 using UnityStandardAssets.Utility;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 using Photon.Realtime;
 using Photon.Pun;
@@ -35,6 +36,9 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] GameObject countdownPanel;
     [SerializeField] GameObject confirmationText;
 
+    [SerializeField] Transform routeListContent;
+    [SerializeField] GameObject routeListItemPrefab;
+
     private int buildIndex;
     private int singleplayerIndex = 1;
     private int multiplayerIndex = 1;
@@ -49,7 +53,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         DontDestroyOnLoad(gameObject);
         Instance = this;
-        
+
         CheckConnection();
     }
 
@@ -312,14 +316,19 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Check if player currently participating in event
             if (player.participatingInTimeTrial == false && player.participatingInRace == false)
             {
-                // Add player to race
-                GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(player);
 
-                // Reset track distance
+                MenuManager.Instance.OpenMenu("Race Choice");
+                EventOrganizer.Instance.eventType = EventOrganizer.EventType.Race;
+                EventOrganizer.Instance.eventInitiator = player;
+
+                //// Add player to race
+                //GameObject.Find("Race Manager").GetComponent<RaceManager>().AddPlayerToRace(player);
+
+                //// Reset track distance
                 player.GetComponent<WaypointProgressTracker>().progressDistance = 0;
 
-                // Open HUD
-                MenuManager.Instance.OpenMenu("HUD");
+                //// Open HUD
+                //MenuManager.Instance.OpenMenu("HUD");
             }
 
             // No need to check any more views, so return
@@ -343,14 +352,19 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Check if player currently participating in event
             if (player.participatingInTimeTrial == false && player.participatingInRace == false)
             {
-                // Add player to time trial
-                GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(player);
-                
-                // Reset track distance
-                player.GetComponent<WaypointProgressTracker>().Reset();
 
-                // Open HUD
-                MenuManager.Instance.OpenMenu("HUD");
+                OpenRouteSelectionMenu(true);
+                EventOrganizer.Instance.eventType = EventOrganizer.EventType.Trial;
+                EventOrganizer.Instance.eventInitiator = player;
+
+                //// Add player to time trial
+                //GameObject.Find("Time Trial Manager").GetComponent<TimeTrialManager>().AddPlayerToTimeTrial(player);
+
+                //// Reset track distance
+                //player.GetComponent<WaypointProgressTracker>().Reset();
+
+                //// Open HUD
+                //MenuManager.Instance.OpenMenu("HUD");
             }
 
             // No need to check any more views, so return
@@ -568,5 +582,128 @@ public class GameManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(duration);
         countdownPanel.SetActive(false);
     }
+    #endregion
+
+    #region Menu
+
+    public void GoBackToRouteSelectionMenu()
+    {       
+        EventOrganizer.Instance.ReleaseRoute();
+        EventOrganizer.Instance.ResetRaceSetup();
+        EventOrganizer.Instance.ResetTrialSetup();
+        OpenRouteSelectionMenu(true);
+    }
+
+    public void BackOutOfEventMenuToPauseMenu()
+    {
+        MenuManager.Instance.OpenMenu("Pause");
+        EventOrganizer.Instance.DisposeResources();
+    }
+
+    public void ReturnToPauseMenuFromRouteSelection()
+    {
+        if(EventOrganizer.Instance.eventType == EventOrganizer.EventType.Race)
+        {
+            MenuManager.Instance.OpenMenu("Race Choice");
+        }
+        else
+        {
+            MenuManager.Instance.OpenMenu("Pause");
+            EventOrganizer.Instance.DisposeResources();
+        }
+
+        EventOrganizer.Instance.ResetRouteSelection();
+    }
+
+    public void OpenRouteSelectionMenu(bool ShowAllAvailableRoutes)
+    {
+        if(ShowAllAvailableRoutes == true)
+        {
+            //Show all routes
+            routeMenuType = Route.RouteStatus.Available;
+        }
+        else
+        {
+            //Show routes that have an initiated race, that is waiting for other participants to join
+            routeMenuType = Route.RouteStatus.InitiatedRace;
+            EventOrganizer.Instance.eventType = EventOrganizer.EventType.JoinARace;
+        }
+        
+        UpdateRoutesList();
+        MenuManager.Instance.OpenMenu("Route Selection");
+    }
+
+    #region Routes Selection
+    public enum RouteFilter
+    {
+        ShowAllRoutes,
+        ShowLoopedRoutes,
+        ShowStraightRoutes
+    }
+    [SerializeField] private RouteFilter routeOptionChosen = RouteFilter.ShowAllRoutes;
+
+    [SerializeField] public Route.RouteStatus routeMenuType;
+
+    public void UpdateRoutesList()
+    {
+        ClearOutdatedRouteList();
+
+        if(routeOptionChosen == RouteFilter.ShowAllRoutes || routeOptionChosen == RouteFilter.ShowLoopedRoutes)
+        {
+            if (RouteManager.Instance.listOfLoopedRoutes != null)
+                SortRoutesOutForList(Route.RouteType.LoopedTrack, RouteManager.Instance.listOfLoopedRoutes);
+        }
+
+        if(routeOptionChosen == RouteFilter.ShowAllRoutes || routeOptionChosen == RouteFilter.ShowStraightRoutes)
+        {
+            if (RouteManager.Instance.listOfStraightRoutes != null)
+                SortRoutesOutForList(Route.RouteType.LinearTrack, RouteManager.Instance.listOfStraightRoutes);
+        }
+    }
+
+    //Sort through given list of routes, and add applicable routes to the list that will be displayed in route selection menu
+    private void SortRoutesOutForList(Route.RouteType routeType, Route[] listToSort)
+    {
+        foreach(Route route in listToSort)
+        {
+            if(route.routeType == routeType && route.routeStatus == routeMenuType)
+            {
+                Instantiate(routeListItemPrefab, routeListContent).GetComponent<RouteListItem>().SetUp(route);
+            }
+        }
+    }
+
+    private void ClearOutdatedRouteList()
+    {
+        foreach (Transform child in routeListContent)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    public void ToggleRoutesOption(Dropdown routeFilterDD)
+    {
+        if(routeFilterDD.value == 0)
+        {
+            routeOptionChosen = RouteFilter.ShowAllRoutes;
+        }
+        else if(routeFilterDD.value == 1)
+        {
+            routeOptionChosen = RouteFilter.ShowLoopedRoutes;
+        }
+        else if(routeFilterDD.value == 2)
+        {
+            routeOptionChosen = RouteFilter.ShowStraightRoutes;
+        }
+
+        UpdateRoutesList();
+    }
+
+    ////Update dropdown to only highlight the selected value, deselect previous values
+    //public void UpdateDropdown(Dropdown dropdown)
+    //{
+        
+    //}
+    #endregion
     #endregion
 }

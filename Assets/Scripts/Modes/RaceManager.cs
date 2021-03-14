@@ -5,77 +5,77 @@ using UnityStandardAssets.Utility;
 public class RaceManager : MonoBehaviour
 {
     PhotonView photonView;
+    public static RaceManager Instance;
 
-    void Awake()
+    private void Awake()
     {
         photonView = GetComponent<PhotonView>();
-    }
 
-    public void TakePartInARace(PlayerController player)
-    {
-        //Will initiate Menu Screen to appear where player will be prompted to select race track they wish to take part in
-        //From this interaction the following methods starting with "AddPlayerToXXX" represent the button pressed actions relevant to race selected
-    }
-
-    #region Race Initiation Button Responses
-    public void AddPlayerToHeroBeachRace()
-    {
-        // Changing this just to get it working for the release
-        // Will change back to previous implementation later
-        Race heroBeachRace = FindObjectOfType<Race>();
-        if(heroBeachRace.raceInitiated == false)
+        if (Instance)
         {
-            //BringUpRaceSetupMenu
-            //SetAllRaceParametersBased on the feedback given by player
-            heroBeachRace.raceInitiated = true;
-            //heroBeachRace.numberOfLaps = ?;
-            //heroBeachRace.raceCapacity = ?;
-            //Add player to participants list
+            Destroy(gameObject);
+            return;
         }
-        else
-        {
-            if(heroBeachRace.players.Count < heroBeachRace.raceCapacity)
-            {
-                //Add player to the partcipants list
-            }
-        }
-    }
-    #endregion Race Initiation Button Responses
 
-    //HardCoded Method to reach simple solution for Base Version of the 
-    //waypoint/ race/ time trial mechanics until the menu and more race routes are implemented 
-    //IMPORTANT: Everything being set in this method will need to be set for every player joining game, it is essential 
-    public void AddPlayerToRace(PlayerController player)
+        DontDestroyOnLoad(gameObject);
+        Instance = this;
+    }
+
+    //Create a race and add the player who created it, into the race
+    public void CreateRace(PlayerController player, Route chosenRoute, float secondsForWait, int numberOfLaps, int raceCapacity)
     {
-        // Retrieve race
-        Race race = FindObjectOfType<Race>();
+        chosenRoute.GetComponent<Race>().InitiateRace(secondsForWait, numberOfLaps, raceCapacity);
+        AddPlayerToRace(player, chosenRoute);
+    }
+
+    //Add a player into an existing race which has not began yet
+    public void AddPlayerToRace(PlayerController player, Route chosenRoute)
+    {
+        Race race = chosenRoute.GetComponent<Race>();
 
         // Retrieve waypoint progress tracker
         WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
 
         // Setup wpt values
         wpt.SetCircuit(race.gameObject.GetComponent<WaypointCircuit>());
-        wpt.UpdateLastNodeIndex(race.route.Length - 1);
+        wpt.UpdateLastNodeIndex(race.track.Length - 1);
         wpt.SetRace(race);
+        wpt.routeType = chosenRoute.routeType;
 
-        PhotonView playerView = player.GetComponent<PhotonView>();
-        photonView.RPC("RPC_AddPlayerToRace", RpcTarget.All, playerView.ViewID);
+        chosenRoute.GetComponent<Race>().AddParticipantIntoRace(player);
     }
 
-    [PunRPC]
-    void RPC_AddPlayerToRace(int playerID)
-    {
-        // Retrieve race
-        Race race = FindObjectOfType<Race>();
+    //public void AddPlayerToRace(PlayerController player)
+    //{
+    //    // Retrieve race
+    //    Race race = FindObjectOfType<Race>();
 
-        // Retrieve player view
-        PhotonView playerView = PhotonView.Find(playerID);
+    //    // Retrieve waypoint progress tracker
+    //    WaypointProgressTracker wpt = player.GetComponent<WaypointProgressTracker>();
 
-        // Retrieve player controller
-        PlayerController player = playerView.gameObject.GetComponent<PlayerController>();
-        
-        // Setup race values
-        race.InitiateRace(1, 2);
-        race.AddParticipantIntoRace(player);
-    }
+    //    // Setup wpt values
+    //    wpt.SetCircuit(race.gameObject.GetComponent<WaypointCircuit>());
+    //    wpt.UpdateLastNodeIndex(race.track.Length - 1);
+    //    wpt.SetRace(race);
+
+    //    PhotonView playerView = player.GetComponent<PhotonView>();
+    //    photonView.RPC("RPC_AddPlayerToRace", RpcTarget.All, playerView.ViewID);
+    //}
+
+    //[PunRPC]
+    //void RPC_AddPlayerToRace(int playerID)
+    //{
+    //    // Retrieve race
+    //    Race race = FindObjectOfType<Race>();
+
+    //    // Retrieve player view
+    //    PhotonView playerView = PhotonView.Find(playerID);
+
+    //    // Retrieve player controller
+    //    PlayerController player = playerView.gameObject.GetComponent<PlayerController>();
+
+    //    // Setup race values
+    //    race.InitiateRace(1, 2);
+    //    race.AddParticipantIntoRace(player);
+    //}
 }

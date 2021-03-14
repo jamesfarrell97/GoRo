@@ -18,6 +18,7 @@ namespace UnityStandardAssets.Utility
         [HideInInspector] public TimeTrial currentTimeTrial;
 
         [HideInInspector] public float timeOfCompletion;
+        [HideInInspector] public Route.RouteType routeType; //Here simply to dictate type of route
 
         private PlayerController player;
         private TimeSpan eventDuration;
@@ -33,6 +34,8 @@ namespace UnityStandardAssets.Utility
 
         [SerializeField] public WaypointCircuit[] Routes;
 
+        [SerializeField] public int straightRouteTargetPoint;
+
         [SerializeField] private float lookAheadForTargetOffset = 5f;
         // The offset ahead along the route that the we will aim for
 
@@ -45,7 +48,7 @@ namespace UnityStandardAssets.Utility
         [SerializeField] private float lookAheadForSpeedFactor = .2f;
         // A multiplier adding distance ahead along the route for speed adjustments
 
-        [SerializeField] private ProgressStyle progressStyle = ProgressStyle.SmoothAlongRoute;
+        [SerializeField] public ProgressStyle progressStyle = ProgressStyle.SmoothAlongRoute;
         // whether to update the position smoothly along the route (good for curved paths) or just when we reach each waypoint.
 
         [SerializeField] private float pointToPointThreshold = 4;
@@ -119,7 +122,7 @@ namespace UnityStandardAssets.Utility
                     UpdatePosition();
                 }
 
-                if (halfPointOftrackReached == false)
+                if (routeType == Route.RouteType.LoopedTrack && halfPointOftrackReached == false)
                 {
                     if (CheckIfHalfPointOfTrackReached() == true)
                         halfPointOftrackReached = true;
@@ -153,6 +156,7 @@ namespace UnityStandardAssets.Utility
         {
             progressDistance = 0;
             progressNum = 0;
+            //straightRouteTargetPoint = 1;
 
             if (progressStyle == ProgressStyle.PointToPoint)
             {
@@ -169,6 +173,7 @@ namespace UnityStandardAssets.Utility
         public void UpdateLastNodeIndex(int lastNodeIndex)
         {
             lastIndex = lastNodeIndex;
+            straightRouteTargetPoint = lastNodeIndex;
         }
 
         public void SetRace(Race race)
@@ -189,10 +194,12 @@ namespace UnityStandardAssets.Utility
                 Circuit.GetRoutePoint(progressDistance + lookAheadForTargetOffset + lookAheadForTargetFactor * speed)
                         .position;
 
+            
             target.rotation =
                 Quaternion.LookRotation(
-                    Circuit.GetRoutePoint(progressDistance + lookAheadForSpeedOffset + lookAheadForSpeedFactor * speed)
+                    Circuit.GetRoutePoint(progressDistance + lookAheadForSpeedOffset + lookAheadForSpeedFactor * 0.2f)
                             .direction);
+            
 
             // get our current progress along the route
             progressPoint = Circuit.GetRoutePoint(progressDistance);
@@ -213,7 +220,7 @@ namespace UnityStandardAssets.Utility
             int middleIndex = lastIndex / 2;
             if (target.GetComponent<PlayerController>().participatingInRace == true)
             {
-                distance = Vector3.Distance(transform.position, currentRace.route[middleIndex].position);
+                distance = Vector3.Distance(transform.position, currentRace.track[middleIndex].position);
 
                 if (distance < pointToPointThreshold)
                 {
@@ -222,7 +229,7 @@ namespace UnityStandardAssets.Utility
             }
             else if (target.GetComponent<PlayerController>().participatingInTimeTrial == true)
             {
-                distance = Vector3.Distance(transform.position, currentTimeTrial.route[middleIndex].position);
+                distance = Vector3.Distance(transform.position, currentTimeTrial.track[middleIndex].position);
 
                 if (distance < pointToPointThreshold)   
                 {
@@ -235,17 +242,49 @@ namespace UnityStandardAssets.Utility
 
         private void CheckIfLapComplete()
         {
+            if(routeType == Route.RouteType.LinearTrack)
+            {
+                CheckIfStraightRouteLapComplete();
+            }
+            else if(routeType == Route.RouteType.LoopedTrack)
+            {
+                CheckLoopedRouteLapComplete();
+            }
+        }
+
+        private void CheckIfStraightRouteLapComplete()
+        {
+            if (target.GetComponent<PlayerController>().participatingInRace == false && target.GetComponent<PlayerController>().participatingInRace == false) return;
+
+            float distance;
+            if (target.GetComponent<PlayerController>().participatingInRace == true)
+            {
+                distance = Vector3.Distance(transform.position, currentRace.track[straightRouteTargetPoint].position);
+            }
+            else
+            {
+                distance = Vector3.Distance(transform.position, currentTimeTrial.track[straightRouteTargetPoint].position);
+            }
+
+            if (distance < pointToPointThreshold)
+            {               
+                UpdateEventLapCount();                
+            }
+        }
+
+        private void CheckLoopedRouteLapComplete()
+        {
             // Precaution to avoid this firing off instantly on start of race
             if (halfPointOftrackReached == true)
             {
                 float distance;
                 if (target.GetComponent<PlayerController>().participatingInRace == true)
                 {
-                    distance = Vector3.Distance(transform.position, currentRace.route[lastIndex].position);
+                    distance = Vector3.Distance(transform.position, currentRace.track[lastIndex].position);
                 }
                 else
                 {
-                    distance = Vector3.Distance(transform.position, currentTimeTrial.route[lastIndex].position);
+                    distance = Vector3.Distance(transform.position, currentTimeTrial.track[lastIndex].position);
                 }
 
                 if (distance < pointToPointThreshold)
@@ -260,7 +299,9 @@ namespace UnityStandardAssets.Utility
         {
             if (currentLap < numberOfLaps)
             {
+                UpdateStraightRouteTarget();
                 currentLap++;
+                RotatePlayerToRepeatLinearTrack();
             }
             else
             {
@@ -268,6 +309,26 @@ namespace UnityStandardAssets.Utility
                 CompleteEvent();
                 ResetEventData();
             }
+        }
+
+        private void UpdateStraightRouteTarget()
+        {
+            if(straightRouteTargetPoint == 0)
+            {
+                straightRouteTargetPoint = 1;
+            }
+            else
+            {
+                straightRouteTargetPoint = 0;
+            }
+        }
+
+        //Rotate the player 180 degrees instantly to allow them to travel back the other way of the linear track
+        private void RotatePlayerToRepeatLinearTrack()
+        {
+            target.transform.RotateAround(target.transform.position, target.transform.up, 180f);
+            //player.ChangeCameraView();
+            //target.transform.Rotate(0, Time.deltaTime*30,0,Space.Self);
         }
 
         private void CompleteEvent()
@@ -308,6 +369,7 @@ namespace UnityStandardAssets.Utility
             timeOfCompletion = 0;
             numberOfLaps = 0;
             currentLap = 1;
+            straightRouteTargetPoint = 1;
         }
     }
 }

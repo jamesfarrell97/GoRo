@@ -9,7 +9,7 @@ using TMPro;
 public class Race : MonoBehaviour
 {
     #region Public Variables   
-    [HideInInspector] public Transform[] route;
+    [HideInInspector] public Transform[] track;
     [HideInInspector] public List<PlayerController> players;
     [HideInInspector] public Dictionary<int, PlayerController> participantsCompletedRace;
 
@@ -21,6 +21,7 @@ public class Race : MonoBehaviour
     [HideInInspector] public float timeRaceInitiated;
     [HideInInspector] public float timeRaceStarted;
 
+    [SerializeField] public Route route;
     [SerializeField] public TimeSpan raceDuration;
     [SerializeField] public int numberOfLaps;
     [SerializeField] public int raceCapacity;
@@ -41,10 +42,9 @@ public class Race : MonoBehaviour
     
     private void Awake()
     {
+        track = route.GetComponent<WaypointCircuit>().Waypoints;
         photonView = GetComponent<PhotonView>();
         participantsCompletedRace = new Dictionary<int, PlayerController>();
-
-        route = FindObjectOfType<Race>().GetComponentsInChildren<Transform>();
     }
 
     void Update()
@@ -89,6 +89,8 @@ public class Race : MonoBehaviour
     {
         foreach(PlayerController participant in players)
         {
+            route.routeStatus = Route.RouteStatus.Busy;
+
             // Pause player movement
             participant.Pause();
 
@@ -117,13 +119,15 @@ public class Race : MonoBehaviour
         }
     }
 
-    public void InitiateRace(int numberOfLaps, int raceCapacity)
+    public void InitiateRace(float secondsForWait, int chosenNumberOfLaps, int chosenRaceCapacity)
     {
+        route.routeStatus = Route.RouteStatus.InitiatedRace;
         raceInitiated = true;
         timeRaceInitiated = Time.timeSinceLevelLoad;
 
-        this.numberOfLaps = numberOfLaps;
-        this.raceCapacity = raceCapacity;
+        waitTimeForOtherPlayersToJoin = secondsForWait;
+        numberOfLaps = chosenNumberOfLaps;
+        raceCapacity = chosenRaceCapacity;
     }
 
     private void UpdateStopWatch()
@@ -285,6 +289,7 @@ public class Race : MonoBehaviour
             GameManager.Instance.StartJustRow();
         }
 
+        route.routeStatus = Route.RouteStatus.Available;
         players.Clear();
         participantsCompletedRace.Clear();
         raceInitiated = false;

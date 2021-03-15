@@ -366,8 +366,11 @@ public class Race : MonoBehaviour
         Reset();
     }
 
-    public void FormRace(PlayerController player)
+    public void FormRace(PlayerController player, float secondsForWait, int numberOfLaps, int raceCapacity)
     {
+        // Setup race
+        SetupRace(secondsForWait, numberOfLaps, raceCapacity);
+
         // Add player to race
         AddPlayerToRace(player);
 
@@ -388,6 +391,13 @@ public class Race : MonoBehaviour
 
         // Set state
         SetState(RaceState.Forming);
+    }
+
+    private void SetupRace(float secondsForWait, int numberOfLaps, int raceCapacity)
+    {
+        this.waitTimeForOtherPlayersToJoin = secondsForWait;
+        this.numberOfLaps = numberOfLaps;
+        this.raceCapacity = raceCapacity;
     }
 
     public void SendRaceNotification()

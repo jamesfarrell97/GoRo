@@ -171,10 +171,10 @@ namespace UnityStandardAssets.Utility
         public void StartRace()
         {
             ExtractAllValues(true);
-            RaceManager.Instance.CreateRace(eventInitiator, route, waitingTime, lapAmount, participantsAmount);
+            RaceManager.Instance.CreateRace(eventInitiator, route.gameObject.name, waitingTime, lapAmount, participantsAmount);
             MenuManager.Instance.OpenMenu("HUD");
 
-            DisposeResources();
+            //DisposeResources();
             ResetRaceSetup();
         }
 
@@ -184,8 +184,8 @@ namespace UnityStandardAssets.Utility
             TrialManager.Instance.CreateTrialAndAddPlayer(eventInitiator, route, lapAmount);
             MenuManager.Instance.OpenMenu("HUD");
 
-            DisposeResources();
-            ResetRaceSetup();
+            //DisposeResources();
+            ResetTrialSetup();
         }
 
         //Set all values within the setup menu back to default after this window is closed

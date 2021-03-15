@@ -191,7 +191,7 @@ public class PlayerController : MonoBehaviour
         rowingSpeed = stats.GetSpeed();
 
         // Get stroke state from erg
-        strokeState = (StrokeState) stats.GetStrokeState();
+        strokeState = (StrokeState)stats.GetStrokeState();
 
         // If the user is currently driving
         if (strokeState == StrokeState.Driving)
@@ -201,7 +201,7 @@ public class PlayerController : MonoBehaviour
         }
 
 #if UNITY_EDITOR
-        
+
         // If debug 'move' button pressed
         if (move)
         {
@@ -213,7 +213,7 @@ public class PlayerController : MonoBehaviour
 
         // Calculate velocity based on rigibody current speed
         playerVelocity = rigidbody.velocity.magnitude * boatSpeed;
-        
+
         // Update velocity
         routeFollower.UpdateVelocity(playerVelocity);
     }

@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 using UnityEngine.SceneManagement;
 using System.IO;
@@ -13,6 +10,9 @@ using System.IO;
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     public static RoomManager Instance;
+
+    // EXTRACT INTO APPDATA FILE
+    private const int gameIndex = 1;
 
     private void Awake()
     {
@@ -40,9 +40,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
-        if (scene.buildIndex == 1)
+        if (scene.buildIndex == gameIndex)
         {
-            PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player", "Player Manager"), Vector3.zero, Quaternion.identity);
+            PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Managers", "Player Manager"), Vector3.zero, Quaternion.identity);
 
             FindObjectOfType<AudioManager>().Stop("Theme");
             FindObjectOfType<AudioManager>().Play("BackgroundLoop");

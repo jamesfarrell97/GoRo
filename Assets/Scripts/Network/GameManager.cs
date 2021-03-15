@@ -15,6 +15,8 @@ using TMPro;
 //
 
 using static PlayerController;
+using System.IO;
+
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance;
@@ -46,10 +48,9 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] GameObject lapPanel;
     [SerializeField] GameObject countdownPanel;
     [SerializeField] GameObject confirmationText;
-
-    private int buildIndex;
-    private int singleplayerIndex = 1;
-    private int multiplayerIndex = 1;
+    
+    private int menuIndex = 0;
+    private int gameIndex = 1;
 
     private string nickname;
 
@@ -66,7 +67,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         
         CheckConnection();
     }
-
+    
     private void Start()
     {
         UpdateState();
@@ -107,7 +108,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void Singleplayer()
     {
         PhotonNetwork.OfflineMode = true;
-        buildIndex = singleplayerIndex;
 
         CreateRoom();
         StartGame();
@@ -125,7 +125,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.OfflineMode = false;
-        buildIndex = multiplayerIndex;
 
         Debug.Log("Connected to Server.");
         MenuManager.Instance.OpenMenu("Loading");
@@ -200,7 +199,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        PhotonNetwork.LoadLevel(buildIndex);
+        PhotonNetwork.LoadLevel(gameIndex);
     }
 
     public void UpdateName()
@@ -333,14 +332,13 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void LeaveRoom()
     {
+        PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
         PhotonNetwork.LeaveRoom();
-        MenuManager.Instance.OpenMenu("Loading");
     }
 
     public override void OnLeftRoom()
     {
-        // TODO: Uncomment Later
-        // MenuManager.Instance.OpenMenu("Main");
+        PhotonNetwork.LoadLevel(menuIndex);
     }
 
     public void OpenMainMenu()
@@ -508,11 +506,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         if (confirmPressed == true)
         {
-            if (waitingToConfirmLeaveRoom == true)
+            if (waitingToConfirmLeaveRoom)
             {
                 Instance.LeaveRoom();
             }
-            else if (waitingToConfirmExitGame == true)
+            else if (waitingToConfirmExitGame)
             {
                 Application.Quit();
             }

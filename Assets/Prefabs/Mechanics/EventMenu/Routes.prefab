@@ -284,6 +284,7 @@ GameObject:
   - component: {fileID: 4052002059547873617}
   - component: {fileID: 4052002059547873619}
   - component: {fileID: 4052002059547873616}
+  - component: {fileID: 5474176532424961459}
   m_Layer: 0
   m_Name: Heaven Beach Route
   m_TagString: Untagged
@@ -387,6 +388,28 @@ MonoBehaviour:
   resolveTimeoutDuration: 0
   trialGhost: {fileID: 0}
   track: []
+--- !u!114 &5474176532424961459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4052002059547873620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents: []
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4052002059573579240
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,6 +452,7 @@ GameObject:
   - component: {fileID: 1667713730692440167}
   - component: {fileID: 4052002059630144557}
   - component: {fileID: 4052002059630144556}
+  - component: {fileID: 5664902468857804952}
   m_Layer: 0
   m_Name: Ocean Gate Route
   m_TagString: Untagged
@@ -518,6 +542,28 @@ MonoBehaviour:
   resolveTimeoutDuration: 0
   trialGhost: {fileID: 0}
   track: []
+--- !u!114 &5664902468857804952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4052002059630144593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents: []
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4052002059691615394
 GameObject:
   m_ObjectHideFlags: 0
@@ -710,6 +756,7 @@ GameObject:
   - component: {fileID: 4052002060072686073}
   - component: {fileID: 4052002060072686074}
   - component: {fileID: 4052002060072686075}
+  - component: {fileID: 3334793568633011179}
   m_Layer: 0
   m_Name: Cliff Fissure Route
   m_TagString: Untagged
@@ -809,6 +856,28 @@ MonoBehaviour:
   resolveTimeoutDuration: 0
   trialGhost: {fileID: 0}
   track: []
+--- !u!114 &3334793568633011179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4052002060072686079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents: []
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4052002060118316325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1061,6 +1130,7 @@ GameObject:
   - component: {fileID: 4052002060654381586}
   - component: {fileID: 4052002060654381587}
   - component: {fileID: 4052002060654381584}
+  - component: {fileID: 1020357912515439440}
   m_Layer: 0
   m_Name: Heaven Overpass Route
   m_TagString: Untagged
@@ -1150,6 +1220,28 @@ MonoBehaviour:
   resolveTimeoutDuration: 0
   trialGhost: {fileID: 0}
   track: []
+--- !u!114 &1020357912515439440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4052002060654381591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents: []
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4052002060828637739
 GameObject:
   m_ObjectHideFlags: 0
@@ -1317,6 +1409,7 @@ GameObject:
   - component: {fileID: 4052002061198167921}
   - component: {fileID: 4052002061198167923}
   - component: {fileID: 4052002061198167920}
+  - component: {fileID: 5164797501746879685}
   m_Layer: 0
   m_Name: Crescent Route
   m_TagString: Untagged
@@ -1414,3 +1507,25 @@ MonoBehaviour:
   resolveTimeoutDuration: 0
   trialGhost: {fileID: 0}
   track: []
+--- !u!114 &5164797501746879685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4052002061198167927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents: []
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0

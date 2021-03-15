@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityStandardAssets.Utility;
 
-public class TimeTrialManager : MonoBehaviour
+public class TrialManager : MonoBehaviour
 {
-    public static TimeTrialManager Instance;
+    public static TrialManager Instance;
 
     private void Awake()
     {

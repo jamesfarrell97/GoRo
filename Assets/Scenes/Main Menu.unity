@@ -1933,7 +1933,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 167904703}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35a2d48235c21bd4f942a46d7fc7d238, type: 3}
+  m_Script: {fileID: 11500000, guid: 9e0a097ab74815d418e62762e8580913, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &167904706
@@ -32675,8 +32675,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3025706926771369198}
-  - component: {fileID: 3025706926771369185}
   - component: {fileID: 1389962859143698213}
+  - component: {fileID: 3025706926771369185}
   m_Layer: 0
   m_Name: Audio Manager
   m_TagString: Untagged

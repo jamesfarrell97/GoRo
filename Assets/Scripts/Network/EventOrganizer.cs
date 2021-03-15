@@ -181,7 +181,7 @@ namespace UnityStandardAssets.Utility
         public void StartTrial()
         {
             ExtractAllValues(false);
-            TimeTrialManager.Instance.CreateTrialAndAddPlayer(eventInitiator, route, lapAmount);
+            TrialManager.Instance.CreateTrialAndAddPlayer(eventInitiator, route, lapAmount);
             MenuManager.Instance.OpenMenu("HUD");
 
             DisposeResources();

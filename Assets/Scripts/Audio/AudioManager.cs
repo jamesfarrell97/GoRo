@@ -67,4 +67,12 @@ public class AudioManager : MonoBehaviour
 
         sound.source.Stop();
     }
+    
+    public void ToggleAudio(bool mute)
+    {
+        foreach (Sound sound in sounds)
+        {
+            sound.source.mute = mute;
+        }
+    }
 }

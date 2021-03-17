@@ -796,6 +796,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         notificationTextPanel.SetActive(true);
 
         timePanel.SetActive(false);
+        countdownPanel.SetActive(false);
         lapPanel.SetActive(false);
 
         notificationTextPanel.GetComponentInChildren<TMP_Text>().text = text;

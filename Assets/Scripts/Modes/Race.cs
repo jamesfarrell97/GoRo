@@ -173,11 +173,14 @@ public class Race : MonoBehaviour
             if (positions.ContainsKey(player)) continue;
             
             // Display race ending message
-            StartCoroutine(GameManager.Instance.DisplayCountdown("Race ending!", 3));
+            StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("Race ending!", 3));
         }
 
         // Wait for other players to finish race
         yield return new WaitForSeconds(timeout);
+
+        // Don't resolve if already over
+        if (state.Equals(RaceState.Resolving) || state.Equals(RaceState.Inactive)) yield return new WaitForSeconds(0);
 
         // Resolve race
         SetState(RaceState.Resolving);
@@ -472,6 +475,8 @@ public class Race : MonoBehaviour
     {
         foreach (PlayerController player in players)
         {
+            if (player == null) RemovePlayerFromRace(player);
+
             PhotonView playerView = player.GetComponent<PhotonView>();
 
             if (!playerView.IsMine) continue;

@@ -249,12 +249,12 @@ public class GameManager : MonoBehaviourPunCallbacks
             MenuManager.Instance.OpenMenu("Multiplayer");
         }
     }
-
+    
     public void CreateRoom()
     {
         if (string.IsNullOrEmpty(roomNameInputField.text))
         {
-            PhotonNetwork.CreateRoom("Default");
+            PhotonNetwork.CreateRoom("Room " + UnityEngine.Random.Range(0, 1000));
             MenuManager.Instance.OpenMenu("Loading");
         }
         else
@@ -267,6 +267,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         errorText.text = "A room with that name already exists!";
+
         PhotonNetwork.Disconnect();
         PhotonNetwork.OfflineMode = true;
         MenuManager.Instance.OpenMenu("Error");

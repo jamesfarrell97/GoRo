@@ -1,6 +1,8 @@
 ﻿using UnityStandardAssets.Utility;
 using UnityEngine;
 using Photon.Pun;
+using TMPro;
+using System;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -35,6 +37,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Animator[] rowingAnimators;
     [SerializeField] private Material otherPlayerMaterial;
+
     [SerializeField] private Oar leftOar;
     [SerializeField] private Oar rightOar;
 
@@ -46,7 +49,7 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public PhotonView photonView { get; private set; }
     [HideInInspector] public PlayerState state;
 
-    private Rigidbody rigidbody;
+    private Rigidbody rigidBody;
     private BoxCollider boxCollider;
 
     private AchievementTracker achievementTracker;
@@ -67,7 +70,6 @@ public class PlayerController : MonoBehaviour
 
         achievementTracker = GetComponent<AchievementTracker>();
         routeFollower = GetComponent<RouteFollower>();
-        boxCollider = GetComponent<BoxCollider>();
         photonView = GetComponent<PhotonView>();
 
         leftOar.rowing = false;
@@ -83,7 +85,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            DestroyComponents();
+            DisableCameras();
+            DestroyWaypointTracker();
             UpdateAppearance();
         }
     }
@@ -122,23 +125,21 @@ public class PlayerController : MonoBehaviour
 
     private void AssignRigidbody()
     {
-        // Retrieve rigidbody from scene
-        rigidbody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
+        rigidBody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
     }
 
-    private void DestroyComponents()
+    private void DisableCameras()
     {
-        // Store list of cameras
         Camera[] cameras = GetComponentsInChildren<Camera>();
 
-        // For each camera
         foreach (Camera camera in cameras)
         {
-            // Disable camera
             camera.gameObject.SetActive(false);
         }
+    }
 
-        // Destroy waypoint tracker
+    private void DestroyWaypointTracker()
+    {
         Destroy(GetComponent<RouteFollower>());
     }
 
@@ -178,7 +179,7 @@ public class PlayerController : MonoBehaviour
             renderer.materials = materials;
         }
     }
-    
+
     private void UpdateSpeed()
     {
         // Get speed from erg
@@ -191,7 +192,7 @@ public class PlayerController : MonoBehaviour
         if (strokeState == StrokeState.Driving)
         {
             // Apply force to the rigidbody
-            rigidbody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
+            rigidBody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
         }
 
 #if UNITY_EDITOR
@@ -200,13 +201,13 @@ public class PlayerController : MonoBehaviour
         if (move)
         {
             // Apply force to the rigibody
-            rigidbody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
+            rigidBody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
         }
 
 #endif
 
         // Calculate velocity based on rigibody current speed
-        playerVelocity = rigidbody.velocity.magnitude * boatSpeed;
+        playerVelocity = rigidBody.velocity.magnitude * boatSpeed;
         
         // Update velocity
         routeFollower.UpdateVelocity(playerVelocity);
@@ -214,7 +215,6 @@ public class PlayerController : MonoBehaviour
 
     private void Animate()
     {
-        // Update animation
         foreach (Animator animator in rowingAnimators)
         {
             animator.SetInteger("State", (int) strokeState);

@@ -64,6 +64,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackedObject: {fileID: 0}
   pivotPoint: {fileID: 0}
+  rowing: 0
 --- !u!65 &1126582107035226587
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -154,6 +155,31 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 9cad11d33c3d10748bbfedb1ad79915e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: 08fd47390e815bc418af8bb3d6d28a72, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 9cad11d33c3d10748bbfedb1ad79915e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[4]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1b5a0f79f66e1534b8b57dd74ba989dc, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 9cad11d33c3d10748bbfedb1ad79915e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 16fc227163c1dbd4a9b3182ca582262f, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 9cad11d33c3d10748bbfedb1ad79915e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[3]
+      value: 
+      objectReference: {fileID: 2100000, guid: 16fc227163c1dbd4a9b3182ca582262f, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 9cad11d33c3d10748bbfedb1ad79915e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 08fd47390e815bc418af8bb3d6d28a72, type: 2}
     - target: {fileID: 919132149155446097, guid: 9cad11d33c3d10748bbfedb1ad79915e,
         type: 3}
       propertyPath: m_Name

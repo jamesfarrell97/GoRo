@@ -8,6 +8,8 @@ using Photon.Pun;
 using TMPro;
 
 using static PlayerController;
+using static EventNotification;
+
 public class Race : MonoBehaviour
 {
     public enum RaceState
@@ -362,7 +364,7 @@ public class Race : MonoBehaviour
             if (players.Contains(player)) continue;
 
             // Send race notification
-            StartCoroutine(GameManager.Instance.DisplayCountdown("Race Starting", 3));
+            StartCoroutine(GameManager.Instance.SendEventNotification(EventCategory.Race, "Join Race", "Race Track", numberOfLaps.ToString(), players.Count.ToString(), 15));
         }
     }
 

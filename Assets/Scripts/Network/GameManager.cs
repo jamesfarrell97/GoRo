@@ -189,7 +189,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        if (PhotonNetwork.NickName == null)
+        if (playerNameText.text.Length.Equals(0))
         {
             AssignDefaultNickname();
         }

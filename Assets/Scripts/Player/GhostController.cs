@@ -58,27 +58,36 @@ public class GhostController : MonoBehaviour
         
         // Update velocity
         routeFollower.UpdateVelocity(speedSamples[sampleIndex]);
-
-        // Animate
-        Animate();
-    }
-
-    private void Animate()
-    {
-        //foreach (Animator animator in animators)
-        //{
-        //    animator.SetBool("Paused", paused);
-        //}
     }
 
     public void Pause()
     {
         this.paused = true;
+
+        PauseAnimations();
     }
 
     public void Resume()
     {
         this.paused = false;
+
+        PlayAnimations();
+    }
+
+    public void PlayAnimations()
+    {
+        foreach (Animator animator in animators)
+        {
+            animator.SetInteger("State", 1);
+        }
+    }
+
+    public void PauseAnimations()
+    {
+        foreach (Animator animator in animators)
+        {
+            animator.SetInteger("State", 0);
+        }
     }
 
     public bool Paused()

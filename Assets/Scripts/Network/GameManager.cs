@@ -15,11 +15,15 @@ using TMPro;
 //
 
 using static PlayerController;
-using System.IO;
+using System;
+using static EventNotification;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance;
+
+    private const int MENU_INDEX = 0;
+    private const int GAME_INDEX = 1;
 
     public enum GameState
     {
@@ -28,11 +32,13 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     public static GameState State;
-
+    
     [SerializeField] TMP_Text errorText;
     [SerializeField] TMP_Text roomNameText;
+    [SerializeField] TMP_Text playerNameText;
 
     [SerializeField] GameObject startGameButton;
+    [SerializeField] GameObject muteLine;
 
     [SerializeField] TMP_InputField roomNameInputField;
     [SerializeField] TMP_InputField playerNameInputField;
@@ -43,16 +49,22 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] Transform playerListContent;
     [SerializeField] GameObject playerListItemPrefab;
 
+    [SerializeField] GameObject eventPanel;
     [SerializeField] GameObject notificationTextPanel;
+    [SerializeField] GameObject countdownPanel;
     [SerializeField] GameObject timePanel;
     [SerializeField] GameObject lapPanel;
-    [SerializeField] GameObject countdownPanel;
     [SerializeField] GameObject confirmationText;
-    
-    private int menuIndex = 0;
-    private int gameIndex = 1;
 
-    private string nickname;
+    [SerializeField] GameObject startRaceButton;
+    [SerializeField] GameObject startTrialButton;
+    [SerializeField] GameObject exitEventButton;
+    [SerializeField] GameObject leaveRoomButton;
+
+    [SerializeField] GameObject[] Containers;
+
+    [SerializeField] GameObject audioManager;
+    [SerializeField] GameObject roomManager;
 
     private void Awake()
     {
@@ -65,14 +77,34 @@ public class GameManager : MonoBehaviourPunCallbacks
         DontDestroyOnLoad(gameObject);
         Instance = this;
         
+        InstantiateManagers();
         CheckConnection();
     }
-    
+
+    private void InstantiateManagers()
+    {
+        Instantiate(roomManager);
+        Instantiate(audioManager);
+    }
+
     private void Start()
     {
         UpdateState();
         SetSleepTimeout();
         ShowConnectionMenu();
+        LoadNicknameFromFile();
+    }
+
+    private void LoadNicknameFromFile()
+    {
+        string[] playerSettings = HelperFunctions.ReadArrayFromFile("player_settings", '\n');
+
+        if (playerSettings != null)
+        {
+            PhotonNetwork.NickName = playerSettings[0];
+
+            playerNameText.text = PhotonNetwork.NickName;
+        }
     }
 
     private void FixedUpdate()
@@ -157,7 +189,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        if (nickname == null)
+        if (PhotonNetwork.NickName == null)
         {
             AssignDefaultNickname();
         }
@@ -168,7 +200,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void AssignDefaultNickname()
     {
-        PhotonNetwork.NickName = "Player " + Random.Range(0, 1000);
+        PhotonNetwork.NickName = "Player " + UnityEngine.Random.Range(0, 1000);
+        playerNameText.text = PhotonNetwork.NickName;
     }
 
     public override void OnMasterClientSwitched(Player newMasterClient)
@@ -199,7 +232,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        PhotonNetwork.LoadLevel(gameIndex);
+        PhotonNetwork.LoadLevel(GAME_INDEX);
     }
 
     public void UpdateName()
@@ -210,9 +243,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            nickname = playerNameInputField.text;
-
-            PhotonNetwork.NickName = nickname;
+            PhotonNetwork.NickName = playerNameInputField.text;
+            playerNameText.text = PhotonNetwork.NickName;
+            HelperFunctions.WriteDatatoFile(PhotonNetwork.NickName, 0, '\n', "player_settings");
             MenuManager.Instance.OpenMenu("Multiplayer");
         }
     }
@@ -333,12 +366,17 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void LeaveRoom()
     {
         PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
+        MenuManager.Instance.OpenMenu("Main");
+
+        FindObjectOfType<AudioManager>().Stop("BackgroundLoop");
+        FindObjectOfType<AudioManager>().Play("Theme");
+
         PhotonNetwork.LeaveRoom();
     }
 
     public override void OnLeftRoom()
     {
-        PhotonNetwork.LoadLevel(menuIndex);
+        PhotonNetwork.LoadLevel(MENU_INDEX);
     }
 
     public void OpenMainMenu()
@@ -353,7 +391,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     #region Game Modes
-    public void StartRace()
+    public void StartRace(string route)
     {
         // Retrieve all players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
@@ -370,13 +408,16 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
             {
                 // Add player to race
-                GameObject.Find("Race Manager").GetComponent<RaceManager>().JoinRace(player, "Race Track");
+                GameObject.Find("Race Manager").GetComponent<RaceManager>().JoinRace(player, route);
 
                 // Update player state
                 player.state = PlayerState.ParticipatingInRace;
 
                 // Reset track distance
                 player.GetComponent<RouteFollower>().progressAlongRoute = 0;
+
+                // Update menu buttons
+                UpdateMenuButtons(false, true, false);
 
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
@@ -387,7 +428,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public void StartTimeTrial()
+    public void StartTrial(string route)
     {
         // Retrieve all players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
@@ -404,13 +445,16 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
             {
                 // Add player to time trial
-                GameObject.Find("Time Trial Manager").GetComponent<TrialManager>().JoinTrial(player, "Race Track");
+                GameObject.Find("Time Trial Manager").GetComponent<TrialManager>().JoinTrial(player, route);
 
                 // Update player state
                 player.state = PlayerState.ParticipatingInTrial;
 
                 // Reset track distance
                 player.GetComponent<RouteFollower>().Reset();
+
+                // Update menu buttons
+                UpdateMenuButtons(false, true, false);
 
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
@@ -453,12 +497,47 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Hide time and lap info
             HideTimeAndLap();
 
+            // Update menu buttons
+            UpdateMenuButtons(true, false, true);
+
             // Open HUD
             MenuManager.Instance.OpenMenu("HUD");
 
             // No need to check any more views, so return
             return;
         }
+    }
+
+    public void ExitEvent()
+    {
+        // Retrieve all players
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
+
+        foreach (PlayerController player in players)
+        {
+            // Retrieve player view
+            PhotonView photonView = player.GetComponent<PhotonView>();
+
+            // If not our view, skip rest of loop
+            if (!photonView.IsMine) continue;
+
+            // Remove player from race
+            if (player.state.Equals(PlayerState.ParticipatingInRace)) player.race.RemovePlayerFromRace(player);
+
+            // Remove player from trial
+            if (player.state.Equals(PlayerState.ParticipatingInTrial)) player.trial.EndTrial();
+
+            // No need to check any more views, so return
+            return;
+        }
+    }
+
+    private void UpdateMenuButtons(bool showStartEvent, bool showLeaveEvent, bool showLeaveRoom)
+    {
+        startRaceButton.SetActive(showStartEvent);
+        startTrialButton.SetActive(showStartEvent);
+        exitEventButton.SetActive(showLeaveEvent);
+        leaveRoomButton.SetActive(showLeaveRoom);
     }
     #endregion
 
@@ -482,7 +561,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         if (eventBeingConfirmed == "leaveRoom")
         {
-            confirmationText.GetComponent<TMP_Text>().text = "Are you sure you wish to leave this lobby?";
+            confirmationText.GetComponent<TMP_Text>().text = "Are you sure you wish to leave this room?";
             waitingToConfirmLeaveRoom = true;
         }
         else if (eventBeingConfirmed == "exitGame")
@@ -504,7 +583,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void ConfirmChoice(bool confirmPressed)
     {
-        if (confirmPressed == true)
+        if (confirmPressed)
         {
             if (waitingToConfirmLeaveRoom)
             {
@@ -610,9 +689,63 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public void MuteAudio()
+    private bool mute = false;
+    public void ToggleAudio()
     {
+        mute = !mute;
 
+        muteLine.SetActive(mute);
+
+        AudioManager.Instance.ToggleAudio(mute);
+    }
+
+    private int state = 3;
+    private const int MAX_UI_STATES = 6;
+    public void ToggleUI()
+    {
+        state = (state < MAX_UI_STATES - 1) 
+            ? state + 1 
+            : 0;
+
+        switch (state)
+        {
+            case 0:
+
+                SwitchUIState(false, false, false);
+                break;
+
+            case 1:
+
+                SwitchUIState(true, false, false);
+                break;
+
+            case 2:
+
+                SwitchUIState(true, true, false);
+                break;
+
+            case 3:
+
+                SwitchUIState(true, true, true);
+                break;
+
+            case 4:
+
+                SwitchUIState(true, false, true);
+                break;
+
+            case 5:
+
+                SwitchUIState(false, false, true);
+                break;
+        }
+    }
+
+    private void SwitchUIState(bool state0, bool state1, bool state2)
+    {
+        Containers[0].gameObject.SetActive(state0);
+        Containers[1].gameObject.SetActive(state1);
+        Containers[2].gameObject.SetActive(state2);
     }
 
     public void DisplayTimeAndLap(string time, string lap)
@@ -628,6 +761,28 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         timePanel.SetActive(false);
         lapPanel.SetActive(false);
+    }
+
+    public void HideNotificationPanel()
+    {
+        notificationTextPanel.SetActive(false);
+    }
+
+    public void HideCountdownPanel()
+    {
+        countdownPanel.SetActive(false);
+    }
+
+    public void HideAllPanels()
+    {
+        HideTimeAndLap();
+        HideNotificationPanel();
+        HideCountdownPanel();
+    }
+
+    public void HideEventPanel()
+    {
+        eventPanel.SetActive(false);
     }
 
     public void DisplayNotificationText(string text)
@@ -646,6 +801,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         notificationTextPanel.GetComponentInChildren<TMP_Text>().text = text;
 
         yield return new WaitForSeconds(duration);
+
         notificationTextPanel.SetActive(false);
     }
 
@@ -656,6 +812,16 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(duration);
         countdownPanel.SetActive(false);
+    }
+
+    public IEnumerator SendEventNotification(EventCategory category, string title, string route, string laps, string participants, int duration)
+    {
+        eventPanel.SetActive(true);
+        eventPanel.GetComponent<EventNotification>().Setup(category, title, route, laps, participants);
+
+        yield return new WaitForSeconds(duration);
+
+        eventPanel.SetActive(false);
     }
     #endregion
 }

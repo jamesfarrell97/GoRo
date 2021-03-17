@@ -475,7 +475,7 @@ public class StatsManager : MonoBehaviour
 
         int[] hms = HelperFunctions.SecondsToHMS((int) splitAvgPace);
 
-        SplitAvgPaceDisplay.text = hms[1].ToString("D2") + ":" + hms[2].ToString("D2");
+        SplitAvgPaceDisplay.text = hms[1].ToString("D1") + ":" + hms[2].ToString("D2");
     }
 
     private void SetSplitAvgPowerDisplay(float splitAvgPower)

@@ -347,21 +347,24 @@ public class Trial : MonoBehaviour
         SetState(TrialState.InProgress);
     }
 
-    private void EndTrial()
+    public void EndTrial()
     {
-        RecordTrialInformation(name, trialDuration.TotalSeconds);
         RemovePlayerFromTrial();
+        RecordTrialInformation(name, trialDuration.TotalSeconds);
         RemoveGhostFromTrial();
         Reset();
     }
 
-    private void RemovePlayerFromTrial()
+    public void RemovePlayerFromTrial()
     {
         // Resume player movement
         player.Resume();
 
         // Start just row
         GameManager.Instance.StartJustRow();
+
+        // Hide all panels
+        GameManager.Instance.HideAllPanels();
     }
 
     private void RemoveGhostFromTrial()
@@ -380,7 +383,7 @@ public class Trial : MonoBehaviour
     IEnumerator DisplayEndOfTrialStats()
     {
         // Display player position
-        StartCoroutine(GameManager.Instance.DisplayCountdown("Time: " + trialDuration.ToString(@"mm\:ss"), 3));
+        StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("Time: " + trialDuration.ToString(@"mm\:ss"), 3));
 
         // Display stats for resolve timeout seconds
         yield return new WaitForSeconds(resolveTimeoutDuration);

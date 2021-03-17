@@ -61,6 +61,29 @@ public static class HelperFunctions
 
     }
 
+    public static void WriteDatatoFile(string str, int pos, char delim, string filename)
+    {
+
+#if !WEB_BUILD
+
+        string[] data = ReadArrayFromFile(filename, delim);
+
+        if (data != null)
+        {
+            data[pos] = str;
+
+            string path = PathForDocumentsFile(filename);
+            File.WriteAllLines(path, data);
+        }
+        else
+        {
+            WriteStringToFile(str, filename);
+        }
+
+#endif
+
+    }
+
     public static string ReadStringFromFile(string filename)
     {
 
@@ -80,6 +103,39 @@ public static class HelperFunctions
             file.Close();
 
             return str;
+        }
+
+        else
+        {
+            return null;
+        }
+
+#else
+
+        return null;
+
+#endif
+    }
+
+    public static string[] ReadArrayFromFile(string filename, char delim)
+    {
+
+#if !WEB_BUILD
+
+        string path = PathForDocumentsFile(filename);
+
+        if (File.Exists(path))
+        {
+            FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read);
+            StreamReader sr = new StreamReader(file);
+
+            string str = null;
+            str = sr.ReadLine();
+
+            sr.Close();
+            file.Close();
+
+            return str.Split(delim);
         }
 
         else

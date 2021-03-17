@@ -95,7 +95,6 @@ public class Race : MonoBehaviour
     private void MonitorRace()
     {
         UpdateStopWatch();
-        CheckIfComplete();
     }
 
     private void UpdateStopWatch()
@@ -114,23 +113,6 @@ public class Race : MonoBehaviour
 
             // Display duration
             DisplayDataToParticipants(raceDuration.ToString(@"mm\:ss"));
-        }
-    }
-
-    private void CheckIfComplete()
-    {
-        // Check if complete
-        photonView.RPC("RPC_CheckIfComplete", RpcTarget.AllBufferedViaServer);
-    }
-
-    [PunRPC]
-    private void RPC_CheckIfComplete()
-    {
-        // If all players have finished the race
-        if (positions.Count.Equals(players.Count))
-        {
-            // Resolve race
-            SetState(RaceState.Resolving);
         }
     }
 
@@ -160,9 +142,16 @@ public class Race : MonoBehaviour
 
         // Pause player movement
         player.Pause();
-        
-        // If first player to finish the race
-        if (positions.Count.Equals(1))
+
+        // If all players have finished the race
+        if (positions.Count.Equals(players.Count))
+        {
+            // Resolve race
+            SetState(RaceState.Resolving);
+        }
+
+        // Else if first player to finish the race
+        else if (positions.Count.Equals(1))
         {
             // Begin position timeout
             // Will need to determine way of resetting this timeout later for each player across the line
@@ -213,14 +202,14 @@ public class Race : MonoBehaviour
             if (positions.ContainsKey(player))
             {
                 // Display player position
-                StartCoroutine(GameManager.Instance.DisplayCountdown("Position: " + positions[player], 3));
+                StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("Your Position: " + positions[player] + "!", 3));
             }
 
             // Otherwise
             else
             {
                 // Display race ended message
-                StartCoroutine(GameManager.Instance.DisplayCountdown("Race Ended", 3));
+                StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("Race Ended", 3));
             }
         }
 
@@ -295,11 +284,20 @@ public class Race : MonoBehaviour
         // Retrieve player
         PlayerController player = playerView.GetComponent<PlayerController>();
 
+        // Remove player from race
+        players.Remove(player);
+
         // Resume player movement
         player.Resume();
 
         // Start just row
         GameManager.Instance.StartJustRow();
+
+        // Hide all panels
+        GameManager.Instance.HideAllPanels();
+
+        // Reset if the race is now empty
+        if (players.Count <= 0) Reset();
     }
 
     public void RemoveAllPlayersFromRace()

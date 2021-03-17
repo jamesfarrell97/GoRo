@@ -12,7 +12,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public static RoomManager Instance;
 
     // EXTRACT INTO APPDATA FILE
-    private const int gameIndex = 1;
+    private const int GAME_INDEX = 1;
 
     private void Awake()
     {
@@ -40,7 +40,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
-        if (scene.buildIndex == gameIndex)
+        if (scene.buildIndex == GAME_INDEX)
         {
             PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Managers", "Player Manager"), Vector3.zero, Quaternion.identity);
 

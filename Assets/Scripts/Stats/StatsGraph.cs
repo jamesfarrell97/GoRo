@@ -30,6 +30,8 @@ public class StatsGraph : MonoBehaviour
     [SerializeField] private RectTransform dashTemplateX;
     [SerializeField] private RectTransform dashTemplateY;
 
+    [SerializeField] private GameObject[] statButtons;
+
     private RectTransform graph1;
     private RectTransform graph2;
     private RectTransform graph3;
@@ -91,11 +93,11 @@ public class StatsGraph : MonoBehaviour
         graph4Labels = new List<RectTransform>();
         graph5Labels = new List<RectTransform>();
 
-        CreateGraph(graph1, graph1Points, graph1Connections, graph1Labels, Color.green);
-        CreateGraph(graph2, graph2Points, graph2Connections, graph2Labels, Color.magenta);
-        CreateGraph(graph3, graph3Points, graph3Connections, graph3Labels, Color.red);
-        CreateGraph(graph4, graph4Points, graph4Connections, graph4Labels, Color.yellow);
-        CreateGraph(graph5, graph5Points, graph5Connections, graph5Labels, Color.cyan);
+        CreateGraph(graph1, graph1Points, graph1Connections, graph1Labels, new Color(1f, 0.49f, 0f));
+        CreateGraph(graph2, graph2Points, graph2Connections, graph2Labels, new Color(1f, 0.49f, 0f));
+        CreateGraph(graph3, graph3Points, graph3Connections, graph3Labels, new Color(1f, 0.49f, 0f));
+        CreateGraph(graph4, graph4Points, graph4Connections, graph4Labels, new Color(1f, 0.49f, 0f));
+        CreateGraph(graph5, graph5Points, graph5Connections, graph5Labels, new Color(1f, 0.49f, 0f));
 
         graphs = new List<RectTransform>() { graph1, graph2, graph3, graph4, graph5 };
     }
@@ -358,13 +360,15 @@ public class StatsGraph : MonoBehaviour
         rectTransform.localEulerAngles = new Vector3(0, 0, HelperFunctions.GetAngleFromVectorFloat(direction));
     }
 
-    public void ActivateGraph(string name)
+    private const int STAT_COUNT = 5;
+    public void ActivateGraph(int index)
     {
-        // Set graph correlating to graph name to active
-        // Set all others graphs to inactive
-        foreach (RectTransform graph in graphs)
+        for(int i = 0; i < STAT_COUNT; i++)
         {
-            graph.gameObject.SetActive(graph.name.Equals(name));
+            var active = (i == index);
+
+            statButtons[i].gameObject.SetActive(active);
+            graphs[i].gameObject.SetActive(active);
         }
     }
 

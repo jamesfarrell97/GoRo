@@ -135,6 +135,11 @@ namespace UnityStandardAssets.Utility
             float accumulateDistance = 0;
             for (int i = 0; i < points.Length; ++i)
             {
+                if (i == points.Length - 1)
+                {
+                    routeDistance = accumulateDistance;
+                }
+
                 var t1 = Waypoints[(i)%Waypoints.Length];
                 var t2 = Waypoints[(i + 1)%Waypoints.Length];
                 if (t1 != null && t2 != null)
@@ -146,8 +151,6 @@ namespace UnityStandardAssets.Utility
                     accumulateDistance += (p1 - p2).magnitude;
                 }
             }
-
-            routeDistance = accumulateDistance;
         }
 
 

@@ -3,6 +3,7 @@ using System.Collections;
 
 using UnityStandardAssets.Utility;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using UnityEngine;
 
 using Photon.Realtime;
@@ -15,8 +16,8 @@ using TMPro;
 //
 
 using static PlayerController;
-using System;
 using static EventNotification;
+using System;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -37,9 +38,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] TMP_Text roomNameText;
     [SerializeField] TMP_Text playerNameText;
 
-    [SerializeField] GameObject startGameButton;
-    [SerializeField] GameObject muteLine;
-
     [SerializeField] TMP_InputField roomNameInputField;
     [SerializeField] TMP_InputField playerNameInputField;
 
@@ -49,19 +47,33 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] Transform playerListContent;
     [SerializeField] GameObject playerListItemPrefab;
 
-    [SerializeField] GameObject eventPanel;
-    [SerializeField] GameObject notificationTextPanel;
     [SerializeField] GameObject countdownPanel;
-    [SerializeField] GameObject timePanel;
-    [SerializeField] GameObject lapPanel;
+    [SerializeField] TMP_Text countdownText;
+
+    [SerializeField] GameObject notificationPanel;
+    [SerializeField] TMP_Text notificationText;
+
+    [SerializeField] GameObject eventNotificationPanel;
+    [SerializeField] GameObject eventInformationPanel;
+    [SerializeField] TMP_Text eventTimeText;
+    [SerializeField] TMP_Text eventLapText;
+    [SerializeField] TMP_Text eventPositionText;
+
     [SerializeField] GameObject confirmationText;
 
+    [SerializeField] GameObject startGameButton;
     [SerializeField] GameObject startRaceButton;
     [SerializeField] GameObject startTrialButton;
     [SerializeField] GameObject exitEventButton;
     [SerializeField] GameObject leaveRoomButton;
 
-    [SerializeField] GameObject[] Containers;
+    [SerializeField] Button goButton;
+    [SerializeField] Button toggleUIButton;
+    [SerializeField] Slider distanceSlider;
+
+    [SerializeField] GameObject muteLine;
+
+    [SerializeField] GameObject[] panels;
 
     [SerializeField] GameObject audioManager;
     [SerializeField] GameObject roomManager;
@@ -79,6 +91,15 @@ public class GameManager : MonoBehaviourPunCallbacks
         
         InstantiateManagers();
         CheckConnection();
+    }
+
+    private void CheckState()
+    {
+#if UNITY_EDITOR
+    
+        goButton.gameObject.SetActive(false);
+
+#endif
     }
 
     private void InstantiateManagers()
@@ -224,7 +245,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         for (int i = 0; i < roomList.Count; i++)
         {
             if (roomList[i].RemovedFromList)
+            {
                 continue;
+            }
 
             Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(roomList[i]);
         }
@@ -295,8 +318,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Go
             player.Go();
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
     }
 
@@ -316,8 +339,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Change camera view
             player.GetComponent<PlayerController>().ChangeCameraView();
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
     }
 
@@ -337,8 +360,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Stop
             player.Stop();
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
     }
 
@@ -420,12 +443,18 @@ public class GameManager : MonoBehaviourPunCallbacks
                 // Update menu buttons
                 UpdateMenuButtons(false, true, false);
 
+                // Hide non-race ui panels
+                SwitchUIState(false, false, false);
+
+                // Disable ui toggle button
+                EnableUIToggle(false);
+
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
             }
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
     }
 
@@ -457,12 +486,18 @@ public class GameManager : MonoBehaviourPunCallbacks
                 // Update menu buttons
                 UpdateMenuButtons(false, true, false);
 
+                // Hide non-race ui panels
+                SwitchUIState(false, false, false);
+
+                // Disable ui toggle button
+                EnableUIToggle(false);
+
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
             }
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
     }
 
@@ -496,16 +531,22 @@ public class GameManager : MonoBehaviourPunCallbacks
             routeFollower.route = routeFollower.routes[0];
 
             // Hide time and lap info
-            HideTimeAndLap();
+            HideEventPanel();
 
             // Update menu buttons
             UpdateMenuButtons(true, false, true);
 
+            // Reset UI state
+            SwitchUIState(true, true, true);
+
+            // Enable UI toggle
+            EnableUIToggle();
+
             // Open HUD
             MenuManager.Instance.OpenMenu("HUD");
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
     }
 
@@ -528,9 +569,31 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Remove player from trial
             if (player.state.Equals(PlayerState.ParticipatingInTrial)) player.trial.EndTrial();
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so exit
+            break;
         }
+    }
+
+    private void EnableUIToggle(bool enable = true)
+    {
+        toggleUIButton.interactable = enable;
+    }
+
+    public void UpdateDistanceSlider(Route route, PlayerController player)
+    {
+        RouteFollower routeFollower = player.GetComponent<RouteFollower>();
+
+        var routeLength = route.routeDistance;
+        var playerProgress = routeFollower.progressAlongRoute;
+
+        var distance = playerProgress / routeLength;
+
+        distanceSlider.value = distance;
+    }
+
+    public void ResetDistanceSlider()
+    {
+        distanceSlider.value = 0;
     }
 
     private void UpdateMenuButtons(bool showStartEvent, bool showLeaveEvent, bool showLeaveRoom)
@@ -626,8 +689,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Pause movement
             player.Pause();
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
 
         // For each loaded ghost
@@ -642,9 +705,12 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Pause movement
             ghost.Pause();
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
+
+        // Update game state
+        State = GameState.Paused;
     }
 
     public void UnpauseGame()
@@ -669,8 +735,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Resume movement
             player.Resume();
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
 
         // For each loaded ghost
@@ -685,9 +751,12 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Resume movement
             ghost.Resume();
 
-            // No need to check any more views, so return
-            return;
+            // No need to check any more views, so break
+            break;
         }
+
+        // Update game state
+        State = GameState.Playing;
     }
 
     private bool mute = false;
@@ -700,15 +769,15 @@ public class GameManager : MonoBehaviourPunCallbacks
         AudioManager.Instance.ToggleAudio(mute);
     }
 
-    private int state = 3;
+    private int UIState = 3;
     private const int MAX_UI_STATES = 6;
     public void ToggleUI()
     {
-        state = (state < MAX_UI_STATES - 1) 
-            ? state + 1 
+        UIState = (UIState < MAX_UI_STATES - 1) 
+            ? UIState + 1 
             : 0;
 
-        switch (state)
+        switch (UIState)
         {
             case 0:
 
@@ -742,31 +811,37 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void SwitchUIState(bool state0, bool state1, bool state2)
+    public void SwitchUIState(bool state0, bool state1, bool state2)
     {
-        Containers[0].gameObject.SetActive(state0);
-        Containers[1].gameObject.SetActive(state1);
-        Containers[2].gameObject.SetActive(state2);
+        panels[0].gameObject.SetActive(state0);
+        panels[1].gameObject.SetActive(state1);
+        panels[2].gameObject.SetActive(state2);
     }
 
-    public void DisplayTimeAndLap(string time, string lap)
+    public void DisplayEventPanel(string time, string lap, string position)
     {
-        timePanel.SetActive(true);
-        timePanel.GetComponentInChildren<TMP_Text>().text = time;
+        eventInformationPanel.SetActive(true);
 
-        lapPanel.SetActive(true);
-        lapPanel.GetComponentInChildren<TMP_Text>().text = lap;
+        eventTimeText.text = time;
+        eventLapText.text = lap;
+        eventPositionText.text = position;
     }
 
-    public void HideTimeAndLap()
+    public void HideEventPanel()
     {
-        timePanel.SetActive(false);
-        lapPanel.SetActive(false);
+        eventInformationPanel.SetActive(false);
+    }
+
+    public void ResetEventPanel()
+    {
+        eventTimeText.text = "00:00";
+        eventLapText.text = "0";
+        eventPositionText.text = "0";
     }
 
     public void HideNotificationPanel()
     {
-        notificationTextPanel.SetActive(false);
+        notificationPanel.SetActive(false);
     }
 
     public void HideCountdownPanel()
@@ -776,35 +851,25 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void HideAllPanels()
     {
-        HideTimeAndLap();
+        HideEventPanel();
         HideNotificationPanel();
         HideCountdownPanel();
     }
 
-    public void HideEventPanel()
-    {
-        eventPanel.SetActive(false);
-    }
-
     public void DisplayNotificationText(string text)
     {
-        notificationTextPanel.SetActive(true);
-        notificationTextPanel.GetComponentInChildren<TMP_Text>().text = text;
+        notificationPanel.SetActive(true);
+        notificationText.text = text;
     }
 
     public IEnumerator DisplayQuickNotificationText(string text, int duration)
     {
-        notificationTextPanel.SetActive(true);
-
-        timePanel.SetActive(false);
-        countdownPanel.SetActive(false);
-        lapPanel.SetActive(false);
-
-        notificationTextPanel.GetComponentInChildren<TMP_Text>().text = text;
+        notificationPanel.SetActive(true);
+        notificationText.text = text;
 
         yield return new WaitForSeconds(duration);
 
-        notificationTextPanel.SetActive(false);
+        notificationPanel.SetActive(false);
     }
 
     public IEnumerator DisplayCountdown(string time, int duration)
@@ -818,12 +883,12 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public IEnumerator SendEventNotification(EventCategory category, string title, string route, string laps, string participants, int duration)
     {
-        eventPanel.SetActive(true);
-        eventPanel.GetComponent<EventNotification>().Setup(category, title, route, laps, participants);
+        eventNotificationPanel.SetActive(true);
+        eventNotificationPanel.GetComponent<EventNotification>().Setup(category, title, route, laps, participants);
 
         yield return new WaitForSeconds(duration);
 
-        eventPanel.SetActive(false);
+        eventNotificationPanel.SetActive(false);
     }
     #endregion
 }

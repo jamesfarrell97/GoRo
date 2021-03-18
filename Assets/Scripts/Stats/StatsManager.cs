@@ -19,19 +19,21 @@ public class StatsManager : MonoBehaviour
     [SerializeField] private TMP_Text SpeedDisplay;
 
     // Split Data
-    [SerializeField] private TMP_Text SplitTimeDisplay;
-    [SerializeField] private TMP_Text[] SplitDistDisplays;
+    // [SerializeField] private TMP_Text SplitTimeDisplay;
+    // [SerializeField] private TMP_Text SplitAvgPowerDisplay;
     [SerializeField] private TMP_Text SplitAvgPaceDisplay;
-    [SerializeField] private TMP_Text SplitAvgPowerDisplay;
+
+    [SerializeField] private TMP_Text[] SplitDistDisplays;
 
     // Projection Data
-    [SerializeField] private TMP_Text ProjectedWorkTimeDisplay;
-    [SerializeField] private TMP_Text ProjectedWorkDistanceDisplay;
+    //[SerializeField] private TMP_Text ProjectedWorkTimeDisplay;
+    //[SerializeField] private TMP_Text ProjectedWorkDistanceDisplay;
 
     // Stroke Data
     [SerializeField] private TMP_Text StrokesPerMinDisplay;
     [SerializeField] private TMP_Text StrokePowerDisplay;
-    [SerializeField] private TMP_Text DriveLengthDisplay;
+
+    //[SerializeField] private TMP_Text DriveLengthDisplay;
 
     // Drag Data
     [SerializeField] private TMP_Text DragFactorDisplay;
@@ -462,11 +464,11 @@ public class StatsManager : MonoBehaviour
 
     private void SetSplitTimeDisplay(float seconds)
     {
-        if (!SplitTimeDisplay.enabled) return;
+        //if (!SplitTimeDisplay.enabled) return;
 
-        int[] hms = HelperFunctions.SecondsToHMS((int) seconds);
+        //int[] hms = HelperFunctions.SecondsToHMS((int) seconds);
 
-        SplitTimeDisplay.text = hms[1] + ":" + hms[2].ToString("D2") + " /";
+        //SplitTimeDisplay.text = hms[1] + ":" + hms[2].ToString("D2") + " /";
     }
 
     private void SetSplitAvgPaceDisplay(float splitAvgPace)
@@ -480,9 +482,9 @@ public class StatsManager : MonoBehaviour
 
     private void SetSplitAvgPowerDisplay(float splitAvgPower)
     {
-        if (!SplitAvgPowerDisplay.enabled) return;
+        //if (!SplitAvgPowerDisplay.enabled) return;
 
-        SplitAvgPowerDisplay.text = splitAvgPower.ToString();
+        //SplitAvgPowerDisplay.text = splitAvgPower.ToString();
     }
 
     private void SetStrokesPerMinDisplay(float strokesPerMin)
@@ -501,9 +503,9 @@ public class StatsManager : MonoBehaviour
 
     private void SetDriveLengthDisplay(float driveLength)
     {
-        if (!DriveLengthDisplay.enabled) return;
+        //if (!DriveLengthDisplay.enabled) return;
 
-        DriveLengthDisplay.text = (driveLength / 100).ToString();
+        //DriveLengthDisplay.text = (driveLength / 100).ToString();
     }
 
     private void SetDragFactorDisplay(float dragFactor)
@@ -515,16 +517,16 @@ public class StatsManager : MonoBehaviour
 
     private void SetProjectedWorkTimeDisplay(float projectedWorkTime)
     {
-        if (!ProjectedWorkTimeDisplay.enabled) return;
+        //if (!ProjectedWorkTimeDisplay.enabled) return;
 
-        ProjectedWorkTimeDisplay.text = projectedWorkTime.ToString();
+        //ProjectedWorkTimeDisplay.text = projectedWorkTime.ToString();
     }
 
     private void SetProjectedWorkDistanceDisplay(float projectedWorkDist)
     {
-        if (!ProjectedWorkDistanceDisplay.enabled) return;
+        //if (!ProjectedWorkDistanceDisplay.enabled) return;
 
-        ProjectedWorkDistanceDisplay.text = projectedWorkDist.ToString();
+        //ProjectedWorkDistanceDisplay.text = projectedWorkDist.ToString();
     }
 
     public int GetMetersRowed()

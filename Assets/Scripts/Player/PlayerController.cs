@@ -251,6 +251,11 @@ public class PlayerController : MonoBehaviour
         return playerVelocity;
     }
 
+    public void ReduceVelocity()
+    {
+        rigidBody.velocity = Vector3.zero;
+    }
+
     public void ChangeCameraView()
     {
         cameraIndex = (cameraIndex < cameras.Length - 1) ? cameraIndex + 1 : 0;
@@ -259,5 +264,15 @@ public class PlayerController : MonoBehaviour
         {
             cameras[i].gameObject.SetActive(i == cameraIndex);
         }
+    }
+
+    public void UpdateRace(Race race)
+    {
+        this.race = race;
+    }
+
+    public void UpdateTrial(Trial trial)
+    {
+        this.trial = trial;
     }
 }

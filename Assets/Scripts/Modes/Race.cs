@@ -7,9 +7,7 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 
-using static PlayerController;
 using static EventNotification;
-
 public class Race : MonoBehaviour
 {
     public enum RaceState
@@ -59,8 +57,11 @@ public class Race : MonoBehaviour
 
         position = 0;
 
+        pauseDuration = 0;
         raceDuration = TimeSpan.Zero;
         raceStartTime = 0;
+
+        ResetDistanceSlider();
     }
 
     private void FixedUpdate()
@@ -97,9 +98,40 @@ public class Race : MonoBehaviour
     private void MonitorRace()
     {
         UpdateStopWatch();
+        UpdateDistanceSlider();
     }
 
+    private float pauseDuration = 0;
     private void UpdateStopWatch()
+    {
+        // Don't execute if game paused
+        if (GameManager.State.Equals(GameManager.GameState.Paused))
+        {
+            if (PhotonNetwork.OfflineMode)
+            {
+                pauseDuration += Time.fixedDeltaTime;
+            }
+
+            return;
+        }
+
+        // For each player in race
+        foreach (PlayerController player in players)
+        {
+            // Only execute on our view
+            if (!player.photonView.IsMine) continue;
+
+            // Update duration
+            raceDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - (raceStartTime + pauseDuration));
+
+            // Display duration
+            DisplayDataToParticipants(raceDuration.ToString(@"mm\:ss"));
+
+            break;
+        }
+    }
+
+    private void UpdateDistanceSlider()
     {
         // Don't execute if game paused
         if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
@@ -110,11 +142,28 @@ public class Race : MonoBehaviour
             // Only execute on our view
             if (!player.photonView.IsMine) continue;
 
-            // Update duration
-            raceDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - raceStartTime);
+            // Update distance slider
+            GameManager.Instance.UpdateDistanceSlider(route, player);
 
-            // Display duration
-            DisplayDataToParticipants(raceDuration.ToString(@"mm\:ss"));
+            break;
+        }
+    }
+
+    private void ResetDistanceSlider()
+    {
+        // Don't execute if game paused
+        if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
+
+        // For each player in race
+        foreach (PlayerController player in players)
+        {
+            // Only execute on our view
+            if (!player.photonView.IsMine) continue;
+
+            // Update distance slider
+            GameManager.Instance.ResetDistanceSlider();
+
+            break;
         }
     }
 
@@ -142,8 +191,8 @@ public class Race : MonoBehaviour
         // Assign player to position
         positions.Add(player, position);
 
-        // Pause player movement
-        player.Pause();
+        // Pause game
+        GameManager.Instance.PauseGame();
 
         // If all players have finished the race
         if (positions.Count.Equals(players.Count))
@@ -216,6 +265,8 @@ public class Race : MonoBehaviour
                 // Display race ended message
                 StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("Race Ended", 3));
             }
+
+            break;
         }
 
         // Display stats for resolve timeout seconds
@@ -230,12 +281,6 @@ public class Race : MonoBehaviour
         // If player not already in race
         if (!players.Contains(player))
         {
-            // Pause player movement
-            player.Pause();
-
-            // Update player race
-            player.race = this;
-
             // Retrieve player view
             PhotonView playerView = player.GetComponent<PhotonView>();
 
@@ -247,6 +292,12 @@ public class Race : MonoBehaviour
 
             // Update route
             routeFollower.UpdateRoute(route, numberOfLaps);
+
+            // Update player race
+            player.UpdateRace(this);
+
+            // Pause game
+            GameManager.Instance.PauseGame();
         }
     }
 
@@ -261,6 +312,9 @@ public class Race : MonoBehaviour
 
         // Add player to list
         players.Add(player);
+
+        // Display event information panel
+        GameManager.Instance.DisplayEventPanel("00:00", $"{1}/{numberOfLaps}", players.Count.ToString());
     }
 
     public void RemovePlayerFromRace(PlayerController player)
@@ -292,14 +346,20 @@ public class Race : MonoBehaviour
         // Remove player from race
         players.Remove(player);
 
-        // Resume player movement
-        player.Resume();
+        // Reduce player velocity to 0
+        player.ReduceVelocity();
+
+        // Unpause game
+        GameManager.Instance.UnpauseGame();
 
         // Start just row
         GameManager.Instance.StartJustRow();
 
         // Hide all panels
         GameManager.Instance.HideAllPanels();
+
+        // Reset event panel
+        GameManager.Instance.ResetEventPanel();
 
         // Reset if the race is now empty
         if (players.Count <= 0) Reset();
@@ -315,6 +375,8 @@ public class Race : MonoBehaviour
             
             // Remove player from race
             RemovePlayerFromRace(player);
+
+            break;
         }
 
         // Reset
@@ -368,6 +430,8 @@ public class Race : MonoBehaviour
 
             // Send race notification
             StartCoroutine(GameManager.Instance.SendEventNotification(EventCategory.Race, "Join Race", "Race Track", numberOfLaps.ToString(), players.Count.ToString(), 15));
+
+            break;
         }
     }
 
@@ -397,6 +461,8 @@ public class Race : MonoBehaviour
 
             // Start race countdown
             StartCoroutine(StartCountdown());
+
+            break;
         }
     }
 
@@ -433,18 +499,23 @@ public class Race : MonoBehaviour
         // For each player in the race
         foreach (PlayerController player in players)
         {
-            // Resume movement
-            player.Resume();
+            // Only execute on our view
+            if (!player.photonView.IsMine) continue;
 
-            // Retrieve notification container
-            Transform notificationContainer = GameManager.Instance.transform.Find("HUD/Notification Cont");
+            // Retrieve toast panel
+            Transform toastPanel = GameManager.Instance.transform.Find("HUD/Toast Panel");
 
             // Activate component if not current active
-            if (!notificationContainer.gameObject.activeSelf)
+            if (!toastPanel.gameObject.activeSelf)
             {
-                notificationContainer.gameObject.SetActive(true);
-                notificationContainer.GetComponentInChildren<TMP_Text>().text = "";
+                toastPanel.gameObject.SetActive(true);
+                toastPanel.GetComponentInChildren<TMP_Text>().text = "";
             }
+
+            // Unpause game
+            GameManager.Instance.UnpauseGame();
+
+            break;
         }
 
         // Set race start time
@@ -469,6 +540,7 @@ public class Race : MonoBehaviour
     public void EndRace()
     {
         RemoveAllPlayersFromRace();
+        ResetDistanceSlider();
     }
 
     private void DisplayDataToParticipants(string time)
@@ -483,9 +555,9 @@ public class Race : MonoBehaviour
 
             int currentLap = player.GetComponent<RouteFollower>().currentLap;
 
-            GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
+            GameManager.Instance.DisplayEventPanel(time, $"{currentLap}/{numberOfLaps}" , "1/" + players.Count.ToString());
 
-            return;
+            break;
         }
     }
 

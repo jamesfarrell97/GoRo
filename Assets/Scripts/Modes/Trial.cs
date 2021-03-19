@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
+using System.Collections;
 using System;
 
 using UnityStandardAssets.Utility;
@@ -6,8 +7,6 @@ using UnityEngine;
 using Photon.Pun;
 
 using static PlayerController;
-using System.Collections.Generic;
-
 public class Trial : MonoBehaviour
 {
     public enum TrialState
@@ -58,6 +57,7 @@ public class Trial : MonoBehaviour
         state = TrialState.Inactive;
         player = null;
 
+        pauseDuration = 0;
         trialDuration = TimeSpan.Zero;
         trialStartTime = 0;
     }
@@ -90,16 +90,41 @@ public class Trial : MonoBehaviour
     private void MonitorTrial()
     {
         UpdateStopWatch();
+        UpdateDistanceSlider();
         SamplePlayerVelocity();
         CheckIfComplete();
     }
 
+    private float pauseDuration = 0;
     private void UpdateStopWatch()
     {
-        if (GameManager.State != GameManager.GameState.Playing) return;
+        if (GameManager.State.Equals(GameManager.GameState.Paused))
+        {
+            if (PhotonNetwork.OfflineMode)
+            {
+                pauseDuration += Time.fixedDeltaTime;
+            }
 
-        trialDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - trialStartTime);
+            return;
+        }
+
+        trialDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - (trialStartTime + pauseDuration));
         DisplayDataToParticipants(trialDuration.ToString(@"mm\:ss"));
+    }
+
+    private void UpdateDistanceSlider()
+    {
+        // Don't execute if game paused
+        if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
+
+        // Update distance slider
+        GameManager.Instance.UpdateDistanceSlider(route, player);
+    }
+
+    private void ResetDistanceSlider()
+    {
+        // Reset slide distance
+        GameManager.Instance.ResetDistanceSlider();
     }
 
     private void SamplePlayerVelocity()
@@ -123,11 +148,14 @@ public class Trial : MonoBehaviour
         // If player has completed time trial
         if (player.state == PlayerState.CompletedTimeTrial)
         {
-            // Pause player movement
-            player.Pause();
+            // Pause game
+            GameManager.Instance.PauseGame();
 
             // Display trial stats to participants
             StartCoroutine(DisplayEndOfTrialStats());
+
+            // Record trial information
+            RecordTrialInformation(name, trialDuration.TotalSeconds);
 
             // Resolve trial
             SetState(TrialState.Inactive);
@@ -137,7 +165,7 @@ public class Trial : MonoBehaviour
     private void DisplayDataToParticipants(string time)
     {
         int currentLap = player.GetComponent<RouteFollower>().currentLap;
-        GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
+        GameManager.Instance.DisplayEventPanel(time, $"{currentLap}/{numberOfLaps}", "1/1");
     }
 
     public void FormTrial(PlayerController player, string route)
@@ -160,17 +188,20 @@ public class Trial : MonoBehaviour
         // Assign player
         this.player = player;
 
-        // Pause player movement
-        this.player.Pause();
-
-        // Update player trial
-        this.player.trial = this;
-
         // Retrieve route follower
         RouteFollower routeFollower = this.player.GetComponent<RouteFollower>();
 
         // Update route
         routeFollower.UpdateRoute(route, numberOfLaps);
+
+        // Update player trial
+        this.player.UpdateTrial(this);
+        
+        // Display event information panel
+        GameManager.Instance.DisplayEventPanel("00:00", $"{1}/{numberOfLaps}", "1");
+
+        // Pause game
+        GameManager.Instance.PauseGame();
     }
 
     private const string TRIAL_GHOST_FILEPATH = "trial-ghost-data";
@@ -280,11 +311,11 @@ public class Trial : MonoBehaviour
                     // If player time is less than the stored time
                     if (time < storedTime)
                     {
-                        // Update data array
-                        data[i] = name + "|" + time + "|" + samples.Count + "|" + string.Join(",", samples) + "\n";
+                        // Update file
+                        lines[i] = name + "|" + time + "|" + samples.Count + "|" + string.Join(",", samples) + "\n";
 
                         // Overwrite file
-                        HelperFunctions.WriteArrayToFile(data, TRIAL_GHOST_FILEPATH);
+                        HelperFunctions.WriteArrayToFile(lines, TRIAL_GHOST_FILEPATH);
                     }
 
                     // No need to check any more! Return
@@ -334,11 +365,8 @@ public class Trial : MonoBehaviour
 
     private void StartTrial()
     {
-        // Resume player movement
-        player.Resume();
-
-        // Resume ghost movement
-        if (ghost != null) ghost.Resume();
+        // Unpause game
+        GameManager.Instance.UnpauseGame();
 
         // Set start time
         trialStartTime = (float) PhotonNetwork.Time;
@@ -350,34 +378,33 @@ public class Trial : MonoBehaviour
     public void EndTrial()
     {
         RemovePlayerFromTrial();
-        RecordTrialInformation(name, trialDuration.TotalSeconds);
         RemoveGhostFromTrial();
+        ResetDistanceSlider();
         Reset();
     }
 
     public void RemovePlayerFromTrial()
     {
-        // Resume player movement
-        player.Resume();
+        // Reduce player velocity to 0
+        player.ReduceVelocity();
+
+        // Unpause game
+        GameManager.Instance.UnpauseGame();
 
         // Start just row
         GameManager.Instance.StartJustRow();
 
         // Hide all panels
         GameManager.Instance.HideAllPanels();
+
+        // Reset event panel
+        GameManager.Instance.ResetEventPanel();
     }
 
     private void RemoveGhostFromTrial()
     {
         Destroy(ghost);
         Destroy(spawnedGhost);
-    }
-
-    private void DisplayTimeTrialDataToParticipants(string time)
-    {
-        int currentLap = player.GetComponent<RouteFollower>().currentLap;
-
-        GameManager.Instance.DisplayTimeAndLap(time, $"Lap: {currentLap}/{numberOfLaps}");
     }
 
     IEnumerator DisplayEndOfTrialStats()

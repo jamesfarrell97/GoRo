@@ -470,28 +470,28 @@ public class Race : MonoBehaviour
     {
         // Display countdown 3
         //
-        StartCoroutine(GameManager.Instance.DisplayCountdown("3", 1));
+        if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("3", 1));
 
         yield return new WaitForSeconds(1);
 
         // Display countdown 2
         //
-        StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
+        if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
 
         yield return new WaitForSeconds(1);
 
         // Display countdown 1
         //
-        StartCoroutine(GameManager.Instance.DisplayCountdown("1", 1));
+        if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("1", 1));
 
         yield return new WaitForSeconds(1);
 
         // Display start!
         //
-        StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
+        if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
 
         // Start race
-        StartRace();
+        if (players.Count > 0) StartRace();
     }
 
     public void StartRace()

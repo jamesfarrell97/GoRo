@@ -3,12 +3,7 @@ using static Race;
 
 public class RaceManager : MonoBehaviour
 {
-    private Race[] races;
-
-    void Start()
-    {
-        races = FindObjectsOfType<Race>();
-    }
+    [SerializeField] private Race[] races;
 
     public void JoinRace(PlayerController player, string route)
     {

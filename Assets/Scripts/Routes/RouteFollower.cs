@@ -38,9 +38,19 @@ namespace UnityStandardAssets.Utility
         private void Awake()
         {
             routes = FindObjectsOfType<Route>();
-            route = routes[0];
+            route = FindRoute("Cliff Fissure Route");
         }
         
+        private Route FindRoute(string name)
+        {
+            foreach (Route route in routes)
+            {
+                if (route.name.Equals(name)) return route;
+            }
+
+            return routes[0];
+        }
+
         private void Start()
         {
             if (GetComponent<PlayerController>() != null)

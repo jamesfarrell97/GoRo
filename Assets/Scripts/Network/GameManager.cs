@@ -91,6 +91,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         
         InstantiateManagers();
         CheckConnection();
+        CheckState();
     }
 
     private void CheckState()

@@ -50,6 +50,8 @@ public class Race : MonoBehaviour
 
     private void Reset()
     {
+        ResetDistanceSlider();
+
         state = RaceState.Inactive;
 
         players = new List<PlayerController>();
@@ -60,8 +62,6 @@ public class Race : MonoBehaviour
         pauseDuration = 0;
         raceDuration = TimeSpan.Zero;
         raceStartTime = 0;
-
-        ResetDistanceSlider();
     }
 
     private void FixedUpdate()
@@ -539,8 +539,8 @@ public class Race : MonoBehaviour
 
     public void EndRace()
     {
-        RemoveAllPlayersFromRace();
         ResetDistanceSlider();
+        RemoveAllPlayersFromRace();
     }
 
     private void DisplayDataToParticipants(string time)

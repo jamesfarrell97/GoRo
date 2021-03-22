@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 // Code referenced: https://www.youtube.com/watch?v=zPZK7C5_BQo
 //

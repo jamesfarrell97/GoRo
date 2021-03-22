@@ -17,7 +17,6 @@ using TMPro;
 
 using static PlayerController;
 using static EventNotification;
-using System;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -91,13 +90,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         
         InstantiateManagers();
         CheckConnection();
+        CheckState();
     }
 
     private void CheckState()
     {
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
     
-        goButton.gameObject.SetActive(false);
+        goButton.transform.parent.gameObject.SetActive(false);
 
 #endif
     }

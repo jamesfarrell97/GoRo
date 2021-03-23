@@ -411,11 +411,11 @@ public class StatsManager : MonoBehaviour
 
 #if UNITY_EDITOR
 
-        SpeedData.Enqueue(Random.Range(0, 6));
-        SplitAvgPaceData.Enqueue(Random.Range(0, 95));
-        DragFactorData.Enqueue(Random.Range(0, 300));
-        StrokesPerMinData.Enqueue(Random.Range(0, 45));
-        StrokePowerData.Enqueue(Random.Range(0, 400));
+        SpeedData.Enqueue(Random.Range(4, 5));
+        SplitAvgPaceData.Enqueue(Random.Range(85, 95));
+        DragFactorData.Enqueue(Random.Range(275, 300));
+        StrokesPerMinData.Enqueue(Random.Range(36, 45));
+        StrokePowerData.Enqueue(Random.Range(250, 350));
 
 #else
 

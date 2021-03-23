@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!photonView.IsMine) return;
 
-        achievementTracker.TrackAchievements(photonView);
+        //achievementTracker.TrackAchievements(photonView);
 
         if (paused)
         {
@@ -182,6 +182,29 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateSpeed()
     {
+#if UNITY_EDITOR
+        
+        // If debug 'move' button pressed
+        if (move || Input.GetKey(KeyCode.W))
+        {
+            // Apply force to the rigibody
+            rigidBody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
+
+            // Update stroke state
+            strokeState = StrokeState.Driving;
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            // Update stroke state
+            strokeState = StrokeState.Recovery;
+        }
+        else if (Input.GetKey(KeyCode.Q))
+        {
+            // Update stroke state
+            strokeState = StrokeState.WaitingForWheelToAccelerate;
+        }
+
+#else
         // Get speed from erg
         rowingSpeed = stats.GetSpeed();
 
@@ -194,16 +217,6 @@ public class PlayerController : MonoBehaviour
             // Apply force to the rigidbody
             rigidBody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
         }
-
-#if UNITY_EDITOR
-        
-        // If debug 'move' button pressed
-        if (move)
-        {
-            // Apply force to the rigibody
-            rigidBody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
-        }
-
 #endif
 
         // Calculate velocity based on rigibody current speed

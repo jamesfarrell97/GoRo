@@ -312,14 +312,25 @@ public class Trial : MonoBehaviour
                     if (time < storedTime)
                     {
                         // Update file
-                        lines[i] = name + "|" + time + "|" + samples.Count + "|" + string.Join(",", samples) + "\n";
+                        lines[i] = route + "|" + time + "|" + samples.Count + "|" + string.Join(",", samples) + "\n";
 
                         // Overwrite file
                         HelperFunctions.WriteArrayToFile(lines, TRIAL_GHOST_FILEPATH);
                     }
 
-                    // No need to check any more! Return
-                    return;
+                    // No need to check any more! Break
+                    break;
+                }
+                else
+                {
+                    // Record trial data
+                    string trialData = route + "|" + time + "|" + samples.Count + "|" + string.Join(",", samples) + "\n";
+
+                    // Overwrite file
+                    HelperFunctions.WriteStringToFile(trialData, TRIAL_GHOST_FILEPATH);
+
+                    // No need to check any more! Break
+                    break;
                 }
             }
         }

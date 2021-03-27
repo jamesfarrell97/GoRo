@@ -10,6 +10,13 @@ using System;
 //
 public class PlayerController : MonoBehaviour
 {
+    // TODO: Extract into external APPDATA file
+    private static readonly int HIDDEN_ROWER_LAYER = 15;
+    private static readonly int VISIBLE_ROWER_LAYER = 16;
+
+    private static readonly int HIDDEN_PLAYERTAG_LAYER = 17;
+    private static readonly int VISIBLE_PLAYERTAG_LAYER = 18;
+
     public enum PlayerState
     {
         JustRowing,
@@ -38,10 +45,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Animator[] rowingAnimators;
     [SerializeField] private Material otherPlayerMaterial;
 
-    [SerializeField] private Oar leftOar;
-    [SerializeField] private Oar rightOar;
+    [SerializeField] private Camera camera;
+    [SerializeField] private Transform[] cameraPositions;
 
-    [SerializeField] private Camera[] cameras;
+    [SerializeField] private GameObject rowerSkin;
+    [SerializeField] private GameObject playerTag;
 
     [HideInInspector] public Trial trial;
     [HideInInspector] public Race race;
@@ -54,8 +62,7 @@ public class PlayerController : MonoBehaviour
 
     private AchievementTracker achievementTracker;
     private RouteFollower routeFollower;
-    private StatsManager stats;
-
+    
     private bool paused = false;
     private bool move = false;
 
@@ -66,14 +73,9 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        stats = GameManager.Instance.GetComponent<StatsManager>();
-
         achievementTracker = GetComponent<AchievementTracker>();
         routeFollower = GetComponent<RouteFollower>();
         photonView = GetComponent<PhotonView>();
-
-        leftOar.rowing = false;
-        rightOar.rowing = false;
     }
 
     private void Start()
@@ -82,20 +84,20 @@ public class PlayerController : MonoBehaviour
         {
             AssignMenuCamera();
             AssignRigidbody();
+            UpdateCanva();
         }
         else
         {
             DisableCameras();
             DestroyWaypointTracker();
             UpdateAppearance();
+            UpdateLayers();
         }
     }
 
     private void FixedUpdate()
     {
         if (!photonView.IsMine) return;
-
-        //achievementTracker.TrackAchievements(photonView);
 
         if (paused)
         {
@@ -112,12 +114,9 @@ public class PlayerController : MonoBehaviour
     }
 
     private void AssignMenuCamera()
-    {
-        // Retrieve player camera
-        Camera playerCamera = transform.Find("Cameras/Rear Camera").GetComponent<Camera>();
-        
+    {        
         // Update menu camera
-        MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = playerCamera;
+        MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = camera;
         
         // Display HUD
         MenuManager.Instance.OpenMenu("HUD");
@@ -126,6 +125,18 @@ public class PlayerController : MonoBehaviour
     private void AssignRigidbody()
     {
         rigidBody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
+    }
+
+    private void UpdateCanva()
+    {
+        photonView.RPC("RPC_UpdateCanva", RpcTarget.AllBufferedViaServer, PhotonNetwork.LocalPlayer.NickName);
+    }
+
+    [PunRPC]
+    private void RPC_UpdateCanva(string nickname)
+    {
+        // Update canvas to display users nickname
+        playerTag.GetComponentInChildren<TMP_Text>().text = nickname;
     }
 
     private void DisableCameras()
@@ -180,8 +191,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void UpdateLayers()
+    {
+        rowerSkin.gameObject.layer = VISIBLE_ROWER_LAYER; // Networked Rower
+
+        playerTag.gameObject.layer = VISIBLE_PLAYERTAG_LAYER; // Networked Player Tag
+
+        foreach (GameObject gObj in playerTag.GetComponentsInChildren<GameObject>())
+        {
+            gObj.layer = VISIBLE_PLAYERTAG_LAYER;
+        }
+    }
+
     private void UpdateSpeed()
     {
+
 #if UNITY_EDITOR
         
         // If debug 'move' button pressed
@@ -189,7 +213,7 @@ public class PlayerController : MonoBehaviour
         {
             // Apply force to the rigibody
             rigidBody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
-
+            
             // Update stroke state
             strokeState = StrokeState.Driving;
         }
@@ -205,11 +229,12 @@ public class PlayerController : MonoBehaviour
         }
 
 #else
+
         // Get speed from erg
-        rowingSpeed = stats.GetSpeed();
+        rowingSpeed = StatsManager.Instance.GetSpeed();
 
         // Get stroke state from erg
-        strokeState = (StrokeState) stats.GetStrokeState();
+        strokeState = (StrokeState) StatsManager.Instance.GetStrokeState();
 
         // If the user is currently driving
         if (strokeState == StrokeState.Driving)
@@ -217,6 +242,7 @@ public class PlayerController : MonoBehaviour
             // Apply force to the rigidbody
             rigidBody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
         }
+
 #endif
 
         // Calculate velocity based on rigibody current speed
@@ -264,18 +290,30 @@ public class PlayerController : MonoBehaviour
         return playerVelocity;
     }
 
+    public int GetCurrentLap()
+    {
+        return routeFollower.currentLap;
+    }
+
+    public float GetPlayerProgress()
+    {
+        return routeFollower.progressAlongRoute;
+    }
+
     public void ReduceVelocity()
     {
         rigidBody.velocity = Vector3.zero;
     }
 
-    public void ChangeCameraView()
+    public void ChangeCameraPosition()
     {
-        cameraIndex = (cameraIndex < cameras.Length - 1) ? cameraIndex + 1 : 0;
+        cameraIndex = (cameraIndex < cameraPositions.Length - 1) ? cameraIndex + 1 : 0;
 
-        for (int i = 0; i < cameras.Length; i++)
+        rowerSkin.layer = (cameraIndex != 0) ? VISIBLE_ROWER_LAYER : HIDDEN_ROWER_LAYER;
+
+        for (int i = 0; i < cameraPositions.Length; i++)
         {
-            cameras[i].gameObject.SetActive(i == cameraIndex);
+            camera.transform.SetPositionAndRotation(cameraPositions[cameraIndex].transform.position, cameraPositions[cameraIndex].transform.rotation);
         }
     }
 

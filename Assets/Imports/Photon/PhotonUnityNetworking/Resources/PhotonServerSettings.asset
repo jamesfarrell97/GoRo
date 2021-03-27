@@ -57,6 +57,7 @@ MonoBehaviour:
   - RPC_CheckIfPlayerComplete
   - RPC_StartRaceTimeout
   - RPC_PlayerCompletedRace
+  - RPC_UpdateCanva
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

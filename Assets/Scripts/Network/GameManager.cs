@@ -337,7 +337,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (!photonView.IsMine) continue;
 
             // Change camera view
-            player.GetComponent<PlayerController>().ChangeCameraView();
+            player.GetComponent<PlayerController>().ChangeCameraPosition();
 
             // No need to check any more views, so break
             break;
@@ -586,7 +586,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         var routeLength = route.routeDistance;
         var playerProgress = routeFollower.progressAlongRoute;
 
-        var distance = playerProgress / routeLength;
+        // Calculate distance as a percentage of the total number of laps
+        var distance = playerProgress / (routeLength * routeFollower.numberOfLaps);
 
         distanceSlider.value = distance;
     }

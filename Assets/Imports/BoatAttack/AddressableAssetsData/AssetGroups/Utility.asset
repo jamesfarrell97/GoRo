@@ -107,20 +107,26 @@ MonoBehaviour:
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
-  - m_GUID: a02c0fd7d6949a64686a18ee4cfbc06b
-    m_Address: Assets/Materials/Player/Boat/White.mat
+  - m_GUID: 941667a3fcffc2149b04df68c1e47e2a
+    m_Address: Assets/Materials/Player/Boat/Yellow Plastic.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
-  - m_GUID: 5596414ece8e460448283097471c075d
-    m_Address: Assets/Materials/Player/Boat/Red.mat
+  - m_GUID: 7d9fe128464221e47a29da8b3cbf14c9
+    m_Address: Assets/Materials/Player/Boat/Blue Plastic.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
-  - m_GUID: 85323f3d05dacbc4fa58bc5eb22e05de
-    m_Address: Assets/Materials/Player/Boat/Steel.mat
+  - m_GUID: a0f53f486b4fbfc49a9dea326613f5c1
+    m_Address: Assets/Materials/Player/Boat/Black Plastic.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 6111f0161c5885a419501b04f03e3e8c
+    m_Address: Assets/Materials/Player/Boat/Red Shirt.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
@@ -131,14 +137,50 @@ MonoBehaviour:
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
-  - m_GUID: 6111f0161c5885a419501b04f03e3e8c
-    m_Address: Assets/Materials/Player/Boat/Red Plastic.mat
+  - m_GUID: 3b7593afd8ac32f46bd8ad1ddd488fc2
+    m_Address: Assets/Materials/Player/Boat/White Plastic.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
-  - m_GUID: 3b7593afd8ac32f46bd8ad1ddd488fc2
-    m_Address: Assets/Materials/Player/Boat/White Plastic.mat
+  - m_GUID: 44e60abe079df97418313f426899e344
+    m_Address: Assets/Materials/Player/Boat/Red Plastic 1.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 85323f3d05dacbc4fa58bc5eb22e05de
+    m_Address: Assets/Materials/Player/Boat/Steel.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 5596414ece8e460448283097471c075d
+    m_Address: Assets/Materials/Player/Boat/Red.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: a02c0fd7d6949a64686a18ee4cfbc06b
+    m_Address: Assets/Materials/Player/Boat/White.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 5d51ba4796e28e04b997d633f552708b
+    m_Address: Assets/Materials/Player/Boat/Ghost Player.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: daef718f533b45943b9cbe38ccb408d4
+    m_Address: Assets/Materials/Player/Boat/Green Plastic.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: c658382a085516b4086d4ac0933e53e3
+    m_Address: Assets/Materials/Player/Boat/WaterMask.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}

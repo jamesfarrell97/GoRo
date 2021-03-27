@@ -2,7 +2,6 @@
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
-using System;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -10,6 +9,15 @@ using System;
 //
 public class PlayerController : MonoBehaviour
 {
+    // TODO: Extract into external APPDATA file
+    private static readonly int HIDDEN_ROWER_LAYER = 15;
+    private static readonly int VISIBLE_ROWER_LAYER = 16;
+
+    private static readonly int HIDDEN_PLAYERTAG_LAYER = 17;
+    private static readonly int VISIBLE_PLAYERTAG_LAYER = 18;
+
+    private static Camera playerCamera;
+
     public enum PlayerState
     {
         JustRowing,
@@ -36,12 +44,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Range(0, 3)] public float boatSpeed = 1f;
 
     [SerializeField] private Animator[] rowingAnimators;
-    [SerializeField] private Material otherPlayerMaterial;
 
-    [SerializeField] private Oar leftOar;
-    [SerializeField] private Oar rightOar;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private Camera cullCamera;
+    [SerializeField] private Transform[] cameraPositions;
 
-    [SerializeField] private Camera[] cameras;
+    [SerializeField] private GameObject rower;
+    [SerializeField] private GameObject localBoat;
+    [SerializeField] private GameObject networkedBoat;
+    [SerializeField] private GameObject minimapIcon;
+    [SerializeField] private GameObject playerTag;
 
     [HideInInspector] public Trial trial;
     [HideInInspector] public Race race;
@@ -54,8 +66,7 @@ public class PlayerController : MonoBehaviour
 
     private AchievementTracker achievementTracker;
     private RouteFollower routeFollower;
-    private StatsManager stats;
-
+    
     private bool paused = false;
     private bool move = false;
 
@@ -66,14 +77,9 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        stats = GameManager.Instance.GetComponent<StatsManager>();
-
         achievementTracker = GetComponent<AchievementTracker>();
         routeFollower = GetComponent<RouteFollower>();
         photonView = GetComponent<PhotonView>();
-
-        leftOar.rowing = false;
-        rightOar.rowing = false;
     }
 
     private void Start()
@@ -82,20 +88,24 @@ public class PlayerController : MonoBehaviour
         {
             AssignMenuCamera();
             AssignRigidbody();
+            UpdatePlayerTag();
+            UpdateBoat();
         }
         else
         {
             DisableCameras();
+            AssignBillboard();
             DestroyWaypointTracker();
-            UpdateAppearance();
+            UpdateMinimapIcon();
+            UpdateLayers();
+            UpdateBoat();
         }
+
     }
 
     private void FixedUpdate()
     {
         if (!photonView.IsMine) return;
-
-        //achievementTracker.TrackAchievements(photonView);
 
         if (paused)
         {
@@ -113,9 +123,9 @@ public class PlayerController : MonoBehaviour
 
     private void AssignMenuCamera()
     {
-        // Retrieve player camera
-        Camera playerCamera = transform.Find("Cameras/Rear Camera").GetComponent<Camera>();
-        
+        // Assign camera
+        playerCamera = mainCamera;
+
         // Update menu camera
         MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = playerCamera;
         
@@ -126,6 +136,18 @@ public class PlayerController : MonoBehaviour
     private void AssignRigidbody()
     {
         rigidBody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
+    }
+
+    private void UpdatePlayerTag()
+    {
+        photonView.RPC("RPC_UpdatePlayerTag", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
+    }
+
+    [PunRPC]
+    private void RPC_UpdatePlayerTag(string nickname)
+    {
+        // Update canvas to display users nickname
+        playerTag.GetComponentInChildren<TMP_Text>().text = nickname;
     }
 
     private void DisableCameras()
@@ -143,45 +165,65 @@ public class PlayerController : MonoBehaviour
         Destroy(GetComponent<RouteFollower>());
     }
 
-    private void UpdateAppearance()
+    private void UpdateMinimapIcon()
     {
-        Renderer[] renderers = GetComponentsInChildren<Renderer>();
-
-        foreach (Renderer renderer in renderers)
+        // Change minimap icon colour
+        foreach (SpriteRenderer spriteRenderer in minimapIcon.GetComponentsInChildren<SpriteRenderer>())
         {
-            Material[] materials = renderer.materials;
+            spriteRenderer.color = Color.red;
+        }
 
-            for (int i = 0; i < renderer.materials.Length; i++)
+        // Place higher than our icon in minimap
+        minimapIcon.transform.Translate(new Vector3(0, 1f, 0));
+    }
+
+    private void UpdateBoat()
+    {
+        if (photonView.IsMine)
+        {
+            Destroy(networkedBoat);
+        }
+        else
+        {
+            Destroy(localBoat);
+        }
+    }
+
+    private void UpdateLayers()
+    {
+        SetLayerRecursively(rower, VISIBLE_ROWER_LAYER);
+        SetLayerRecursively(playerTag, VISIBLE_PLAYERTAG_LAYER);
+    }
+
+    private void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (null == obj)
+        {
+            return;
+        }
+
+        obj.layer = newLayer;
+
+        foreach (Transform child in obj.transform)
+        {
+            if (null == child)
             {
-                // Change minimap icon color
-                if (renderer.gameObject.name == "Boat Front" || renderer.gameObject.name == "Boat Rear")
-                {
-                    // Render other player icon below ours
-                    renderer.gameObject.transform.parent.Translate(new Vector3(0, -0.5f, 0));
-
-                    materials[i].color = Color.red;
-                }
-
-                //Destroy water mask
-                else if (renderer.gameObject.name.Contains("Mask"))
-                {
-                    Destroy(renderer.transform.parent.gameObject.GetComponent<SetRenderQueue>());
-                    Destroy(renderer.gameObject);
-                }
-
-                // Update material
-                else if (!materials[i].color.Equals(null))
-                {
-                    materials[i] = otherPlayerMaterial;
-                }
+                continue;
             }
 
-            renderer.materials = materials;
+            SetLayerRecursively(child.gameObject, newLayer);
         }
+    }
+
+    private void AssignBillboard()
+    {
+        playerTag.GetComponent<Billboard>().camTransform = playerCamera.transform;
+        playerTag.GetComponent<Canvas>().worldCamera = playerCamera;
     }
 
     private void UpdateSpeed()
     {
+
 #if UNITY_EDITOR
         
         // If debug 'move' button pressed
@@ -189,7 +231,7 @@ public class PlayerController : MonoBehaviour
         {
             // Apply force to the rigibody
             rigidBody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
-
+            
             // Update stroke state
             strokeState = StrokeState.Driving;
         }
@@ -205,11 +247,12 @@ public class PlayerController : MonoBehaviour
         }
 
 #else
+
         // Get speed from erg
-        rowingSpeed = stats.GetSpeed();
+        rowingSpeed = StatsManager.Instance.GetSpeed();
 
         // Get stroke state from erg
-        strokeState = (StrokeState) stats.GetStrokeState();
+        strokeState = (StrokeState) StatsManager.Instance.GetStrokeState();
 
         // If the user is currently driving
         if (strokeState == StrokeState.Driving)
@@ -217,6 +260,7 @@ public class PlayerController : MonoBehaviour
             // Apply force to the rigidbody
             rigidBody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
         }
+
 #endif
 
         // Calculate velocity based on rigibody current speed
@@ -264,18 +308,31 @@ public class PlayerController : MonoBehaviour
         return playerVelocity;
     }
 
+    public int GetCurrentLap()
+    {
+        return routeFollower.currentLap;
+    }
+
+    public float GetPlayerProgress()
+    {
+        return routeFollower.progressAlongRoute;
+    }
+
     public void ReduceVelocity()
     {
         rigidBody.velocity = Vector3.zero;
     }
 
-    public void ChangeCameraView()
+    public void ChangeCameraPosition()
     {
-        cameraIndex = (cameraIndex < cameras.Length - 1) ? cameraIndex + 1 : 0;
+        cameraIndex = (cameraIndex < cameraPositions.Length - 1) ? cameraIndex + 1 : 0;
 
-        for (int i = 0; i < cameras.Length; i++)
+        SetLayerRecursively(rower, (cameraIndex != 0) ? VISIBLE_ROWER_LAYER : HIDDEN_ROWER_LAYER);
+
+        for (int i = 0; i < cameraPositions.Length; i++)
         {
-            cameras[i].gameObject.SetActive(i == cameraIndex);
+            mainCamera.transform.SetPositionAndRotation(cameraPositions[cameraIndex].transform.position, cameraPositions[cameraIndex].transform.rotation);
+            cullCamera.transform.SetPositionAndRotation(cameraPositions[cameraIndex].transform.position, cameraPositions[cameraIndex].transform.rotation);
         }
     }
 

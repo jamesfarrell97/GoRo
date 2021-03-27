@@ -268,11 +268,13 @@ public class StatsGraph : MonoBehaviour
         float graphHeight = graphContainer.sizeDelta.y;
         float graphWidth = graphContainer.sizeDelta.x;
 
-        float unitWidth = graphWidth / ((dataPoints.Count != 0) ? dataPoints.Count : 1);
-        float unitHeight = graphHeight / ((dataPoints.Max() != 0) ? dataPoints.Max() : 1);
-
         float yMinimum = dataPoints.Min();
         float yMaximum = dataPoints.Max();
+
+        float dataRange = yMaximum - yMinimum;
+
+        float unitWidth = graphWidth / ((dataPoints.Count != 0) ? dataPoints.Count : 1);
+        float unitHeight = graphHeight / dataRange / ((dataRange != 0) ? dataRange : 1);
 
         GameObject previousDataPoint = null;
         for (int i = 0; i < dataPoints.Count; i++)
@@ -304,7 +306,7 @@ public class StatsGraph : MonoBehaviour
         // Update labels
         for (int i = 0; i < graphLabels.Count; i++)
         {
-            graphLabels[i].GetComponent<TMP_Text>().text = getAxisLabelY((yMaximum / SEPERATOR_COUNT) * i);
+            graphLabels[i].GetComponent<TMP_Text>().text = getAxisLabelY((dataRange / SEPERATOR_COUNT) * i);
         }
     }
 

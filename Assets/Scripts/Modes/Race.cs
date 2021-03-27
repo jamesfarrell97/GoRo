@@ -8,6 +8,8 @@ using Photon.Pun;
 using TMPro;
 
 using static EventNotification;
+using System.Linq;
+
 public class Race : MonoBehaviour
 {
     public enum RaceState
@@ -97,13 +99,24 @@ public class Race : MonoBehaviour
 
     private void MonitorRace()
     {
-        UpdateStopWatch();
-        UpdateDistanceSlider();
+        UpdateEventPanel();
     }
 
-    private float pauseDuration = 0;
-    private void UpdateStopWatch()
+    private void UpdatePosition()
     {
+        // Add player to completed race list
+        photonView.RPC("RPC_UpdatePosition", RpcTarget.AllBufferedViaServer);
+    }
+
+    Dictionary<float, PlayerController> currentDistances = new Dictionary<float, PlayerController>();
+
+    private float pauseDuration = 0;
+
+    private void UpdateEventPanel()
+    {
+        // Clear current distances
+        currentDistances.Clear();
+
         // Don't execute if game paused
         if (GameManager.State.Equals(GameManager.GameState.Paused))
         {
@@ -115,18 +128,44 @@ public class Race : MonoBehaviour
             return;
         }
 
-        // For each player in race
+        float playerProgress = 0;
+
+        // For each player
         foreach (PlayerController player in players)
         {
-            // Only execute on our view
+            // Store local player progress
+            if (player.photonView.IsMine) playerProgress = player.GetPlayerProgress();
+
+            // Add player progress to dictionary
+            currentDistances.Add(player.GetPlayerProgress(), player);
+        }
+
+        // Convert dictionary to list
+        List<float> position = currentDistances.Keys.ToList();
+        
+        // Sort
+        position.Sort();
+
+        // For each player
+        foreach (PlayerController player in players)
+        {
+            // Skip networked players
             if (!player.photonView.IsMine) continue;
 
             // Update duration
             raceDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - (raceStartTime + pauseDuration));
 
-            // Display duration
-            DisplayDataToParticipants(raceDuration.ToString(@"mm\:ss"));
+            // Update lap
+            int currentLap = player.GetCurrentLap();
 
+            // Update position
+            int playerPosition = position.IndexOf(playerProgress) + 1; // 0 indexed
+            int playerCount = players.Count();
+
+            // Display event panel
+            GameManager.Instance.DisplayEventPanel(raceDuration.ToString(@"mm\:ss"), $"{currentLap}/{numberOfLaps}", playerPosition.ToString() + "/" + playerCount.ToString());
+
+            // Local player found, stop checking
             break;
         }
     }
@@ -429,7 +468,7 @@ public class Race : MonoBehaviour
             if (players.Contains(player)) continue;
 
             // Send race notification
-            StartCoroutine(GameManager.Instance.SendEventNotification(EventCategory.Race, "Join Race", "Race Track", numberOfLaps.ToString(), players.Count.ToString(), 15));
+            StartCoroutine(GameManager.Instance.SendEventNotification(EventCategory.Race, "Join Race", name, numberOfLaps.ToString(), players.Count.ToString(), 15));
 
             break;
         }

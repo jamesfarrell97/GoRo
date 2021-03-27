@@ -9,6 +9,10 @@ TagManager:
   - FinishRace
   - Boat Tip
   - Water
+  - Canva
+  - Networked Canva
+  - Rower
+  - Networked Rower
   layers:
   - Default
   - TransparentFX
@@ -25,12 +29,12 @@ TagManager:
   - Minimap Icon
   - Clouds
   - Player
-  - Rower
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Hidden Rower
+  - Visible Rower
+  - Hidden Player Tag
+  - Visible Player Tag
+  - Transparent Player
+  - Opaque Player
   - 
   - 
   - 

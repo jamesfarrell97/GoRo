@@ -1,17 +1,24 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+
+using UnityEngine;
 using TMPro;
-using System.Collections.Generic;
-using System;
+
 using Random = UnityEngine.Random;
 
 public class StatsManager : MonoBehaviour
 {
+    public static StatsManager Instance;
+
     // TODO: EXTRACT INTO SEPERATE .APPDATA SETTINGS FILE
     public static readonly int[] SplitDistances = { 100, 500, 1000, 1500, 5000 };
     public static readonly float KILOMETERS_METER = 1000;
     public static readonly float SECS_MINUTE = 60;
 
-    private const int MAX_DATA_POINTS = 200;
+    public static readonly float SAMPLE_RATE = 4;   // Number of data samples per second
+    public static readonly float SAMPLE_MINS = 120; // Maximum minutes worth of data samples to store
+
+    // Maximum samples to store
+    private readonly int MAX_DATA_POINTS = (int) (SECS_MINUTE * SAMPLE_MINS * SAMPLE_RATE);
 
     // Basic Data
     [SerializeField] private TMP_Text TimeDisplay;
@@ -79,13 +86,25 @@ public class StatsManager : MonoBehaviour
     public static Queue<float> DriveLengthData { get; private set; }
     public static Queue<float> DragFactorData { get; private set; }
 
+    private void Awake()
+    {
+        if (Instance)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        DontDestroyOnLoad(gameObject);
+        Instance = this;
+    }
+
     private void Start()
     {
         ResetDisplay();
         BuildDataStores();
 
-        // Update stats every 0.5 seconds
-        InvokeRepeating("UpdateStats", 0f, 0.5f);
+        // Update stats SAMPLE_RATE times per second
+        InvokeRepeating("UpdateStats", 0f, (1 / SAMPLE_RATE));
     }
 
     private void Update()
@@ -129,9 +148,6 @@ public class StatsManager : MonoBehaviour
     {
         // Update often to sync rowing animation with user stroke state
         StrokeState = BluetoothManager.RowingStatusData[10];
-
-        // Update stroke state
-        DebugDisplay.text = StrokeState + "";
     }
 
     // Measured as 0.1 meters per least-significant bit
@@ -221,23 +237,13 @@ public class StatsManager : MonoBehaviour
 
     private void RetrieveStats()
     {
-        // Distance Covered (meters)
-        DistanceL = BluetoothManager.RowingStatusData[3];           // Distance Lo
-        DistanceM = BluetoothManager.RowingStatusData[4];           // Distance Mid
-        DistanceH = BluetoothManager.RowingStatusData[5];           // Distance Hi
+        Distance = (BluetoothManager.RowingStatusData[3] * DISTANCE_H_METER_VALUE)  // Distance Lo
+                 + (BluetoothManager.RowingStatusData[4] * DISTANCE_M_METER_VALUE)  // Distance Mids
+                 + (BluetoothManager.RowingStatusData[5] * DISTANCE_L_METER_VALUE); // Distance Hi
 
-        Distance = (DistanceH * DISTANCE_H_METER_VALUE)
-                 + (DistanceM * DISTANCE_M_METER_VALUE)
-                 + (DistanceL * DISTANCE_L_METER_VALUE);
-
-        // Time Rowing (seconds)
-        ElapsedTimeL = BluetoothManager.RowingStatusData[0];        // Elapsed Time Lo
-        ElapsedTimeM = BluetoothManager.RowingStatusData[1];        // Elapsed Time Mid
-        ElapsedTimeH = BluetoothManager.RowingStatusData[2];        // Elapsed Time Hi
-
-        Time = (ElapsedTimeL * ELAPSED_TIME_L_S_VALUE)
-             + (ElapsedTimeM * ELAPSED_TIME_M_S_VALUE)
-             + (ElapsedTimeH * ELAPSED_TIME_H_S_VALUE);
+        Time = (BluetoothManager.RowingStatusData[0] * ELAPSED_TIME_L_S_VALUE)      // Elapsed Time Lo
+             + (BluetoothManager.RowingStatusData[1] * ELAPSED_TIME_M_S_VALUE)      // Elapsed Time Mid
+             + (BluetoothManager.RowingStatusData[2] * ELAPSED_TIME_H_S_VALUE);     // Elapsed Time Hi
 
 #if !UNITY_EDITOR
 
@@ -321,7 +327,7 @@ public class StatsManager : MonoBehaviour
         DriveLength = BluetoothManager.StrokeData[6];               // Drive Length
 
         // Update data stores
-        UpdateDataStores();
+        RecordData();
 
         // Update display
         UpdateDisplay();
@@ -366,7 +372,7 @@ public class StatsManager : MonoBehaviour
     }
 
     private int dataPointCount = 0;
-    private void UpdateDataStores()
+    private void RecordData()
     {
         dataPointCount++;
         if (dataPointCount > MAX_DATA_POINTS)
@@ -431,22 +437,16 @@ public class StatsManager : MonoBehaviour
 
     private void SetDistanceDisplay(float distance)
     {
-        if (!DistanceDisplay.enabled) return;
-
         DistanceDisplay.text = (int) distance + "m";
     }
 
     private void SetSpeedDisplay(float speed)
     {
-        if (!SpeedDisplay.enabled) return;
-
         SpeedDisplay.text = string.Format("{0:0.00}", speed);
     }
 
     private void SetTimeDisplay(float seconds)
     {
-        if (!TimeDisplay.enabled) return;
-
         int[] hms = HelperFunctions.SecondsToHMS((int) seconds);
 
         TimeDisplay.text = hms[0].ToString("D2") + ":" + hms[1].ToString("D2") + ":" + hms[2].ToString("D2");
@@ -456,8 +456,6 @@ public class StatsManager : MonoBehaviour
     {
         foreach(TMP_Text SplitDistDisplay in SplitDistDisplays)
         {
-            if (!SplitDistDisplay.enabled) continue;
-
             SplitDistDisplay.text = distance.ToString();
         }
     }
@@ -473,8 +471,6 @@ public class StatsManager : MonoBehaviour
 
     private void SetSplitAvgPaceDisplay(float splitAvgPace)
     {
-        if (!SplitAvgPaceDisplay.enabled) return;
-
         int[] hms = HelperFunctions.SecondsToHMS((int) splitAvgPace);
 
         SplitAvgPaceDisplay.text = hms[1].ToString("D1") + ":" + hms[2].ToString("D2");
@@ -489,15 +485,11 @@ public class StatsManager : MonoBehaviour
 
     private void SetStrokesPerMinDisplay(float strokesPerMin)
     {
-        if (!StrokesPerMinDisplay.enabled) return;
-
         StrokesPerMinDisplay.text = strokesPerMin.ToString();
     }
 
     private void SetPowerDisplay(float power)
     {
-        if (!StrokePowerDisplay.enabled) return;
-
         StrokePowerDisplay.text = power.ToString();
     }
 
@@ -510,8 +502,6 @@ public class StatsManager : MonoBehaviour
 
     private void SetDragFactorDisplay(float dragFactor)
     {
-        if (!DragFactorDisplay.enabled) return;
-
         DragFactorDisplay.text = dragFactor.ToString();
     }
 

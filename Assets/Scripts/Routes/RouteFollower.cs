@@ -8,15 +8,8 @@ namespace UnityStandardAssets.Utility
 {
     public class RouteFollower : MonoBehaviour
     {
-        [SerializeField] public Route route;
-        [SerializeField] public Route[] routes;
-
-        [SerializeField] private float translationalVelocity = 5f;
-        [SerializeField] private float translationVelocityFactor = .1f;
-
-        [SerializeField] private float rotationalVelocity = 10;
-        [SerializeField] private float rotationalVelocityFactor = .2f;
-        [SerializeField] private float minimumThreshold = 1f;
+        [HideInInspector] public Route route;
+        [HideInInspector] public Route[] routes;
 
         [SerializeField] private Transform target;
 
@@ -31,6 +24,13 @@ namespace UnityStandardAssets.Utility
         private PlayerController playerController;
         private GhostController ghostController;
         private Vector3 previousPosition;
+
+        private float translationalVelocity = 5f;
+        private float translationVelocityFactor = .1f;
+
+        private float rotationalVelocity = 10;
+        private float rotationalVelocityFactor = .2f;
+        private float minimumThreshold = 1f;
 
         private bool halfPointReached;
         private float speed;

@@ -42,67 +42,38 @@ public static class CSAFEDictionary
         { "CSAFE_GETUSERINFO_CMD",                                          new List<object> { 0xAB, new int[] { } } },
         { "CSAFE_GETHRCUR_CMD",                                             new List<object> { 0xB0, new int[] { } } },
         { "CSAFE_GETPOWER_CMD",                                             new List<object> { 0xB4, new int[] { } } },
-        
-        /*
-            
-        #Short Commands
-        cmds['CSAFE_GETSTATUS_CMD'] = [0x80, []]
-        cmds['CSAFE_RESET_CMD'] = [0x81, []]
-        cmds['CSAFE_GOIDLE_CMD'] = [0x82, []]
-        cmds['CSAFE_GOHAVEID_CMD'] = [0x83, []]
-        cmds['CSAFE_GOINUSE_CMD'] = [0x85, []]
-        cmds['CSAFE_GOFINISHED_CMD'] = [0x86, []]
-        cmds['CSAFE_GOREADY_CMD'] = [0x87, []]
-        cmds['CSAFE_BADID_CMD'] = [0x88, []]
-        cmds['CSAFE_GETVERSION_CMD'] = [0x91, []]
-        cmds['CSAFE_GETID_CMD'] = [0x92, []]
-        cmds['CSAFE_GETUNITS_CMD'] = [0x93, []]
-        cmds['CSAFE_GETSERIAL_CMD'] = [0x94, []]
-        cmds['CSAFE_GETODOMETER_CMD'] = [0x9B, []]
-        cmds['CSAFE_GETERRORCODE_CMD'] = [0x9C, []]
-        cmds['CSAFE_GETTWORK_CMD'] = [0xA0, []]
-        cmds['CSAFE_GETHORIZONTAL_CMD'] = [0xA1, []]
-        cmds['CSAFE_GETCALORIES_CMD'] = [0xA3, []]
-        cmds['CSAFE_GETPROGRAM_CMD'] = [0xA4, []]
-        cmds['CSAFE_GETPACE_CMD'] = [0xA6, []]
-        cmds['CSAFE_GETCADENCE_CMD'] = [0xA7, []]
-        cmds['CSAFE_GETUSERINFO_CMD'] = [0xAB, []]
-        cmds['CSAFE_GETHRCUR_CMD'] = [0xB0, []]
-        cmds['CSAFE_GETPOWER_CMD'] = [0xB4, []]
 
-        #Long Commands
-        cmds['CSAFE_AUTOUPLOAD_CMD'] = [0x01, [1,]] #Configuration (no affect)
-        cmds['CSAFE_IDDIGITS_CMD'] = [0x10, [1,]] #Number of Digits
-        cmds['CSAFE_SETTIME_CMD'] = [0x11, [1, 1, 1]] #Hour, Minute, Seconds
-        cmds['CSAFE_SETDATE_CMD'] = [0x12, [1, 1, 1]] #Year, Month, Day
-        cmds['CSAFE_SETTIMEOUT_CMD'] = [0x13, [1,]] #State Timeout
-        cmds['CSAFE_SETUSERCFG1_CMD'] = [0x1A, [0,]] #PM3 Specific Command (length computed)
-        cmds['CSAFE_SETTWORK_CMD'] = [0x20, [1, 1, 1]] #Hour, Minute, Seconds
-        cmds['CSAFE_SETHORIZONTAL_CMD'] = [0x21, [2, 1]] #Distance, Units
-        cmds['CSAFE_SETCALORIES_CMD'] = [0x23, [2,]] #Total Calories
-        cmds['CSAFE_SETPROGRAM_CMD'] = [0x24, [1, 1]] #Workout ID, N/A
-        cmds['CSAFE_SETPOWER_CMD'] = [0x34, [2, 1]] #Stroke Watts, Units
-        cmds['CSAFE_GETCAPS_CMD'] = [0x70, [1,]] #Capability Code
+        // Long Commands
+        { "CSAFE_AUTOUPLOAD_CMD",                                           new List<object> { 0x01, new int[] { 1 } } },
+        { "CSAFE_IDDIGITS_CMD",                                             new List<object> { 0x10, new int[] { 1 } } },
+        { "CSAFE_SETTIME_CMD",                                              new List<object> { 0x11, new int[] { 1, 1, 1 } } },
+        { "CSAFE_SETDATE_CMD",                                              new List<object> { 0x12, new int[] { 1, 1, 1 } } },
+        { "CSAFE_SETTIMEOUT_CMD",                                           new List<object> { 0x13, new int[] { 1 } } },
+        { "CSAFE_SETUSERCFG1_CMD",                                          new List<object> { 0x1A, new int[] { 0 } } },
+        { "CSAFE_SETTWORK_CMD",                                             new List<object> { 0x20, new int[] { 1, 1, 1 } } },
+        { "CSAFE_SETHORIZONTAL_CMD",                                        new List<object> { 0x21, new int[] { 2, 1 } } },
+        { "CSAFE_SETCALORIES_CMD",                                          new List<object> { 0x23, new int[] { 2 } } },
+        { "CSAFE_SETPROGRAM_CMD",                                           new List<object> { 0x24, new int[] { 1, 1 } } },
+        { "CSAFE_SETPOWER_CMD",                                             new List<object> { 0x34, new int[] { 2, 1 } } },
+        { "CSAFE_GETCAPS_CMD",                                              new List<object> { 0x70, new int[] { 1 } } },
 
-        #PM3 Specific Short Commands
-        cmds['CSAFE_PM_GET_WORKOUTTYPE'] = [0x89, [], 0x1A]
-        cmds['CSAFE_PM_GET_DRAGFACTOR'] = [0xC1, [], 0x1A]
-        cmds['CSAFE_PM_GET_STROKESTATE'] = [0xBF, [], 0x1A]
-        cmds['CSAFE_PM_GET_WORKTIME'] = [0xA0, [], 0x1A]
-        cmds['CSAFE_PM_GET_WORKDISTANCE'] = [0xA3, [], 0x1A]
-        cmds['CSAFE_PM_GET_ERRORVALUE'] = [0xC9, [], 0x1A]
-        cmds['CSAFE_PM_GET_WORKOUTSTATE'] = [0x8D, [], 0x1A]
-        cmds['CSAFE_PM_GET_WORKOUTINTERVALCOUNT'] = [0x9F, [], 0x1A]
-        cmds['CSAFE_PM_GET_INTERVALTYPE'] = [0x8E, [], 0x1A]
-        cmds['CSAFE_PM_GET_RESTTIME'] = [0xCF, [], 0x1A]
+        // Specific Short Commands
+        { "CSAFE_PM_GET_WORKOUTTYPE",                                       new List<object> { 0x89, new int[] { }, 0x1A } },
+        { "CSAFE_PM_GET_DRAGFACTOR",                                        new List<object> { 0xC1, new int[] { }, 0x1A } },
+        { "CSAFE_PM_GET_STROKESTATE",                                       new List<object> { 0xBF, new int[] { }, 0x1A } },
+        { "CSAFE_PM_GET_WORKTIME",                                          new List<object> { 0xA0, new int[] { }, 0x1A } },
+        { "CSAFE_PM_GET_WORKDISTANCE",                                      new List<object> { 0xA3, new int[] { }, 0x1A } },
+        { "CSAFE_PM_GET_ERRORVALUE",                                        new List<object> { 0xC9, new int[] { }, 0x1A } },
+        { "CSAFE_PM_GET_WORKOUTSTATE",                                      new List<object> { 0x8D, new int[] { }, 0x1A } },
+        { "CSAFE_PM_GET_WORKOUTINTERVALCOUNT",                              new List<object> { 0x9F, new int[] { }, 0x1A } },
+        { "CSAFE_PM_GET_INTERVALTYPE",                                      new List<object> { 0x8E, new int[] { }, 0x1A } },
+        { "CSAFE_PM_GET_RESTTIME",                                          new List<object> { 0xCF, new int[] { }, 0x1A } },
 
-        #PM3 Specific Long Commands
-        cmds['CSAFE_PM_SET_SPLITDURATION'] = [0x05, [1, 4], 0x1A] #Time(0)/Distance(128), Duration
-        cmds['CSAFE_PM_GET_FORCEPLOTDATA'] = [0x6B, [1,], 0x1A] #Block Length
-        cmds['CSAFE_PM_SET_SCREENERRORMODE'] = [0x27, [1,], 0x1A] #Disable(0)/Enable(1)
-        cmds['CSAFE_PM_GET_HEARTBEATDATA'] = [0x6C, [1,], 0x1A] #Block Length
-             
-        */
+        // Specific Long Commands
+        { "CSAFE_PM_GET_SPLITDURATION",                                     new List<object> { 0x85, new int[] { 1, 4 }, 0x1A } },
+        { "CSAFE_PM_GET_FORCEPLOTDATA",                                     new List<object> { 0x68, new int[] { 1 }, 0x1A } },
+        { "CSAFE_PM_GET_SCREENERRORMODE",                                   new List<object> { 0x27, new int[] { 1 }, 0x1A } },
+        { "CSAFE_PM_GET_HEARTBEATDATA",                                     new List<object> { 0x6C, new int[] { 1 }, 0x1A } }
     };
 
     // resp[0xCmd_Id] = [COMMAND_NAME, [Bytes, ...]]

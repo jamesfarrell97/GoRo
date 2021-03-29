@@ -14,7 +14,7 @@ public class StatsManager : MonoBehaviour
     public static readonly float KILOMETERS_METER = 1000;
     public static readonly float SECS_MINUTE = 60;
 
-    public static readonly float SAMPLE_RATE = 4;   // Number of data samples per second
+    public static readonly float SAMPLE_RATE = 8;   // Number of data samples per second
     public static readonly float SAMPLE_MINS = 120; // Maximum minutes worth of data samples to store
 
     // Maximum samples to store
@@ -98,13 +98,18 @@ public class StatsManager : MonoBehaviour
         Instance = this;
     }
 
+    public void SetDebugDisplay(string value)
+    {
+        DebugDisplay.text = value;
+    }
+
     private void Start()
     {
         ResetDisplay();
         BuildDataStores();
 
         // Update stats SAMPLE_RATE times per second
-        InvokeRepeating("UpdateStats", 0f, (1 / SAMPLE_RATE));
+        InvokeRepeating("UpdateStats", 0f, (1f / SAMPLE_RATE));
     }
 
     private void Update()
@@ -137,7 +142,6 @@ public class StatsManager : MonoBehaviour
         DriveLengthData = new Queue<float>();
         DragFactorData = new Queue<float>();
     }
-
 
     private void UpdateStats()
     {
@@ -237,9 +241,9 @@ public class StatsManager : MonoBehaviour
 
     private void RetrieveStats()
     {
-        Distance = (BluetoothManager.RowingStatusData[3] * DISTANCE_H_METER_VALUE)  // Distance Lo
-                 + (BluetoothManager.RowingStatusData[4] * DISTANCE_M_METER_VALUE)  // Distance Mids
-                 + (BluetoothManager.RowingStatusData[5] * DISTANCE_L_METER_VALUE); // Distance Hi
+        Distance = (BluetoothManager.RowingStatusData[3] * DISTANCE_L_METER_VALUE)  // Distance Lo
+                 + (BluetoothManager.RowingStatusData[4] * DISTANCE_M_METER_VALUE)  // Distance Mid
+                 + (BluetoothManager.RowingStatusData[5] * DISTANCE_H_METER_VALUE); // Distance Hi
 
         Time = (BluetoothManager.RowingStatusData[0] * ELAPSED_TIME_L_S_VALUE)      // Elapsed Time Lo
              + (BluetoothManager.RowingStatusData[1] * ELAPSED_TIME_M_S_VALUE)      // Elapsed Time Mid
@@ -519,6 +523,11 @@ public class StatsManager : MonoBehaviour
         //ProjectedWorkDistanceDisplay.text = projectedWorkDist.ToString();
     }
 
+    public float GetDistance()
+    {
+        return Distance;
+    }
+
     public int GetMetersRowed()
     {
         return (int) Distance;
@@ -537,6 +546,16 @@ public class StatsManager : MonoBehaviour
     public float GetStrokePower()
     {
         return StrokePower;
+    }
+
+    public float GetStrokeRate()
+    {
+        return StrokesPerMin;
+    }
+
+    public float GetAvgSplit()
+    {
+        return SplitAvgPace;
     }
 
     public int GetStrokeState()

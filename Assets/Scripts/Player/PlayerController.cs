@@ -3,6 +3,8 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -71,6 +73,12 @@ public class PlayerController : MonoBehaviour
     private float rowingSpeed = 0;
     private float playerVelocity = 0;
 
+    public List<float> DistanceSample { get; private set; }
+    public List<float> PowerSample { get; private set; }
+    public List<float> StrokeRateSample { get; private set; }
+    public List<float> AvgSplitSample { get; private set; }
+    public List<float> SpeedSample { get; private set; }
+
     private void Awake()
     {
         achievementTracker = GetComponent<AchievementTracker>();
@@ -93,22 +101,18 @@ public class PlayerController : MonoBehaviour
             UpdateAppearance();
             UpdateLayers();
         }
+
+        ResetSamples();
+
+        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.SAMPLE_RATE));
     }
 
     private void FixedUpdate()
     {
         if (!photonView.IsMine) return;
 
-        if (paused)
+        if (!paused)
         {
-            if (PhotonNetwork.OfflineMode)
-            {
-                routeFollower.UpdateVelocity(0);
-            }
-        }
-        else
-        {
-            UpdateSpeed();
             Animate();
         }
     }
@@ -197,25 +201,65 @@ public class PlayerController : MonoBehaviour
 
         playerTag.gameObject.layer = VISIBLE_PLAYERTAG_LAYER; // Networked Player Tag
 
-        foreach (GameObject gObj in playerTag.GetComponentsInChildren<GameObject>())
+        foreach (GameObject gameObject in playerTag.GetComponentsInChildren<GameObject>())
         {
-            gObj.layer = VISIBLE_PLAYERTAG_LAYER;
+            gameObject.layer = VISIBLE_PLAYERTAG_LAYER;
         }
     }
 
-    private void UpdateSpeed()
+    public float routeDistance = 0;
+    
+    private void SampleStats()
     {
+        // Sample distance
+        DistanceSample.Add(routeDistance);
+
+        // Sample stroke power
+        PowerSample.Add(StatsManager.Instance.GetStrokePower());
+
+        // Sample stroke rate
+        StrokeRateSample.Add(StatsManager.Instance.GetStrokeRate());
+
+        // Sample split avg
+        AvgSplitSample.Add(StatsManager.Instance.GetAvgSplit());
+
+        // Sample speed
+        SpeedSample.Add(StatsManager.Instance.GetSpeed());
+    }
+
+    public void ResetSamples()
+    {
+        DistanceSample = new List<float>();
+        PowerSample = new List<float>();
+        StrokeRateSample = new List<float>();
+        AvgSplitSample = new List<float>();
+        SpeedSample = new List<float>();
+    }
+
+    private void UpdateMovement()
+    {
+        // Don't execute while paused
+        if (paused) return;
 
 #if UNITY_EDITOR
-        
+
         // If debug 'move' button pressed
         if (move || Input.GetKey(KeyCode.W))
         {
-            // Apply force to the rigibody
-            rigidBody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
+            // Update distance
+            routeDistance += boatSpeed;
             
             // Update stroke state
             strokeState = StrokeState.Driving;
+
+            // Update distance
+            routeFollower.UpdateDistance(routeDistance);
+
+            // Update debug display
+            StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
+
+            // Sample stats
+            SampleStats();
         }
         else if (Input.GetKey(KeyCode.S))
         {
@@ -243,13 +287,12 @@ public class PlayerController : MonoBehaviour
             rigidBody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
         }
 
+        routeFollower.UpdateProgress(StatsManager.Instance.GetDistance());
+
+        StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
+
 #endif
 
-        // Calculate velocity based on rigibody current speed
-        playerVelocity = rigidBody.velocity.magnitude * boatSpeed;
-        
-        // Update velocity
-        routeFollower.UpdateVelocity(playerVelocity);
     }
 
     private void Animate()
@@ -303,6 +346,11 @@ public class PlayerController : MonoBehaviour
     public void ReduceVelocity()
     {
         rigidBody.velocity = Vector3.zero;
+    }
+
+    public void ResetProgress()
+    {
+        routeDistance = 0;
     }
 
     public void ChangeCameraPosition()

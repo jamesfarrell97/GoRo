@@ -6498,6 +6498,41 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 773787443}
   m_Mesh: {fileID: -5970788192211417710, guid: 2bf0c9d33016e7142926747072ff8ffc, type: 3}
+--- !u!84 &783992962
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WaterDepthMap
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  serializedVersion: 3
+  m_Width: 1024
+  m_Height: 1024
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthFormat: 2
+  m_ColorFormat: 142
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
 --- !u!1 &797088763
 GameObject:
   m_ObjectHideFlags: 0
@@ -59995,7 +60030,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   numberOfLaps: 1
-  resolveTimeoutDuration: 10
+  resolveTimeoutDuration: 5
   trialGhost: {fileID: 3128037215741786078, guid: 50eaad33eb632574599abb702f6cb308,
     type: 3}
 --- !u!4 &8104241542546478310
@@ -60232,7 +60267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   numberOfLaps: 1
-  resolveTimeoutDuration: 10
+  resolveTimeoutDuration: 5
   trialGhost: {fileID: 3128037215741786078, guid: 50eaad33eb632574599abb702f6cb308,
     type: 3}
 --- !u!114 &8104241543112346305
@@ -60476,7 +60511,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   numberOfLaps: 1
-  resolveTimeoutDuration: 10
+  resolveTimeoutDuration: 5
   trialGhost: {fileID: 3128037215741786078, guid: 50eaad33eb632574599abb702f6cb308,
     type: 3}
 --- !u!4 &8104241543535446638
@@ -61057,7 +61092,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   computeOverride: 1
-  _depthTex: {fileID: 0}
+  _depthTex: {fileID: 783992962}
   bakedDepthTex: {fileID: 0}
   _waves:
   - amplitude: 0.048627924

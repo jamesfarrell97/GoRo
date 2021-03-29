@@ -670,8 +670,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void PauseGame()
     {
-        if (!PhotonNetwork.OfflineMode) return;
-
         // Retrieve all players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
 

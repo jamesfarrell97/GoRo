@@ -13,7 +13,7 @@ public class GhostController : MonoBehaviour
     
     private RouteFollower routeFollower;
 
-    private float[] speedSamples;
+    private float[] samples;
     private int sampleIndex;
 
     private bool paused;
@@ -26,7 +26,8 @@ public class GhostController : MonoBehaviour
     private void Start()
     {
         Reset();
-        InvokeRepeating("UpdateSpeed", 0, 0.5f);
+
+        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.SAMPLE_RATE));
     }
 
     private void Reset()
@@ -40,24 +41,29 @@ public class GhostController : MonoBehaviour
         this.trial = trial;
     }
 
-    public void InstantiateGhostSamples(float[] speedSamples)
+    public void InstantiateGhostSamples(float[] samples)
     {
-        this.speedSamples = speedSamples;
+        this.samples = samples;
 
-        routeFollower.UpdateVelocity(speedSamples[++sampleIndex]);
+        routeFollower.UpdateDistance(0);
     }
 
-    private void UpdateSpeed()
+    public float distance = 0;
+
+    private void UpdateMovement()
     {
         if (paused) return;
 
+        // Update distance
+        distance = samples[sampleIndex];
+
+        // Move
+        routeFollower.UpdateDistance(distance);
+        
         // Select next sample in the speed samples array
-        sampleIndex = (sampleIndex < speedSamples.Length - 1) 
+        sampleIndex = (sampleIndex < samples.Length - 1) 
             ? sampleIndex + 1 
             : 0;
-        
-        // Update velocity
-        routeFollower.UpdateVelocity(speedSamples[sampleIndex]);
     }
 
     public void Pause()

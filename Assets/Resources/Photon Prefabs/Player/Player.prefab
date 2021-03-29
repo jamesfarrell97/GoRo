@@ -1312,6 +1312,11 @@ MonoBehaviour:
   progressAlongRoute: 0
   numberOfLaps: 0
   currentLap: 1
+  startPosition: {x: 0, y: 0, z: 0}
+  startRotation: {x: 0, y: 0, z: 0, w: 0}
+  targetPosition: {x: 0, y: 0, z: 0}
+  targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  lerpTime: 0
 --- !u!114 &325384146144076460
 MonoBehaviour:
   m_ObjectHideFlags: 0

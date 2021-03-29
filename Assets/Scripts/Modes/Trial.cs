@@ -32,11 +32,6 @@ public class Trial : MonoBehaviour
     private TimeSpan trialDuration;
     private float trialStartTime;
 
-
-    private float sampleTime = 0;
-    private float sampleRate = 0.5f;
-    private List<float> speedSample;
-
     private void Start()
     {
         Setup();
@@ -51,9 +46,6 @@ public class Trial : MonoBehaviour
 
     private void Reset()
     {
-        sampleTime = 0;
-        speedSample = new List<float>();
-
         state = TrialState.Inactive;
         player = null;
 
@@ -91,7 +83,6 @@ public class Trial : MonoBehaviour
     {
         UpdateStopWatch();
         UpdateDistanceSlider();
-        SamplePlayerData();
         CheckIfComplete();
     }
 
@@ -125,22 +116,6 @@ public class Trial : MonoBehaviour
     {
         // Reset slide distance
         GameManager.Instance.ResetDistanceSlider();
-    }
-
-    private void SamplePlayerData()
-    {
-        // Update sample time
-        sampleTime += Time.fixedDeltaTime;
-
-        // If time since last sample exceeds sample rate
-        if (sampleTime > sampleRate)
-        {
-            // Sample player speed
-            //speedSample.Add(.GetSpeed());
-
-            // Reset sample time
-            sampleTime = 0;
-        }
     }
 
     private void CheckIfComplete()
@@ -194,14 +169,20 @@ public class Trial : MonoBehaviour
         // Update route
         routeFollower.UpdateRoute(route, numberOfLaps);
 
+        // Reset progress
+        this.player.ResetProgress();
+
+        // Reset samples
+        this.player.ResetSamples();
+        
         // Update player trial
         this.player.UpdateTrial(this);
         
+        // Pause player movement
+        this.player.Pause();
+
         // Display event information panel
         GameManager.Instance.DisplayEventPanel("00:00", $"{1}/{numberOfLaps}", "1");
-
-        // Pause game
-        GameManager.Instance.PauseGame();
     }
 
     private const string TRIAL_GHOST_FILEPATH = "trial-ghost-data";
@@ -236,17 +217,17 @@ public class Trial : MonoBehaviour
                 string[] samples = data[3].Split(',');
 
                 // Create samples array
-                float[] speedSamples = new float[sampleSize];
+                float[] distanceSamples = new float[sampleSize];
 
                 // Loop through samples
                 for (int i = 0; i < sampleSize; i++)
                 {
                     // Construct samples array
-                    speedSamples[i] = float.Parse(samples[i]);
+                    distanceSamples[i] = float.Parse(samples[i]);
                 }
 
                 // Load ghost
-                LoadGhost(speedSamples);
+                LoadGhost(distanceSamples);
                 return;
             }
         }
@@ -276,6 +257,9 @@ public class Trial : MonoBehaviour
 
         // Update route
         routeFollower.UpdateRoute(route, numberOfLaps);
+
+        // Reset progress
+        player.ResetProgress();
     }
 
     // Record Best time
@@ -312,7 +296,7 @@ public class Trial : MonoBehaviour
                     if (time < storedTime)
                     {
                         // Update file
-                        lines[i] = route + "|" + time + "|" + speedSample.Count + "|" + string.Join(",", speedSample) + "\n";
+                        lines[i] = route + "|" + time + "|" + player.DistanceSample.Count + "|" + string.Join(",", player.DistanceSample) + "\n";
 
                         // Overwrite file
                         HelperFunctions.WriteArrayToFile(lines, TRIAL_GHOST_FILEPATH);
@@ -324,7 +308,7 @@ public class Trial : MonoBehaviour
                 else
                 {
                     // Record trial data
-                    string trialData = route + "|" + time + "|" + speedSample.Count + "|" + string.Join(",", speedSample) + "\n";
+                    string trialData = route + "|" + time + "|" + player.DistanceSample.Count + "|" + string.Join(",", player.DistanceSample) + "\n";
 
                     // Overwrite file
                     HelperFunctions.WriteStringToFile(trialData, TRIAL_GHOST_FILEPATH);
@@ -339,7 +323,7 @@ public class Trial : MonoBehaviour
         else
         {
             // Create data array
-            string[] data = new string[] { name + "|" + time + "|" + speedSample.Count + "|" + string.Join(",", speedSample) + "\n" };
+            string[] data = new string[] { name + "|" + time + "|" + player.DistanceSample.Count + "|" + string.Join(",", player.DistanceSample) + "\n" };
 
             // Write data array to file
             HelperFunctions.WriteArrayToFile(data, TRIAL_GHOST_FILEPATH);

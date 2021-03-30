@@ -31,6 +31,28 @@ public static class HelperFunctions
         return angle;
     }
 
+    // Code referenced: https://forum.unity.com/threads/change-gameobject-layer-at-run-time-wont-apply-to-child.10091/
+    public static void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (null == obj)
+        {
+            return;
+        }
+
+        obj.layer = newLayer;
+
+        foreach (Transform child in obj.transform)
+        {
+            if (null == child)
+            {
+                continue;
+            }
+
+            SetLayerRecursively(child.gameObject, newLayer);
+        }
+    }
+
+    // Code referenced: https://forum.unity.com/threads/local-android-save-data.130740/
     public static void WriteStringToFile(string str, string filename)
     {
 
@@ -49,6 +71,7 @@ public static class HelperFunctions
 
     }
 
+    // Code referenced: https://forum.unity.com/threads/local-android-save-data.130740/
     public static void WriteArrayToFile(string[] str, string filename)
     {
 
@@ -61,6 +84,7 @@ public static class HelperFunctions
 
     }
 
+    // Code referenced: https://forum.unity.com/threads/local-android-save-data.130740/
     public static void WriteDatatoFile(string str, int pos, char delim, string filename)
     {
 
@@ -84,6 +108,7 @@ public static class HelperFunctions
 
     }
 
+    // Code referenced: https://forum.unity.com/threads/local-android-save-data.130740/
     public static string ReadStringFromFile(string filename)
     {
 
@@ -117,6 +142,7 @@ public static class HelperFunctions
 #endif
     }
 
+    // Code referenced: https://forum.unity.com/threads/local-android-save-data.130740/
     public static string[] ReadArrayFromFile(string filename, char delim)
     {
 
@@ -150,6 +176,7 @@ public static class HelperFunctions
 #endif
     }
 
+    // Code referenced: https://forum.unity.com/threads/local-android-save-data.130740/
     public static string PathForDocumentsFile(string filename)
     {
         if (Application.platform == RuntimePlatform.IPhonePlayer)

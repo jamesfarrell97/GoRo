@@ -59,6 +59,7 @@ MonoBehaviour:
   - RPC_PlayerCompletedRace
   - RPC_UpdateCanva
   - RPC_UpdatePlayerTag
+  - RPC_UpdateProgress
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -24,11 +24,11 @@ TagManager:
   - 
   - Environment
   - Rower
-  - Oar
   - Boat
-  - Minimap Icon
-  - Clouds
-  - Player
+  - Oar
+  - Icon
+  - 
+  - Rower
   - Cull Hidden
   - Cull Visible
   - 

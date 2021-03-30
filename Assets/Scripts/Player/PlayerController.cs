@@ -4,8 +4,6 @@ using UnityEngine;
 
 using Photon.Pun;
 using TMPro;
-using System.Collections.Generic;
-using System;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -14,8 +12,9 @@ using System;
 public class PlayerController : MonoBehaviour
 {
     // TODO: Extract into external APPDATA file
-    private static readonly int CULL_HIDDEN = 15;
-    private static readonly int CULL_VISIBLE = 16;
+    private static readonly int ROWER_LAYER = 14;
+    private static readonly int CULL_HIDDEN_LAYER = 15;
+    private static readonly int CULL_VISIBLE_LAYER = 16;
     
     public enum PlayerState
     {
@@ -76,6 +75,9 @@ public class PlayerController : MonoBehaviour
     private float rowingSpeed = 0;
     private float playerVelocity = 0;
 
+    private int playerCount = 0;
+    private float progressAlongRoute;
+
     private void Awake()
     {
         achievementTracker = GetComponent<AchievementTracker>();
@@ -94,15 +96,13 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            UpdateOffset();
             DisableCameras();
             AssignBillboard();
-            //DestroyWaypointTracker();
             UpdateMinimapIcon();
+            UpdateOffset();
             UpdateLayers();
             UpdateBoat();
         }
-
     }
 
     private void FixedUpdate()
@@ -123,12 +123,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    #region Local Player
+
     private void AssignMenuCamera()
     {
-        // Update menu camera
         MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = mainCamera;
         
-        // Display HUD
         MenuManager.Instance.OpenMenu("HUD");
     }
 
@@ -145,26 +145,12 @@ public class PlayerController : MonoBehaviour
     [PunRPC]
     private void RPC_UpdatePlayerTag(string nickname)
     {
-        // Update canvas to display users nickname
         playerTag.GetComponentInChildren<TMP_Text>().text = nickname;
     }
 
-    private int playerCount = 0;
-    private float progressAlongRoute;
+    #endregion
 
-    private void UpdateOffset()
-    {
-        // Update player count
-        playerCount++;
-
-        // Calculate offset
-        Vector3 offset = ((playerCount % 2 == 0) ? Vector3.left * (playerCount * 5) : Vector3.right * (playerCount * 5));
-
-        // Update positions
-        minimapIcon.transform.position += offset;
-        networkedBoat.transform.position += offset;
-        playerTag.transform.position += offset;
-    }
+    #region Networked Player
 
     private void DisableCameras()
     {
@@ -174,72 +160,6 @@ public class PlayerController : MonoBehaviour
         {
             camera.gameObject.SetActive(false);
         }
-    }
-
-    private void DestroyWaypointTracker()
-    {
-        Destroy(GetComponent<RouteFollower>());
-    }
-
-    private void UpdateMinimapIcon()
-    {
-        // Change minimap icon colour
-        foreach (SpriteRenderer spriteRenderer in minimapIcon.GetComponentsInChildren<SpriteRenderer>())
-        {
-            spriteRenderer.color = Color.red;
-        }
-
-        // Place higher than our icon in minimap
-        minimapIcon.transform.Translate(new Vector3(0, 10f, 0));
-    }
-
-    private void UpdateBoat()
-    {
-        if (photonView.IsMine)
-        {
-            Destroy(networkedBoat);
-        }
-        else
-        {
-            Destroy(localBoat);
-        }
-    }
-
-    private void UpdateLayers()
-    {
-        SetLayerRecursively(rower, CULL_VISIBLE);
-        SetLayerRecursively(playerTag, CULL_VISIBLE);
-    }
-
-    private void SetLayerRecursively(GameObject obj, int newLayer)
-    {
-        if (null == obj)
-        {
-            return;
-        }
-
-        obj.layer = newLayer;
-
-        foreach (Transform child in obj.transform)
-        {
-            if (null == child)
-            {
-                continue;
-            }
-
-            SetLayerRecursively(child.gameObject, newLayer);
-        }
-    }
-
-    public void UpdateProgress(float progressAlongRoute)
-    {
-        photonView.RPC("RPC_UpdateProgress", RpcTarget.AllBuffered, progressAlongRoute);
-    }
-
-    [PunRPC]
-    public void RPC_UpdateProgress(float progressAlongRoute)
-    {
-        this.progressAlongRoute = progressAlongRoute;
     }
 
     private void AssignBillboard()
@@ -256,6 +176,64 @@ public class PlayerController : MonoBehaviour
             break;
         }
     }
+
+    private void UpdateMinimapIcon()
+    {
+        // Change minimap icon colour
+        foreach (SpriteRenderer spriteRenderer in minimapIcon.GetComponentsInChildren<SpriteRenderer>())
+        {
+            spriteRenderer.color = Color.red;
+        }
+
+        // Place higher than our icon in minimap
+        minimapIcon.transform.Translate(new Vector3(0, 10f, 0));
+    }
+
+    private void UpdateOffset()
+    {
+        // Update player count
+        playerCount++;
+
+        // Calculate offset
+        Vector3 offset = ((playerCount % 2 == 0) ? Vector3.left * (playerCount * 5) : Vector3.right * (playerCount * 5));
+
+        // Update positions
+        minimapIcon.transform.position += offset;
+        networkedBoat.transform.position += offset;
+        playerTag.transform.position += offset;
+    }
+
+
+    private void UpdateLayers()
+    {
+        HelperFunctions.SetLayerRecursively(rower, CULL_VISIBLE_LAYER);
+        HelperFunctions.SetLayerRecursively(playerTag, CULL_VISIBLE_LAYER);
+    }
+
+    private void UpdateBoat()
+    {
+        if (photonView.IsMine)
+        {
+            Destroy(networkedBoat);
+        }
+        else
+        {
+            Destroy(localBoat);
+        }
+    }
+
+    public void UpdateProgress(float progressAlongRoute)
+    {
+        photonView.RPC("RPC_UpdateProgress", RpcTarget.AllBuffered, progressAlongRoute);
+    }
+
+    [PunRPC]
+    public void RPC_UpdateProgress(float progressAlongRoute)
+    {
+        this.progressAlongRoute = progressAlongRoute;
+    }
+
+    #endregion
 
     private void UpdateSpeed()
     {
@@ -314,6 +292,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    #region Accessors & Mutators
+
     public void Go()
     {
         move = true;
@@ -359,19 +339,6 @@ public class PlayerController : MonoBehaviour
         rigidBody.velocity = Vector3.zero;
     }
 
-    public void ChangeCameraPosition()
-    {
-        cameraIndex = (cameraIndex < cameraPositions.Length - 1) ? cameraIndex + 1 : 0;
-
-        SetLayerRecursively(rower, (cameraIndex != 0) ? CULL_VISIBLE : CULL_HIDDEN);
-
-        for (int i = 0; i < cameraPositions.Length; i++)
-        {
-            mainCamera.transform.SetPositionAndRotation(cameraPositions[cameraIndex].transform.position, cameraPositions[cameraIndex].transform.rotation);
-            cullCamera.transform.SetPositionAndRotation(cameraPositions[cameraIndex].transform.position, cameraPositions[cameraIndex].transform.rotation);
-        }
-    }
-
     public void UpdateRace(Race race)
     {
         this.race = race;
@@ -380,5 +347,20 @@ public class PlayerController : MonoBehaviour
     public void UpdateTrial(Trial trial)
     {
         this.trial = trial;
+    }
+
+    #endregion
+
+    public void ChangeCameraPosition()
+    {
+        cameraIndex = (cameraIndex < cameraPositions.Length - 1) ? cameraIndex + 1 : 0;
+
+        HelperFunctions.SetLayerRecursively(rower, (cameraIndex != 0) ? ROWER_LAYER : CULL_HIDDEN_LAYER);
+
+        for (int i = 0; i < cameraPositions.Length; i++)
+        {
+            mainCamera.transform.SetPositionAndRotation(cameraPositions[cameraIndex].transform.position, cameraPositions[cameraIndex].transform.rotation);
+            cullCamera.transform.SetPositionAndRotation(cameraPositions[cameraIndex].transform.position, cameraPositions[cameraIndex].transform.rotation);
+        }
     }
 }

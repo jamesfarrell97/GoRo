@@ -6,7 +6,7 @@
 //
 public class Billboard : MonoBehaviour
 {
-    public Transform camTransform;
+    public Transform camera;
 
     Quaternion originalRotation;
 
@@ -17,8 +17,15 @@ public class Billboard : MonoBehaviour
 
     void Update()
     {
-        if (camTransform == null) return;
+        if (camera == null) return;
 
-        transform.rotation = camTransform.rotation * originalRotation;
+        transform.LookAt(
+            transform.position + camera.transform.rotation * Vector3.forward,
+            camera.transform.rotation * Vector3.up
+        );
+
+        //Vector3 eulerAngles = transform.eulerAngles;
+        //eulerAngles.x = 0;
+        //transform.eulerAngles = eulerAngles;
     }
 }

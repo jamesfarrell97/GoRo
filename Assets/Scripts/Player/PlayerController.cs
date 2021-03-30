@@ -4,6 +4,7 @@ using UnityEngine;
 
 using Photon.Pun;
 using TMPro;
+using System.Collections;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -96,12 +97,12 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            UpdateBoat();
+            UpdateLayers();
             DisableCameras();
             AssignBillboard();
             UpdateMinimapIcon();
             UpdateOffset();
-            UpdateLayers();
-            UpdateBoat();
         }
     }
 
@@ -170,8 +171,8 @@ public class PlayerController : MonoBehaviour
         {
             if (!player.photonView.IsMine) continue;
 
-            playerTag.GetComponent<Billboard>().camTransform = player.mainCamera.transform;
-            playerTag.GetComponent<Canvas>().worldCamera = player.mainCamera;
+            playerTag.GetComponent<Billboard>().camera = player.cullCamera.transform;
+            playerTag.GetComponent<Canvas>().worldCamera = player.cullCamera;
 
             break;
         }
@@ -195,14 +196,13 @@ public class PlayerController : MonoBehaviour
         playerCount++;
 
         // Calculate offset
-        Vector3 offset = ((playerCount % 2 == 0) ? Vector3.left * (playerCount * 5) : Vector3.right * (playerCount * 5));
+        Vector3 offset = ((playerCount % 2 == 0) ? -transform.right * (playerCount * 5) : transform.right * (playerCount * 5));
 
-        // Update positions
+        // Update offsets
         minimapIcon.transform.position += offset;
         networkedBoat.transform.position += offset;
         playerTag.transform.position += offset;
     }
-
 
     private void UpdateLayers()
     {

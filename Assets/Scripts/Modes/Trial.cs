@@ -118,13 +118,13 @@ public class Trial : MonoBehaviour
         if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
 
         // Update distance slider
-        GameManager.Instance.UpdateDistanceSlider(route, player);
+        GameManager.Instance.UpdateProgress(route, player);
     }
 
     private void ResetDistanceSlider()
     {
         // Reset slide distance
-        GameManager.Instance.ResetDistanceSlider();
+        GameManager.Instance.ResetProgressBar();
     }
 
     private void SamplePlayerData()
@@ -136,7 +136,7 @@ public class Trial : MonoBehaviour
         if (sampleTime > sampleRate)
         {
             // Sample player speed
-            //speedSample.Add(.GetSpeed());
+            speedSample.Add(StatsManager.Instance.GetSpeed());
 
             // Reset sample time
             sampleTime = 0;
@@ -165,7 +165,7 @@ public class Trial : MonoBehaviour
     private void DisplayDataToParticipants(string time)
     {
         int currentLap = player.GetComponent<RouteFollower>().currentLap;
-        GameManager.Instance.DisplayEventPanel(time, $"{currentLap}/{numberOfLaps}", "1/1");
+        GameManager.Instance.DisplayEventPanel(time, $"{currentLap}/{numberOfLaps}");
     }
 
     public void FormTrial(PlayerController player, string route)
@@ -198,10 +198,10 @@ public class Trial : MonoBehaviour
         this.player.UpdateTrial(this);
         
         // Display event information panel
-        GameManager.Instance.DisplayEventPanel("00:00", $"{1}/{numberOfLaps}", "1");
+        GameManager.Instance.DisplayEventPanel("00:00", $"{1}/{numberOfLaps}");
 
-        // Pause game
-        GameManager.Instance.PauseGame();
+        // Pause player movement
+        //player.Pause();
     }
 
     private const string TRIAL_GHOST_FILEPATH = "trial-ghost-data";
@@ -276,6 +276,9 @@ public class Trial : MonoBehaviour
 
         // Update route
         routeFollower.UpdateRoute(route, numberOfLaps);
+
+        // Instantiate tracker
+        GameManager.Instance.InstantiateGhostTracker(ghost);
     }
 
     // Record Best time
@@ -414,6 +417,9 @@ public class Trial : MonoBehaviour
 
     private void RemoveGhostFromTrial()
     {
+        // Remove ghost tracker
+        GameManager.Instance.DestroyGhostTracker(ghost);
+
         Destroy(ghost);
         Destroy(spawnedGhost);
     }

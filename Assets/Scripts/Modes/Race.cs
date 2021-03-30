@@ -26,6 +26,8 @@ public class Race : MonoBehaviour
     [SerializeField] [Range(0, 30)] int startTimeoutDuration;
     [SerializeField] [Range(0, 30)] int positionTimeoutDuration;
     [SerializeField] [Range(0, 30)] int resolveTimeoutDuration;
+
+    [SerializeField] GameObject opponentSlider;
     
     public PhotonView photonView { get; private set; }
     public Route route { get; private set; }
@@ -99,25 +101,7 @@ public class Race : MonoBehaviour
 
     private void MonitorRace()
     {
-        UpdateEventPanel();
-    }
-
-    private void UpdatePosition()
-    {
-        // Add player to completed race list
-        photonView.RPC("RPC_UpdatePosition", RpcTarget.AllBufferedViaServer);
-    }
-
-    Dictionary<float, PlayerController> currentDistances = new Dictionary<float, PlayerController>();
-
-    private float pauseDuration = 0;
-
-    private void UpdateEventPanel()
-    {
-        // Clear current distances
-        currentDistances.Clear();
-
-        // Don't execute if game paused
+        // Don't execute if paused
         if (GameManager.State.Equals(GameManager.GameState.Paused))
         {
             if (PhotonNetwork.OfflineMode)
@@ -128,23 +112,46 @@ public class Race : MonoBehaviour
             return;
         }
 
-        float playerProgress = 0;
+        UpdateEventPanel();
+    }
+
+    private void UpdatePosition()
+    {
+        // Add player to completed race list
+        photonView.RPC("RPC_UpdatePosition", RpcTarget.AllBufferedViaServer);
+    }
+
+    Dictionary<PlayerController, float> currentDistances = new Dictionary<PlayerController, float>();
+
+    private float pauseDuration = 0;
+
+    private void UpdateEventPanel()
+    {
+        // Clear distances dictionary
+        currentDistances.Clear();
+
+        // Reset local player progress
+        float localPlayerProgress = 0;
 
         // For each player
         foreach (PlayerController player in players)
         {
-            // Store local player progress
-            if (player.photonView.IsMine) playerProgress = player.GetPlayerProgress();
+            // Store progress
+            float progress = player.GetProgress();
 
-            // Add player progress to dictionary
-            currentDistances.Add(player.GetPlayerProgress(), player);
+            // Add progress to dictionary
+            currentDistances.Add(player, progress);
+            
+            // Store local player progress
+            if (player.photonView.IsMine) localPlayerProgress = progress;
+
+            // Update progress bar
+            GameManager.Instance.UpdateProgress(route, player);
         }
 
-        // Convert dictionary to list
-        List<float> position = currentDistances.Keys.ToList();
-        
-        // Sort
-        position.Sort();
+        // Convert dictionary to sorted list
+        List<float> position = currentDistances.Values.ToList();
+        position.OrderByDescending(i => i);
 
         // For each player
         foreach (PlayerController player in players)
@@ -159,31 +166,17 @@ public class Race : MonoBehaviour
             int currentLap = player.GetCurrentLap();
 
             // Update position
-            int playerPosition = position.IndexOf(playerProgress) + 1; // 0 indexed
+            int playerPosition = position.IndexOf(localPlayerProgress) + 1; // 0 indexed
             int playerCount = players.Count();
 
             // Display event panel
-            GameManager.Instance.DisplayEventPanel(raceDuration.ToString(@"mm\:ss"), $"{currentLap}/{numberOfLaps}", playerPosition.ToString() + "/" + playerCount.ToString());
+            GameManager.Instance.DisplayEventPanel(
+                raceDuration.ToString(@"mm\:ss"), 
+                $"{currentLap}/{numberOfLaps}", 
+                playerPosition.ToString() + "/" + playerCount.ToString()
+            );
 
             // Local player found, stop checking
-            break;
-        }
-    }
-
-    private void UpdateDistanceSlider()
-    {
-        // Don't execute if game paused
-        if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
-
-        // For each player in race
-        foreach (PlayerController player in players)
-        {
-            // Only execute on our view
-            if (!player.photonView.IsMine) continue;
-
-            // Update distance slider
-            GameManager.Instance.UpdateDistanceSlider(route, player);
-
             break;
         }
     }
@@ -200,7 +193,7 @@ public class Race : MonoBehaviour
             if (!player.photonView.IsMine) continue;
 
             // Update distance slider
-            GameManager.Instance.ResetDistanceSlider();
+            GameManager.Instance.ResetProgressBar();
 
             break;
         }
@@ -335,8 +328,8 @@ public class Race : MonoBehaviour
             // Update player race
             player.UpdateRace(this);
 
-            // Pause game
-            GameManager.Instance.PauseGame();
+            // Pause player movement
+            player.Pause();
         }
     }
 
@@ -351,6 +344,9 @@ public class Race : MonoBehaviour
 
         // Add player to list
         players.Add(player);
+
+        // Instantiate tracker for networked payers
+        if (!player.photonView.IsMine) GameManager.Instance.InstantiatePlayerTracker(player);
 
         // Display event information panel
         GameManager.Instance.DisplayEventPanel("00:00", $"{1}/{numberOfLaps}", players.Count.ToString());
@@ -387,6 +383,9 @@ public class Race : MonoBehaviour
 
         // Reduce player velocity to 0
         player.ReduceVelocity();
+
+        // Destroy tracker for networked payers
+        if (!photonView.IsMine) GameManager.Instance.DestroyPlayerTracker(player);
 
         // Unpause game
         GameManager.Instance.UnpauseGame();
@@ -551,8 +550,8 @@ public class Race : MonoBehaviour
                 toastPanel.GetComponentInChildren<TMP_Text>().text = "";
             }
 
-            // Unpause game
-            GameManager.Instance.UnpauseGame();
+            // Resume player movement
+            player.Resume();
 
             break;
         }

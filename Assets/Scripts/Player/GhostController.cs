@@ -1,4 +1,5 @@
 ﻿using UnityStandardAssets.Utility;
+using UnityEngine.UI;
 using UnityEngine;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
@@ -10,7 +11,9 @@ public class GhostController : MonoBehaviour
     [SerializeField] private Animator[] animators;
 
     [HideInInspector] public Trial trial;
-    
+
+    [HideInInspector] public Slider progressBar;
+
     private RouteFollower routeFollower;
 
     private float[] speedSamples;

@@ -17,6 +17,7 @@ using TMPro;
 
 using static PlayerController;
 using static EventNotification;
+using System;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -56,6 +57,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     [SerializeField] GameObject eventNotificationPanel;
     [SerializeField] GameObject eventInformationPanel;
+    [SerializeField] GameObject eventPositionPanel;
     [SerializeField] TMP_Text eventTimeText;
     [SerializeField] TMP_Text eventLapText;
     [SerializeField] TMP_Text eventPositionText;
@@ -70,7 +72,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     [SerializeField] Button goButton;
     [SerializeField] Button toggleUIButton;
-    [SerializeField] Slider distanceSlider;
+
+    [SerializeField] Slider localProgressBar;
+    [SerializeField] Slider otherProgressBar;
 
     [SerializeField] GameObject muteLine;
 
@@ -586,22 +590,63 @@ public class GameManager : MonoBehaviourPunCallbacks
         toggleUIButton.interactable = enable;
     }
 
-    public void UpdateDistanceSlider(Route route, PlayerController player)
+    public void InstantiateGhostTracker(GhostController ghost)
+    {
+        Slider progressBar = Instantiate(otherProgressBar, localProgressBar.transform.parent) as Slider;
+        progressBar.gameObject.SetActive(true);
+
+        ghost.progressBar = progressBar;
+        ghost.progressBar.handleRect.GetComponent<Image>().color = Color.yellow;
+    }
+
+    public void DestroyGhostTracker(GhostController ghost)
+    {
+        if (ghost != null)
+            Destroy(ghost.progressBar);
+    }
+
+    public void InstantiatePlayerTracker(PlayerController player)
+    {
+        Slider progressBar = Instantiate(otherProgressBar, localProgressBar.transform.parent) as Slider;
+        progressBar.gameObject.SetActive(true);
+
+        player.progressBar = progressBar;
+        player.progressBar.handleRect.GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
+    }
+
+    public void DestroyPlayerTracker(PlayerController player)
+    {
+        if (player != null)
+            Destroy(player.progressBar);
+    }
+
+    public void UpdateProgress(Route route, PlayerController player)
     {
         RouteFollower routeFollower = player.GetComponent<RouteFollower>();
 
         var routeLength = route.routeDistance;
-        var playerProgress = routeFollower.progressAlongRoute;
+        var playerProgress = player.GetProgress();
 
         // Calculate distance as a percentage of the total number of laps
         var distance = playerProgress / (routeLength * routeFollower.numberOfLaps);
 
-        distanceSlider.value = distance;
+        // If local view
+        if (player.photonView.IsMine)
+        {
+            // Update local progress bar
+            localProgressBar.value = distance;
+        }
+
+        else
+        {
+            // Update other progress bar
+            player.progressBar.value = distance;
+        }
     }
 
-    public void ResetDistanceSlider()
+    public void ResetProgressBar()
     {
-        distanceSlider.value = 0;
+        localProgressBar.value = 0;
     }
 
     private void UpdateMenuButtons(bool showStartEvent, bool showLeaveEvent, bool showLeaveRoom)
@@ -826,13 +871,23 @@ public class GameManager : MonoBehaviourPunCallbacks
         panels[2].gameObject.SetActive(state2);
     }
 
-    public void DisplayEventPanel(string time, string lap, string position)
+    public void DisplayEventPanel(string time, string lap, string position = null)
     {
         eventInformationPanel.SetActive(true);
 
         eventTimeText.text = time;
         eventLapText.text = lap;
-        eventPositionText.text = position;
+
+        if (position != null)
+        {
+            eventPositionPanel.gameObject.SetActive(true);
+            eventPositionText.text = position;
+        }
+        else
+        {
+            eventPositionPanel.gameObject.SetActive(false);
+        }
+
     }
 
     public void HideEventPanel()

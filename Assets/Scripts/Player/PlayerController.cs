@@ -1,7 +1,10 @@
 ﻿using UnityStandardAssets.Utility;
+using UnityEngine.UI;
 using UnityEngine;
+
 using Photon.Pun;
 using TMPro;
+using System.Collections.Generic;
 using System;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
@@ -13,9 +16,7 @@ public class PlayerController : MonoBehaviour
     // TODO: Extract into external APPDATA file
     private static readonly int CULL_HIDDEN = 15;
     private static readonly int CULL_VISIBLE = 16;
-
-    private static Camera playerCamera;
-
+    
     public enum PlayerState
     {
         JustRowing,
@@ -56,6 +57,8 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public Trial trial;
     [HideInInspector] public Race race;
 
+    [HideInInspector] public Slider progressBar;
+
     [HideInInspector] public PhotonView photonView { get; private set; }
     [HideInInspector] public PlayerState state;
 
@@ -94,7 +97,7 @@ public class PlayerController : MonoBehaviour
             UpdateOffset();
             DisableCameras();
             AssignBillboard();
-            DestroyWaypointTracker();
+            //DestroyWaypointTracker();
             UpdateMinimapIcon();
             UpdateLayers();
             UpdateBoat();
@@ -122,11 +125,8 @@ public class PlayerController : MonoBehaviour
 
     private void AssignMenuCamera()
     {
-        // Assign camera
-        playerCamera = mainCamera;
-
         // Update menu camera
-        MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = playerCamera;
+        MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = mainCamera;
         
         // Display HUD
         MenuManager.Instance.OpenMenu("HUD");
@@ -150,6 +150,8 @@ public class PlayerController : MonoBehaviour
     }
 
     private int playerCount = 0;
+    private float progressAlongRoute;
+
     private void UpdateOffset()
     {
         // Update player count
@@ -229,10 +231,30 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void UpdateProgress(float progressAlongRoute)
+    {
+        photonView.RPC("RPC_UpdateProgress", RpcTarget.AllBuffered, progressAlongRoute);
+    }
+
+    [PunRPC]
+    public void RPC_UpdateProgress(float progressAlongRoute)
+    {
+        this.progressAlongRoute = progressAlongRoute;
+    }
+
     private void AssignBillboard()
     {
-        playerTag.GetComponent<Billboard>().camTransform = playerCamera.transform;
-        playerTag.GetComponent<Canvas>().worldCamera = playerCamera;
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
+
+        foreach (PlayerController player in players)
+        {
+            if (!player.photonView.IsMine) continue;
+
+            playerTag.GetComponent<Billboard>().camTransform = player.mainCamera.transform;
+            playerTag.GetComponent<Canvas>().worldCamera = player.mainCamera;
+
+            break;
+        }
     }
 
     private void UpdateSpeed()
@@ -327,9 +349,9 @@ public class PlayerController : MonoBehaviour
         return routeFollower.currentLap;
     }
 
-    public float GetPlayerProgress()
+    public float GetProgress()
     {
-        return routeFollower.progressAlongRoute;
+        return progressAlongRoute;
     }
 
     public void ReduceVelocity()

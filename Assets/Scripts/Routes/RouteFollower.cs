@@ -92,7 +92,9 @@ namespace UnityStandardAssets.Utility
             if (route == null) return;
             
             if (route.GetRoutePoint(0).Equals(null)) return;
-             
+
+            if (!playerController.photonView.IsMine) return;
+
             // determine the position we should currently be aiming for
             // (this is different to the current progress position, it is a a certain amount ahead along the route)
             // we use lerp as a simple way of smoothing out the speed over time.
@@ -160,6 +162,8 @@ namespace UnityStandardAssets.Utility
             }
 
             previousPosition = transform.position;
+
+            playerController.UpdateProgress(progressAlongRoute);
         }
 
         public bool CheckIfPointReached(Transform point)

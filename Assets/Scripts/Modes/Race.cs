@@ -146,18 +146,20 @@ public class Race : MonoBehaviour
             if (player.photonView.IsMine) localPlayerProgress = progress;
 
             // Update progress bar
-            GameManager.Instance.UpdateProgress(route, player);
+            GameManager.Instance.UpdateProgress(route, player, numberOfLaps);
         }
 
         // Convert dictionary to sorted list
         List<float> position = currentDistances.Values.ToList();
-        position.OrderByDescending(i => i);
+        position.Sort((a, b) => b.CompareTo(a));
 
         // For each player
         foreach (PlayerController player in players)
         {
             // Skip networked players
             if (!player.photonView.IsMine) continue;
+
+
 
             // Update duration
             raceDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - (raceStartTime + pauseDuration));
@@ -349,7 +351,7 @@ public class Race : MonoBehaviour
         if (!player.photonView.IsMine) GameManager.Instance.InstantiatePlayerTracker(player);
 
         // Display event information panel
-        GameManager.Instance.DisplayEventPanel("00:00", $"{1}/{numberOfLaps}", players.Count.ToString());
+        if (player.photonView.IsMine) GameManager.Instance.DisplayEventPanel("00:00", $"{0}/{numberOfLaps}", players.Count.ToString());
     }
 
     public void RemovePlayerFromRace(PlayerController player)
@@ -382,10 +384,10 @@ public class Race : MonoBehaviour
         players.Remove(player);
 
         // Reduce player velocity to 0
-        player.ReduceVelocity();
+        if (player.photonView.IsMine) player.ReduceVelocity();
 
         // Destroy tracker for networked payers
-        if (!photonView.IsMine) GameManager.Instance.DestroyPlayerTracker(player);
+        if (!player.photonView.IsMine) GameManager.Instance.DestroyPlayerTracker(player);
 
         // Unpause game
         GameManager.Instance.UnpauseGame();
@@ -467,7 +469,7 @@ public class Race : MonoBehaviour
             if (players.Contains(player)) continue;
 
             // Send race notification
-            StartCoroutine(GameManager.Instance.SendEventNotification(EventCategory.Race, "Join Race", name, numberOfLaps.ToString(), players.Count.ToString(), 15));
+            StartCoroutine(GameManager.Instance.SendEventNotification(EventCategory.Race, "Join Race", name, numberOfLaps.ToString(), players.Count.ToString(), startTimeoutDuration));
 
             break;
         }
@@ -579,24 +581,6 @@ public class Race : MonoBehaviour
     {
         ResetDistanceSlider();
         RemoveAllPlayersFromRace();
-    }
-
-    private void DisplayDataToParticipants(string time)
-    {
-        foreach (PlayerController player in players)
-        {
-            if (player == null) RemovePlayerFromRace(player);
-
-            PhotonView playerView = player.GetComponent<PhotonView>();
-
-            if (!playerView.IsMine) continue;
-
-            int currentLap = player.GetComponent<RouteFollower>().currentLap;
-
-            GameManager.Instance.DisplayEventPanel(time, $"{currentLap}/{numberOfLaps}" , "1/" + players.Count.ToString());
-
-            break;
-        }
     }
 
     private void SetState(RaceState state)

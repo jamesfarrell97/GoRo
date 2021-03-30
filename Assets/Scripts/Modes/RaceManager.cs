@@ -5,7 +5,7 @@ public class RaceManager : MonoBehaviour
 {
     [SerializeField] private Race[] races;
 
-    public void JoinRace(PlayerController player, string route)
+    public bool JoinRace(PlayerController player, string route)
     {
         // For each race in the races array
         foreach (Race race in races)
@@ -21,18 +21,21 @@ public class RaceManager : MonoBehaviour
 
                     // Form new race
                     race.FormRace(player);
-                    break;
+                    return true;
 
                 // Race currently forming
                 case RaceState.Forming:
 
                     // Add player to the race
                     race.AddPlayerToRace(player);
-                    break;
+                    return true;
             }
 
             // No need to check any more in the loop
-            return;
+            return false;
         }
+
+        // Unable to join race
+        return false;
     }
 }

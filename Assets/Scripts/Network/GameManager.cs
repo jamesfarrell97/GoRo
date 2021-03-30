@@ -17,7 +17,6 @@ using TMPro;
 
 using static PlayerController;
 using static EventNotification;
-using System;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -232,7 +231,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void AssignDefaultNickname()
     {
-        PhotonNetwork.NickName = "Player " + UnityEngine.Random.Range(0, 1000);
+        PhotonNetwork.NickName = "Player " + Random.Range(0, 1000);
         playerNameText.text = PhotonNetwork.NickName;
     }
 
@@ -288,7 +287,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         if (string.IsNullOrEmpty(roomNameInputField.text))
         {
-            PhotonNetwork.CreateRoom("Room " + UnityEngine.Random.Range(0, 1000));
+            PhotonNetwork.CreateRoom("Room " + Random.Range(0, 1000));
             MenuManager.Instance.OpenMenu("Loading");
         }
         else
@@ -443,7 +442,18 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
             {
                 // Add player to race
-                GameObject.Find("Race Manager").GetComponent<RaceManager>().JoinRace(player, route);
+                bool joinSuccessful = GameObject.Find("Race Manager").GetComponent<RaceManager>().JoinRace(player, route);
+
+                // Return if unsucessful
+                if (!joinSuccessful)
+                {
+                    // Open HUD
+                    MenuManager.Instance.OpenMenu("HUD");
+
+                    // Display error
+                    StartCoroutine(DisplayQuickNotificationText("Unable to join event!", 3));
+                    return;
+                }
 
                 // Update player state
                 player.state = PlayerState.ParticipatingInRace;
@@ -486,7 +496,18 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
             {
                 // Add player to time trial
-                GameObject.Find("Time Trial Manager").GetComponent<TrialManager>().JoinTrial(player, route);
+                bool joinSuccessful = GameObject.Find("Time Trial Manager").GetComponent<TrialManager>().JoinTrial(player, route);
+
+                // Return if unsucessful
+                if (!joinSuccessful)
+                {
+                    // Open HUD
+                    MenuManager.Instance.OpenMenu("HUD");
+
+                    // Display error
+                    StartCoroutine(DisplayQuickNotificationText("Unable to join event!", 3));
+                    return;
+                }
 
                 // Update player state
                 player.state = PlayerState.ParticipatingInTrial;
@@ -542,7 +563,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             routeFollower.route = routeFollower.routes[0];
 
             // Hide time and lap info
-            HideEventPanel();
+            HideEventInformationPanel();
 
             // Update menu buttons
             UpdateMenuButtons(true, false, true);
@@ -611,7 +632,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         progressBar.gameObject.SetActive(true);
 
         player.progressBar = progressBar;
-        player.progressBar.handleRect.GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
+
+        // Update color
+        player.progressBar.handleRect.GetComponent<Image>().color =
+            new Color(
+                Random.Range(0f, 1f),
+                0,
+                0
+            ); 
     }
 
     public void DestroyPlayerTracker(PlayerController player)
@@ -620,15 +648,13 @@ public class GameManager : MonoBehaviourPunCallbacks
             Destroy(player.progressBar);
     }
 
-    public void UpdateProgress(Route route, PlayerController player)
+    public void UpdateProgress(Route route, PlayerController player, int numberOfLaps)
     {
-        RouteFollower routeFollower = player.GetComponent<RouteFollower>();
-
         var routeLength = route.routeDistance;
         var playerProgress = player.GetProgress();
 
         // Calculate distance as a percentage of the total number of laps
-        var distance = playerProgress / (routeLength * routeFollower.numberOfLaps);
+        var distance = playerProgress / (routeLength * numberOfLaps);
 
         // If local view
         if (player.photonView.IsMine)
@@ -887,12 +913,16 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             eventPositionPanel.gameObject.SetActive(false);
         }
-
     }
 
-    public void HideEventPanel()
+    public void HideEventInformationPanel()
     {
         eventInformationPanel.SetActive(false);
+    }
+
+    public void HideEventNotificationPanel()
+    {
+        eventNotificationPanel.SetActive(false);
     }
 
     public void ResetEventPanel()
@@ -914,7 +944,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void HideAllPanels()
     {
-        HideEventPanel();
+        HideEventNotificationPanel();
+        HideEventInformationPanel();
         HideNotificationPanel();
         HideCountdownPanel();
     }

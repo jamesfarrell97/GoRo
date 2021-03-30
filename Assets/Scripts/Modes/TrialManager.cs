@@ -10,7 +10,7 @@ public class TrialManager : MonoBehaviour
         trials = FindObjectsOfType<Trial>();
     }
 
-    public void JoinTrial(PlayerController player, string route)
+    public bool JoinTrial(PlayerController player, string route)
     {
         // For each trial in the trials array
         foreach (Trial trial in trials)
@@ -26,16 +26,18 @@ public class TrialManager : MonoBehaviour
 
                     // Form trial
                     trial.FormTrial(player, route);
-                    break;
+                    return true;
 
                 case TrialState.InProgress:
 
                     // Do nothing
-                    break;
+                    return false;
             }
 
             // No need to check any more in the loop
-            return;
+            return false;
         }
+
+        return false;
     }
 }

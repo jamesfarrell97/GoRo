@@ -37,11 +37,6 @@ public class EventNotification : MonoBehaviour
         state = NotificationState.Active;
     }
 
-    void Start()
-    {
-        Reset();
-    }
-
     public void JoinEvent()
     {
         switch(eventCategory)
@@ -63,9 +58,14 @@ public class EventNotification : MonoBehaviour
         Reset();
     }
 
+    public void ClosePanel()
+    {
+        Reset();
+    }
+
     public void Reset()
     {
         state = NotificationState.Hidden;
-        GameManager.Instance.HideEventPanel();
+        GameManager.Instance.HideEventNotificationPanel();
     }
 }

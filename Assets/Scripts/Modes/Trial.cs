@@ -118,7 +118,7 @@ public class Trial : MonoBehaviour
         if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
 
         // Update distance slider
-        GameManager.Instance.UpdateProgress(route, player);
+        GameManager.Instance.UpdateProgress(route, player, numberOfLaps);
     }
 
     private void ResetDistanceSlider()
@@ -198,10 +198,10 @@ public class Trial : MonoBehaviour
         this.player.UpdateTrial(this);
         
         // Display event information panel
-        GameManager.Instance.DisplayEventPanel("00:00", $"{1}/{numberOfLaps}");
+        GameManager.Instance.DisplayEventPanel("00:00", $"{0}/{numberOfLaps}");
 
         // Pause player movement
-        //player.Pause();
+        player.Pause();
     }
 
     private const string TRIAL_GHOST_FILEPATH = "trial-ghost-data";

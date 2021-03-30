@@ -23,18 +23,18 @@ TagManager:
   - 
   - 
   - Environment
-  - Body
+  - Rower
   - Oar
   - Boat
   - Minimap Icon
   - Clouds
   - Player
-  - Hidden Rower
-  - Visible Rower
-  - Hidden Player Tag
-  - Visible Player Tag
-  - Transparent Player
-  - Opaque Player
+  - Cull Hidden
+  - Cull Visible
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 

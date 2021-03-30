@@ -2,6 +2,7 @@
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
+using System;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -10,11 +11,8 @@ using TMPro;
 public class PlayerController : MonoBehaviour
 {
     // TODO: Extract into external APPDATA file
-    private static readonly int HIDDEN_ROWER_LAYER = 15;
-    private static readonly int VISIBLE_ROWER_LAYER = 16;
-
-    private static readonly int HIDDEN_PLAYERTAG_LAYER = 17;
-    private static readonly int VISIBLE_PLAYERTAG_LAYER = 18;
+    private static readonly int CULL_HIDDEN = 15;
+    private static readonly int CULL_VISIBLE = 16;
 
     private static Camera playerCamera;
 
@@ -93,6 +91,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            UpdateOffset();
             DisableCameras();
             AssignBillboard();
             DestroyWaypointTracker();
@@ -150,6 +149,21 @@ public class PlayerController : MonoBehaviour
         playerTag.GetComponentInChildren<TMP_Text>().text = nickname;
     }
 
+    private int playerCount = 0;
+    private void UpdateOffset()
+    {
+        // Update player count
+        playerCount++;
+
+        // Calculate offset
+        Vector3 offset = ((playerCount % 2 == 0) ? Vector3.left * (playerCount * 5) : Vector3.right * (playerCount * 5));
+
+        // Update positions
+        minimapIcon.transform.position += offset;
+        networkedBoat.transform.position += offset;
+        playerTag.transform.position += offset;
+    }
+
     private void DisableCameras()
     {
         Camera[] cameras = GetComponentsInChildren<Camera>();
@@ -174,7 +188,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Place higher than our icon in minimap
-        minimapIcon.transform.Translate(new Vector3(0, 1f, 0));
+        minimapIcon.transform.Translate(new Vector3(0, 10f, 0));
     }
 
     private void UpdateBoat()
@@ -191,8 +205,8 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateLayers()
     {
-        SetLayerRecursively(rower, VISIBLE_ROWER_LAYER);
-        SetLayerRecursively(playerTag, VISIBLE_PLAYERTAG_LAYER);
+        SetLayerRecursively(rower, CULL_VISIBLE);
+        SetLayerRecursively(playerTag, CULL_VISIBLE);
     }
 
     private void SetLayerRecursively(GameObject obj, int newLayer)
@@ -327,7 +341,7 @@ public class PlayerController : MonoBehaviour
     {
         cameraIndex = (cameraIndex < cameraPositions.Length - 1) ? cameraIndex + 1 : 0;
 
-        SetLayerRecursively(rower, (cameraIndex != 0) ? VISIBLE_ROWER_LAYER : HIDDEN_ROWER_LAYER);
+        SetLayerRecursively(rower, (cameraIndex != 0) ? CULL_VISIBLE : CULL_HIDDEN);
 
         for (int i = 0; i < cameraPositions.Length; i++)
         {

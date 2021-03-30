@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance;
 
+    public static string[] PLAYER_SETTINGS;
+
     private const int MENU_INDEX = 0;
     private const int GAME_INDEX = 1;
 
@@ -113,19 +115,24 @@ public class GameManager : MonoBehaviourPunCallbacks
         UpdateState();
         SetSleepTimeout();
         ShowConnectionMenu();
-        LoadNicknameFromFile();
+        LoadPlayerSettings();
     }
 
-    private void LoadNicknameFromFile()
+
+    private void LoadPlayerSettings()
     {
-        string[] playerSettings = HelperFunctions.ReadArrayFromFile("player_settings", '\n');
+        PLAYER_SETTINGS = HelperFunctions.ReadArrayFromFile("player_settings", '\n');
 
-        if (playerSettings != null)
+        if (PLAYER_SETTINGS != null)
         {
-            PhotonNetwork.NickName = playerSettings[0];
-
-            playerNameText.text = PhotonNetwork.NickName;
+            LoadNickname();
         }
+    }
+
+    private void LoadNickname()
+    {
+        PhotonNetwork.NickName = PLAYER_SETTINGS[0];
+        playerNameText.text = PhotonNetwork.NickName;
     }
 
     private void FixedUpdate()

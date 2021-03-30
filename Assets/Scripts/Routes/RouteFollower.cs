@@ -21,6 +21,8 @@ namespace UnityStandardAssets.Utility
         [HideInInspector] public Route.RoutePoint speedPoint { get; private set; }
         [HideInInspector] public Route.RoutePoint progressPoint { get; private set; }
 
+        private Vector3 offset;
+
         private PlayerController playerController;
         private GhostController ghostController;
         private Vector3 previousPosition;

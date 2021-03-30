@@ -281,7 +281,7 @@ public class StatsGraph : MonoBehaviour
         {
             // Determine x, y position
             float xPosition = (i * unitWidth) + (unitWidth / 2);
-            float yPosition = (unitHeight * dataPoints[i]);
+            float yPosition = ((dataPoints[i] - yMinimum) / (yMaximum - yMinimum)) * graphHeight;
 
             // Retrieve currnt point
             GameObject currentDataPoint = graphPoints[i];
@@ -306,7 +306,8 @@ public class StatsGraph : MonoBehaviour
         // Update labels
         for (int i = 0; i < graphLabels.Count; i++)
         {
-            graphLabels[i].GetComponent<TMP_Text>().text = getAxisLabelY((dataRange / SEPERATOR_COUNT) * i);
+            float normalizedValue = i * 1f / SEPERATOR_COUNT;
+            graphLabels[i].GetComponent<TMP_Text>().text = getAxisLabelY(yMinimum + (normalizedValue * (yMaximum - yMinimum)));
         }
     }
 

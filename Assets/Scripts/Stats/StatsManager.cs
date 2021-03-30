@@ -417,7 +417,7 @@ public class StatsManager : MonoBehaviour
 
 #if UNITY_EDITOR
 
-        SpeedData.Enqueue(Random.Range(4, 5));
+        SpeedData.Enqueue(Random.Range(3, 5));
         SplitAvgPaceData.Enqueue(Random.Range(85, 95));
         DragFactorData.Enqueue(Random.Range(275, 300));
         StrokesPerMinData.Enqueue(Random.Range(36, 45));

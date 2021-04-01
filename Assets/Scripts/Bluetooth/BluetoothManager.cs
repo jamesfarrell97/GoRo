@@ -130,7 +130,7 @@ public class BluetoothManager : MonoBehaviour
                         break;
 
                     case States.Write:
-                        WriteCharacteristic();
+                        WriteCharacteristic(CSAFECommand.Write(new string[] { "CSAFE_STATUS_CMD" }).ToArray());
                         break;
 
                     case States.Read:
@@ -217,7 +217,6 @@ public class BluetoothManager : MonoBehaviour
 
             if (IsEqual(serviceUUID, PMDictionary.RowingServiceUUID))
             {
-                //StatusMessage = "Found Service UUID...";
                 SetState(States.RequestMTU, 5f);
             }
 
@@ -230,24 +229,18 @@ public class BluetoothManager : MonoBehaviour
 
         BluetoothLEHardwareInterface.RequestMtu(DeviceAddress, 247, (address, newMTU) => {
 
-            //StatusMessage = "MTU set to " + newMTU.ToString();
+            WriteCharacteristic(CSAFECommand.Write(new string[] { "CSAFE_PM_SET_RESET_ALL" }).ToArray());
+
             SetState(States.Subscribe, 2f);
         });
     }
 
-    private void WriteCharacteristic()
+    public void WriteCharacteristic(byte[] data)
     {
-        //StatusMessage = "Writing characteristic...";
-
-        byte[] data = CSAFECommand.Write(new string[] { "CSAFE_STATUS_CMD" }).ToArray();
-
         BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data, data.Length, true, (characteristicUUID1) => {
 
             BluetoothLEHardwareInterface.Log("Write Succeeded");
 
-            //StatusMessage = "Write Succeeded";
-
-            SetState(States.Write, 1f);
         });
     }
 

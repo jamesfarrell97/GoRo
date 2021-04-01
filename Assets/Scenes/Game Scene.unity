@@ -60016,6 +60016,7 @@ MonoBehaviour:
   startTimeoutDuration: 10
   positionTimeoutDuration: 10
   resolveTimeoutDuration: 5
+  opponentSlider: {fileID: 0}
 --- !u!114 &8104241542546478309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60030,7 +60031,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   numberOfLaps: 1
-  resolveTimeoutDuration: 10
+  resolveTimeoutDuration: 5
   trialGhost: {fileID: 3128037215741786078, guid: 50eaad33eb632574599abb702f6cb308,
     type: 3}
 --- !u!4 &8104241542546478310
@@ -60267,7 +60268,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   numberOfLaps: 1
-  resolveTimeoutDuration: 10
+  resolveTimeoutDuration: 5
   trialGhost: {fileID: 3128037215741786078, guid: 50eaad33eb632574599abb702f6cb308,
     type: 3}
 --- !u!114 &8104241543112346305
@@ -60318,6 +60319,7 @@ MonoBehaviour:
   startTimeoutDuration: 10
   positionTimeoutDuration: 10
   resolveTimeoutDuration: 5
+  opponentSlider: {fileID: 0}
 --- !u!1 &8104241543112346308
 GameObject:
   m_ObjectHideFlags: 0
@@ -60497,6 +60499,7 @@ MonoBehaviour:
   startTimeoutDuration: 10
   positionTimeoutDuration: 10
   resolveTimeoutDuration: 5
+  opponentSlider: {fileID: 0}
 --- !u!114 &8104241543535446635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60511,7 +60514,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   numberOfLaps: 1
-  resolveTimeoutDuration: 10
+  resolveTimeoutDuration: 5
   trialGhost: {fileID: 3128037215741786078, guid: 50eaad33eb632574599abb702f6cb308,
     type: 3}
 --- !u!4 &8104241543535446638

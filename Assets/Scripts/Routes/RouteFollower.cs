@@ -90,7 +90,7 @@ namespace UnityStandardAssets.Utility
             if (ghostController != null && ghostController.Paused()) return;
 
             if (route == null) return;
-            
+
             if (route.GetRoutePoint(0).Equals(null)) return;
 
             if (!playerController.photonView.IsMine) return;
@@ -112,6 +112,12 @@ namespace UnityStandardAssets.Utility
 
         public void Reset()
         {
+            startPosition = target.position;
+            startRotation = target.rotation;
+
+            targetPosition = startPosition;
+            targetRotation = startRotation;
+
             progressAlongRoute = 0;
             currentLap = 1;
             speed = 0;
@@ -122,48 +128,67 @@ namespace UnityStandardAssets.Utility
             this.translationalVelocity = velocity;
         }
 
+        public void UpdateDistance(float distance)
+        {
+            progressAlongRoute = distance;
+
+            // Set start position
+            startPosition = target.position;
+
+            // Set start rotation
+            startRotation = target.rotation;
+
+            // Calculate target position
+            targetPosition = route.GetRoutePoint(progressAlongRoute).position;
+
+            // Calculate target rotation
+            targetRotation = Quaternion.LookRotation(
+                    route.GetRoutePoint(progressAlongRoute).direction
+                );
+
+            // Reset lerp time
+            lerpTime = 0;
+        }
+
         public void UpdateRoute(Route route, int numberOfLaps)
         {
             this.route = route;
             this.numberOfLaps = numberOfLaps;
- 
+
+            this.progressAlongRoute = 0;
+
             Reset();
-            UpdatePosition();
+            SetPosition();
         }
 
-        private float translation;
-        private Quaternion rotation;
+        public Vector3 startPosition;
+        public Quaternion startRotation;
+        public Vector3 targetPosition;
+        public Quaternion targetRotation;
+
+        public float lerpTime = 0;
 
         public void UpdatePosition()
         {
-            // Calculate speed
-            speed = Mathf.Lerp(speed, (previousPosition - transform.position).magnitude / Time.fixedDeltaTime, Time.fixedDeltaTime);
-
-            // Calculate translation
-            translation = progressAlongRoute + translationalVelocity + translationVelocityFactor * speed;
-
-            // Calculate rotation
-            rotation = Quaternion.LookRotation(
-                    route.GetRoutePoint(progressAlongRoute + rotationalVelocity + rotationalVelocityFactor * speed).direction
-                );
+            // Calculate lerp time
+            lerpTime += Time.fixedDeltaTime / (1f / StatsManager.SAMPLE_RATE);
 
             // Update position
-            target.position = route.GetRoutePoint(translation).position;
+            target.position = Vector3.Lerp(startPosition, targetPosition, lerpTime);
 
             // Update rotation
-            target.rotation = rotation;
+            target.rotation = Quaternion.Lerp(startRotation, targetRotation, lerpTime);
+        }
 
-            // Calculate progress along route
-            progressPoint = route.GetRoutePoint(progressAlongRoute);
-            Vector3 progressDelta = progressPoint.position - transform.position;
-            if (Vector3.Dot(progressDelta, progressPoint.direction) < 0)
-            {
-                progressAlongRoute += progressDelta.magnitude * 0.5f;
-            }
+        public void SetPosition()
+        {
+            // Set position
+            target.position = route.GetRoutePoint(progressAlongRoute).position;
 
-            previousPosition = transform.position;
-
-            playerController.UpdateProgress(progressAlongRoute);
+            // Set rotation
+            target.rotation = Quaternion.LookRotation(
+                    route.GetRoutePoint(progressAlongRoute).direction
+                );
         }
 
         public bool CheckIfPointReached(Transform point)

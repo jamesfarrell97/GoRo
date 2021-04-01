@@ -327,6 +327,9 @@ public class Race : MonoBehaviour
             // Update route
             routeFollower.UpdateRoute(route, numberOfLaps);
 
+            // Reset progress
+            player.ResetProgress();
+
             // Update player race
             player.UpdateRace(this);
 

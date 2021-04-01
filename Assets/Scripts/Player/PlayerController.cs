@@ -1,10 +1,11 @@
-﻿using UnityStandardAssets.Utility;
+﻿using System.Collections.Generic;
+
+using UnityStandardAssets.Utility;
 using UnityEngine.UI;
 using UnityEngine;
 
 using Photon.Pun;
 using TMPro;
-using System.Collections;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -76,6 +77,12 @@ public class PlayerController : MonoBehaviour
     private float rowingSpeed = 0;
     private float playerVelocity = 0;
 
+    public List<float> DistanceSample { get; private set; }
+    public List<float> PowerSample { get; private set; }
+    public List<float> StrokeRateSample { get; private set; }
+    public List<float> AvgSplitSample { get; private set; }
+    public List<float> SpeedSample { get; private set; }
+
     private int playerCount = 0;
     private float progressAlongRoute;
 
@@ -104,22 +111,18 @@ public class PlayerController : MonoBehaviour
             UpdateMinimapIcon();
             UpdateOffset();
         }
+
+        ResetSamples();
+
+        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.SAMPLE_RATE));
     }
 
     private void FixedUpdate()
     {
         if (!photonView.IsMine) return;
 
-        if (paused)
+        if (!paused)
         {
-            if (PhotonNetwork.OfflineMode)
-            {
-                routeFollower.UpdateVelocity(0);
-            }
-        }
-        else
-        {
-            UpdateSpeed();
             Animate();
         }
     }
@@ -235,6 +238,35 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    public float routeDistance = 0;
+
+    private void SampleStats()
+    {
+        // Sample distance
+        DistanceSample.Add(routeDistance);
+
+        // Sample stroke power
+        PowerSample.Add(StatsManager.Instance.GetStrokePower());
+
+        // Sample stroke rate
+        StrokeRateSample.Add(StatsManager.Instance.GetStrokeRate());
+
+        // Sample split avg
+        AvgSplitSample.Add(StatsManager.Instance.GetAvgSplit());
+
+        // Sample speed
+        SpeedSample.Add(StatsManager.Instance.GetSpeed());
+    }
+
+    public void ResetSamples()
+    {
+        DistanceSample = new List<float>();
+        PowerSample = new List<float>();
+        StrokeRateSample = new List<float>();
+        AvgSplitSample = new List<float>();
+        SpeedSample = new List<float>();
+    }
+
     private void UpdateSpeed()
     {
 
@@ -243,11 +275,20 @@ public class PlayerController : MonoBehaviour
         // If debug 'move' button pressed
         if (move || Input.GetKey(KeyCode.W))
         {
-            // Apply force to the rigibody
-            rigidBody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
-            
+            // Update distance
+            routeDistance += boatSpeed;
+
             // Update stroke state
             strokeState = StrokeState.Driving;
+
+            // Update distance
+            routeFollower.UpdateDistance(routeDistance);
+
+            // Update debug display
+            StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
+
+            // Sample stats
+            SampleStats();
         }
         else if (Input.GetKey(KeyCode.S))
         {
@@ -275,13 +316,12 @@ public class PlayerController : MonoBehaviour
             rigidBody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
         }
 
+        routeFollower.UpdateProgress(StatsManager.Instance.GetDistance());
+
+        StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
+
 #endif
 
-        // Calculate velocity based on rigibody current speed
-        playerVelocity = rigidBody.velocity.magnitude * boatSpeed;
-        
-        // Update velocity
-        routeFollower.UpdateVelocity(playerVelocity);
     }
 
     private void Animate()
@@ -337,6 +377,11 @@ public class PlayerController : MonoBehaviour
     public void ReduceVelocity()
     {
         rigidBody.velocity = Vector3.zero;
+    }
+
+    public void ResetProgress()
+    {
+        routeDistance = 0;
     }
 
     public void UpdateRace(Race race)

@@ -20,6 +20,7 @@ public static class CSAFEDictionary
         // Short Commands
         { "CSAFE_GETSTATUS_CMD",                                            new List<object> { 0x80, new int[] { } } },
         { "CSAFE_RESET_CMD",                                                new List<object> { 0x81, new int[] { } } },
+        { "CSAFE_PM_SET_RESET_ALL",                                         new List<object> { 0xE0, new int[] { } } },
         { "CSAFE_GOIDLE_CMD",                                               new List<object> { 0x82, new int[] { } } },
         { "CSAFE_GOHAVEID_CMD",                                             new List<object> { 0x83, new int[] { } } },
         { "CSAFE_GOINUSE_CMD",                                              new List<object> { 0x85, new int[] { } } },

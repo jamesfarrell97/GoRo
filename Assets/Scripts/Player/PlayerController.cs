@@ -63,9 +63,6 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public PhotonView photonView { get; private set; }
     [HideInInspector] public PlayerState state;
 
-    private Rigidbody rigidBody;
-    private BoxCollider boxCollider;
-
     private AchievementTracker achievementTracker;
     private RouteFollower routeFollower;
     
@@ -80,17 +77,18 @@ public class PlayerController : MonoBehaviour
     public List<float> DistanceSample { get; private set; }
     public List<float> PowerSample { get; private set; }
     public List<float> StrokeRateSample { get; private set; }
-    public List<float> AvgSplitSample { get; private set; }
+    public List<float> PaceSample { get; private set; }
     public List<float> SpeedSample { get; private set; }
 
     private int playerCount = 0;
-    private float progressAlongRoute;
 
     private void Awake()
     {
         achievementTracker = GetComponent<AchievementTracker>();
         routeFollower = GetComponent<RouteFollower>();
         photonView = GetComponent<PhotonView>();
+
+        StatsManager.Instance.SetPlayerController(this);
     }
 
     private void Start()
@@ -98,7 +96,6 @@ public class PlayerController : MonoBehaviour
         if (photonView.IsMine)
         {
             AssignMenuCamera();
-            AssignRigidbody();
             UpdatePlayerTag();
             UpdateBoat();
         }
@@ -113,8 +110,14 @@ public class PlayerController : MonoBehaviour
         }
 
         ResetSamples();
+        UpdatePosition();
 
-        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.SAMPLE_RATE));
+        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.MOVE_SAMPLE_RATE));
+    }
+
+    private void UpdatePosition()
+    {
+        routeFollower.SetPosition();
     }
 
     private void FixedUpdate()
@@ -132,13 +135,8 @@ public class PlayerController : MonoBehaviour
     private void AssignMenuCamera()
     {
         MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = mainCamera;
-        
-        MenuManager.Instance.OpenMenu("HUD");
-    }
 
-    private void AssignRigidbody()
-    {
-        rigidBody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
+        MenuManager.Instance.OpenMenu("HUD");
     }
 
     private void UpdatePlayerTag()
@@ -225,25 +223,33 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void UpdateProgress(float progressAlongRoute)
+    public void UpdateRouteDistance(float routeDistance)
     {
-        photonView.RPC("RPC_UpdateProgress", RpcTarget.AllBuffered, progressAlongRoute);
+        photonView.RPC("RPC_UpdateRouteDistance", RpcTarget.AllBuffered, routeDistance);
     }
 
     [PunRPC]
-    public void RPC_UpdateProgress(float progressAlongRoute)
+    public void RPC_UpdateRouteDistance(float routeDistance)
     {
-        this.progressAlongRoute = progressAlongRoute;
+        this.routeDistance = routeDistance;
     }
 
     #endregion
 
     public float routeDistance = 0;
 
-    private void SampleStats()
+    public void SampleStats()
     {
+
+#if UNITY_EDITOR
+
         // Sample distance
         DistanceSample.Add(routeDistance);
+
+#else
+
+        // Sample distance
+        DistanceSample.Add(StatsManager.Instance.GetDistance());
 
         // Sample stroke power
         PowerSample.Add(StatsManager.Instance.GetStrokePower());
@@ -251,11 +257,14 @@ public class PlayerController : MonoBehaviour
         // Sample stroke rate
         StrokeRateSample.Add(StatsManager.Instance.GetStrokeRate());
 
-        // Sample split avg
-        AvgSplitSample.Add(StatsManager.Instance.GetAvgSplit());
+        // Sample pace
+        PaceSample.Add(StatsManager.Instance.GetPace());
 
         // Sample speed
         SpeedSample.Add(StatsManager.Instance.GetSpeed());
+
+#endif
+
     }
 
     public void ResetSamples()
@@ -263,20 +272,22 @@ public class PlayerController : MonoBehaviour
         DistanceSample = new List<float>();
         PowerSample = new List<float>();
         StrokeRateSample = new List<float>();
-        AvgSplitSample = new List<float>();
+        PaceSample = new List<float>();
         SpeedSample = new List<float>();
     }
 
-    private void UpdateSpeed()
+    private void UpdateMovement()
     {
 
 #if UNITY_EDITOR
-        
+
         // If debug 'move' button pressed
         if (move || Input.GetKey(KeyCode.W))
         {
+            float x = Random.Range(15f, 20f);
+
             // Update distance
-            routeDistance += boatSpeed;
+            routeDistance += x;
 
             // Update stroke state
             strokeState = StrokeState.Driving;
@@ -301,38 +312,49 @@ public class PlayerController : MonoBehaviour
             strokeState = StrokeState.WaitingForWheelToAccelerate;
         }
 
-#else
-
-        // Get speed from erg
-        rowingSpeed = StatsManager.Instance.GetSpeed();
-
-        // Get stroke state from erg
-        strokeState = (StrokeState) StatsManager.Instance.GetStrokeState();
-
-        // If the user is currently driving
-        if (strokeState == StrokeState.Driving)
-        {
-            // Apply force to the rigidbody
-            rigidBody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
-        }
-
-        routeFollower.UpdateProgress(StatsManager.Instance.GetDistance());
-
-        StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
-
 #endif
+
+    }
+
+    public float range = 0;
+    private float delta;
+
+    public void ERGUpdateDistance(float distance)
+    {
+        // Don't execute if paused
+        if (paused) return;
+
+        // Update distance
+        routeDistance = distance;
+
+        // Update distance
+        routeFollower.UpdateDistance(routeDistance);
+
+        //// Update debug display
+        //StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
 
     }
 
     private void Animate()
     {
+#if UNITY_EDITOR
+
         foreach (Animator animator in rowingAnimators)
         {
             animator.SetInteger("State", (int) strokeState);
         }
+
+#else
+
+        foreach (Animator animator in rowingAnimators)
+        {
+            animator.SetInteger("State", StatsManager.Instance.GetStrokeState());
+        }
+
+#endif
     }
 
-    #region Accessors & Mutators
+#region Accessors & Mutators
 
     public void Go()
     {
@@ -369,14 +391,9 @@ public class PlayerController : MonoBehaviour
         return routeFollower.currentLap;
     }
 
-    public float GetProgress()
+    public float GetRouteDistance()
     {
-        return progressAlongRoute;
-    }
-
-    public void ReduceVelocity()
-    {
-        rigidBody.velocity = Vector3.zero;
+        return routeDistance;
     }
 
     public void ResetProgress()
@@ -394,7 +411,7 @@ public class PlayerController : MonoBehaviour
         this.trial = trial;
     }
 
-    #endregion
+#endregion
 
     public void ChangeCameraPosition()
     {

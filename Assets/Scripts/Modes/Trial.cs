@@ -109,7 +109,10 @@ public class Trial : MonoBehaviour
         if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
 
         // Update distance slider
-        GameManager.Instance.UpdateProgress(route, player, numberOfLaps);
+        GameManager.Instance.UpdatePlayerProgress(route, player, numberOfLaps);
+
+        // Update ghost slider
+        if (ghost != null) GameManager.Instance.UpdateGhostTracker(route, ghost, numberOfLaps);
     }
 
     private void ResetDistanceSlider()
@@ -335,30 +338,45 @@ public class Trial : MonoBehaviour
 
     IEnumerator StartCountdown()
     {
+        // End Just Row
+        //
+        if (player != null) BluetoothManager.Instance.EndJustRow();
+
+        // Reset stats
+        //
+        StatsManager.Instance.ResetStats();
+
+        yield return new WaitForSeconds(2);
+
         // Display countdown 3
         //
-        StartCoroutine(GameManager.Instance.DisplayCountdown("3", 1));
+        if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("3", 1));
 
         yield return new WaitForSeconds(1);
 
         // Display countdown 2
         //
-        StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
+        if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
+
+        // Start Just Row
+        //
+        if (player != null) BluetoothManager.Instance.StartJustRow();
 
         yield return new WaitForSeconds(1);
 
         // Display countdown 1
         //
-        StartCoroutine(GameManager.Instance.DisplayCountdown("1", 1));
+        if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("1", 1));
 
         yield return new WaitForSeconds(1);
 
         // Display start!
         //
-        StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
+        if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
 
         // Start trial
-        StartTrial();
+        //
+        if (player != null) StartTrial();
     }
 
     private void StartTrial()
@@ -383,12 +401,6 @@ public class Trial : MonoBehaviour
 
     public void RemovePlayerFromTrial()
     {
-        // Reduce player velocity to 0
-        player.ReduceVelocity();
-
-        // Unpause game
-        GameManager.Instance.UnpauseGame();
-
         // Start just row
         GameManager.Instance.StartJustRow();
 

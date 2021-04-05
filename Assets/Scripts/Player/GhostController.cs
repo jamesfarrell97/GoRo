@@ -30,7 +30,7 @@ public class GhostController : MonoBehaviour
     {
         Reset();
 
-        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.SAMPLE_RATE));
+        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.MOVE_SAMPLE_RATE));
     }
 
     private void Reset()
@@ -51,17 +51,17 @@ public class GhostController : MonoBehaviour
         routeFollower.UpdateDistance(0);
     }
 
-    public float distance = 0;
+    public float routeDistance = 0;
 
     private void UpdateMovement()
     {
         if (paused) return;
 
         // Update distance
-        distance = samples[sampleIndex];
+        routeDistance = samples[sampleIndex];
 
         // Move
-        routeFollower.UpdateDistance(distance);
+        routeFollower.UpdateDistance(routeDistance);
         
         // Select next sample in the speed samples array
         sampleIndex = (sampleIndex < samples.Length - 1) 
@@ -97,6 +97,11 @@ public class GhostController : MonoBehaviour
         {
             animator.SetInteger("State", 0);
         }
+    }
+
+    public float GetRouteDistance()
+    {
+        return routeDistance;
     }
 
     public bool Paused()

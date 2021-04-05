@@ -59,6 +59,7 @@ MonoBehaviour:
   - RPC_PlayerCompletedRace
   - RPC_UpdatePlayerTag
   - RPC_UpdateProgress
+  - RPC_UpdateRouteDistance
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

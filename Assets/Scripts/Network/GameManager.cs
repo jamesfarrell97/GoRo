@@ -553,6 +553,13 @@ public class GameManager : MonoBehaviourPunCallbacks
             player.trial = null;
             player.race = null;
 
+#if !UNITY_EDITOR
+
+            // Reset track distance
+            StartCoroutine(ResetTrackDistance());
+
+#endif
+
             // Retrieve progress tracker
             RouteFollower routeFollower = player.GetComponent<RouteFollower>();
 
@@ -580,6 +587,19 @@ public class GameManager : MonoBehaviourPunCallbacks
             // No need to check any more views, so break
             break;
         }
+    }
+
+    IEnumerator ResetTrackDistance()
+    {
+        BluetoothManager.Instance.EndJustRow();
+
+        yield return new WaitForSeconds(0.25f);
+
+        BluetoothManager.Instance.StartJustRow();
+
+        yield return new WaitForSeconds(0.25f);
+
+        UnpauseGame();
     }
 
     public void ExitEvent()
@@ -617,6 +637,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         progressBar.gameObject.SetActive(true);
 
         ghost.progressBar = progressBar;
+
+        // Update color
         ghost.progressBar.handleRect.GetComponent<Image>().color = Color.yellow;
     }
 
@@ -648,10 +670,22 @@ public class GameManager : MonoBehaviourPunCallbacks
             Destroy(player.progressBar);
     }
 
-    public void UpdateProgress(Route route, PlayerController player, int numberOfLaps)
+    public void UpdateGhostTracker(Route route, GhostController ghost, int numberOfLaps)
     {
         var routeLength = route.routeDistance;
-        var playerProgress = player.GetProgress();
+        var ghostProgress = ghost.GetRouteDistance();
+
+        // Calculate distance as a percentage of the total number of laps
+        var distance = ghostProgress / (routeLength * numberOfLaps);
+        
+        // Update ghost progress bar
+        ghost.progressBar.value = distance;
+    }
+
+    public void UpdatePlayerProgress(Route route, PlayerController player, int numberOfLaps)
+    {
+        var routeLength = route.routeDistance;
+        var playerProgress = player.GetRouteDistance();
 
         // Calculate distance as a percentage of the total number of laps
         var distance = playerProgress / (routeLength * numberOfLaps);
@@ -682,9 +716,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         exitEventButton.SetActive(showLeaveEvent);
         leaveRoomButton.SetActive(showLeaveRoom);
     }
-    #endregion
+#endregion
 
-    #region HUD
+#region HUD
     public void ConfirmLeaveRoom()
     {
         RequestConfirmPlayersChoice("leaveRoom");
@@ -984,5 +1018,5 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         eventNotificationPanel.SetActive(false);
     }
-    #endregion
+#endregion
 }

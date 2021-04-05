@@ -1,6 +1,6 @@
-using System;
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
+
 using static PlayerController;
 
 // Code adapted from the Unity Standard Assets WaypointProgressTracker class
@@ -85,15 +85,13 @@ namespace UnityStandardAssets.Utility
         {
             CheckIfLapComplete();
 
-            if (playerController != null && playerController.Paused()) return;
+            if (playerController != null && (playerController.Paused() || !playerController.photonView.IsMine)) return;
 
             if (ghostController != null && ghostController.Paused()) return;
 
             if (route == null) return;
 
             if (route.GetRoutePoint(0).Equals(null)) return;
-
-            if (!playerController.photonView.IsMine) return;
 
             // determine the position we should currently be aiming for
             // (this is different to the current progress position, it is a a certain amount ahead along the route)
@@ -121,15 +119,18 @@ namespace UnityStandardAssets.Utility
             progressAlongRoute = 0;
             currentLap = 1;
             speed = 0;
+
+            SetPosition();
         }
 
-        public void UpdateVelocity(float velocity)
-        {
-            this.translationalVelocity = velocity;
-        }
+        public float range = 0;
+        public float totalDistance = 0;
+
+        public int delta = 0;
 
         public void UpdateDistance(float distance)
         {
+            // Subtract deleta form distance to calculate progress
             progressAlongRoute = distance;
 
             // Set start position
@@ -158,7 +159,6 @@ namespace UnityStandardAssets.Utility
             this.progressAlongRoute = 0;
 
             Reset();
-            SetPosition();
         }
 
         public Vector3 startPosition;
@@ -170,8 +170,19 @@ namespace UnityStandardAssets.Utility
 
         public void UpdatePosition()
         {
-            // Calculate lerp time
-            lerpTime += Time.fixedDeltaTime / (1f / StatsManager.SAMPLE_RATE);
+
+#if UNITY_EDITOR
+
+            // Calculate lerp time based on sample rate
+            lerpTime += Time.fixedDeltaTime / (1f / StatsManager.MOVE_SAMPLE_RATE);
+
+#else
+
+            // Calculate lerp time based on sample rate
+            // This has been changed to only expect samples every one second
+            lerpTime += Time.fixedDeltaTime / (1f / StatsManager.MOVE_SAMPLE_RATE);
+
+#endif
 
             // Update position
             target.position = Vector3.Lerp(startPosition, targetPosition, lerpTime);

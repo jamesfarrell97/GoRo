@@ -134,9 +134,9 @@ public class StatsGraph : MonoBehaviour
             count3
         );
 
-        count4 = (MAX_POINTS < StatsManager.SplitAvgPaceData.Count) ? MAX_POINTS : StatsManager.SplitTimeData.Count;
-        data4 = StatsManager.SplitAvgPaceData.ToList().GetRange(
-            StatsManager.SplitAvgPaceData.Count - count4, 
+        count4 = (MAX_POINTS < StatsManager.PaceData.Count) ? MAX_POINTS : StatsManager.PaceData.Count;
+        data4 = StatsManager.PaceData.ToList().GetRange(
+            StatsManager.PaceData.Count - count4,
             count4
         );
 

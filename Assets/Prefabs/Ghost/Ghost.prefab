@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1652413137834809143}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: -1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1161307997334124168}
@@ -531,6 +531,7 @@ MonoBehaviour:
   - {fileID: 1940535963882314593}
   - {fileID: 3821981568174155192}
   trial: {fileID: 0}
+  progressBar: {fileID: 0}
 --- !u!114 &271775186333819703
 MonoBehaviour:
   m_ObjectHideFlags: 0

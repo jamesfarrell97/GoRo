@@ -146,7 +146,7 @@ public class Race : MonoBehaviour
             if (player.photonView.IsMine) localPlayerProgress = progress;
 
             // Update progress bar
-            GameManager.Instance.UpdateProgress(route, player, numberOfLaps);
+            GameManager.Instance.UpdatePlayerProgress(route, player, numberOfLaps);
         }
 
         // Convert dictionary to sorted list

@@ -20,6 +20,7 @@ public class GhostController : MonoBehaviour
     private int sampleIndex;
 
     private bool paused;
+    private float progressAlongRoute;
 
     private void Awake()
     {
@@ -53,14 +54,19 @@ public class GhostController : MonoBehaviour
     private void UpdateSpeed()
     {
         if (paused) return;
+        
+        // Update velocity
+        routeFollower.UpdateVelocity(speedSamples[sampleIndex]);
 
         // Select next sample in the speed samples array
         sampleIndex = (sampleIndex < speedSamples.Length - 1) 
             ? sampleIndex + 1 
             : 0;
-        
-        // Update velocity
-        routeFollower.UpdateVelocity(speedSamples[sampleIndex]);
+    }
+
+    public void UpdateProgress(float progressAlongRoute)
+    {
+        this.progressAlongRoute = progressAlongRoute;
     }
 
     public void Pause()
@@ -96,5 +102,10 @@ public class GhostController : MonoBehaviour
     public bool Paused()
     {
         return this.paused;
+    }
+
+    public float GetProgress()
+    {
+        return progressAlongRoute;
     }
 }

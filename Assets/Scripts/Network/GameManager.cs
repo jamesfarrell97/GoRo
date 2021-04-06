@@ -613,17 +613,18 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void InstantiateGhostTracker(GhostController ghost)
     {
-        Slider progressBar = Instantiate(otherProgressBar, localProgressBar.transform.parent) as Slider;
-        progressBar.gameObject.SetActive(true);
-
-        ghost.progressBar = progressBar;
+        ghost.progressBar = Instantiate(otherProgressBar, localProgressBar.transform.parent) as Slider;
         ghost.progressBar.handleRect.GetComponent<Image>().color = Color.yellow;
+        ghost.progressBar.gameObject.SetActive(true);
     }
 
     public void DestroyGhostTracker(GhostController ghost)
     {
         if (ghost != null)
-            Destroy(ghost.progressBar);
+        {
+            //ghost.progressBar.gameObject.SetActive(false);
+            Destroy(ghost.progressBar.gameObject);
+        }
     }
 
     public void InstantiatePlayerTracker(PlayerController player)
@@ -648,21 +649,31 @@ public class GameManager : MonoBehaviourPunCallbacks
             Destroy(player.progressBar);
     }
 
-    public void UpdateProgress(Route route, PlayerController player, int numberOfLaps)
+    public void UpdateGhostTracker(Route route, GhostController ghost, int numberOfLaps)
+    {
+        var routeLength = route.routeDistance;
+        var ghostProgress = ghost.GetProgress();
+
+        // Calculate distance as a percentage of the total number of laps
+        var distance = ghostProgress / (routeLength * numberOfLaps);
+
+        // Update ghost progress bar
+        ghost.progressBar.value = distance;
+    }
+
+    public void UpdatePlayerProgress(Route route, PlayerController player, int numberOfLaps)
     {
         var routeLength = route.routeDistance;
         var playerProgress = player.GetProgress();
 
         // Calculate distance as a percentage of the total number of laps
         var distance = playerProgress / (routeLength * numberOfLaps);
-
         // If local view
         if (player.photonView.IsMine)
         {
             // Update local progress bar
             localProgressBar.value = distance;
         }
-
         else
         {
             // Update other progress bar

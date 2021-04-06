@@ -118,7 +118,10 @@ public class Trial : MonoBehaviour
         if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
 
         // Update distance slider
-        GameManager.Instance.UpdateProgress(route, player, numberOfLaps);
+        GameManager.Instance.UpdatePlayerProgress(route, player, numberOfLaps);
+
+        // Update ghost tracker
+        if (ghost != null) GameManager.Instance.UpdateGhostTracker(route, ghost, numberOfLaps);
     }
 
     private void ResetDistanceSlider()
@@ -135,8 +138,18 @@ public class Trial : MonoBehaviour
         // If time since last sample exceeds sample rate
         if (sampleTime > sampleRate)
         {
+
+#if UNITY_EDITOR
+
+            // Sample player speed
+            speedSample.Add(player.GetVelocity());
+
+#else
+
             // Sample player speed
             speedSample.Add(StatsManager.Instance.GetSpeed());
+
+#endif
 
             // Reset sample time
             sampleTime = 0;

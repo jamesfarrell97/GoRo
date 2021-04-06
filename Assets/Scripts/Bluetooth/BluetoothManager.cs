@@ -3,6 +3,7 @@ using System;
 
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class PMDictionary
 {
@@ -65,6 +66,7 @@ public class BluetoothManager : MonoBehaviour
         Connect,
         Subscribed,
         RequestMTU,
+        Reset,
         Notify,
         Write,
         Read,
@@ -75,13 +77,13 @@ public class BluetoothManager : MonoBehaviour
 
     private States State;
 
-    public static BluetoothManager instance;
+    public static BluetoothManager Instance;
 
     private void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
         }
         else
         {
@@ -129,8 +131,12 @@ public class BluetoothManager : MonoBehaviour
                         RequestMTU();
                         break;
 
+                    case States.Reset:
+                        ResetPM();
+                        break;
+
                     case States.Write:
-                        WriteCharacteristic();
+                        WriteCharacteristic(CSAFECommand.Write(new string[] { "CSAFE_STATUS_CMD" }).ToArray());
                         break;
 
                     case States.Read:
@@ -149,19 +155,21 @@ public class BluetoothManager : MonoBehaviour
         }
     }
 
+    public static int RESET_TIME = 2;
+
     public void OnConnectClick(DeviceListItem deviceListItem)
     {
-        InfoMessage = "Don't row yet...";
+        InfoMessage = "Please wait...";
 
         DeviceObject device = FoundDeviceListScript.DeviceAddressList[deviceListItem.DeviceID];
 
         if (device != null)
         {
-                DeviceListItem = deviceListItem;
-                DeviceAddress = device.Address;
-                DeviceName = device.Name;
+            DeviceListItem = deviceListItem;
+            DeviceAddress = device.Address;
+            DeviceName = device.Name;
 
-                SetState(States.Connect, 3f);
+            SetState(States.Connect, 3f);
         }
         else
         {
@@ -217,8 +225,7 @@ public class BluetoothManager : MonoBehaviour
 
             if (IsEqual(serviceUUID, PMDictionary.RowingServiceUUID))
             {
-                //StatusMessage = "Found Service UUID...";
-                SetState(States.RequestMTU, 5f);
+                SetState(States.RequestMTU, 2f);
             }
 
         }, null);
@@ -230,36 +237,95 @@ public class BluetoothManager : MonoBehaviour
 
         BluetoothLEHardwareInterface.RequestMtu(DeviceAddress, 247, (address, newMTU) => {
 
-            //StatusMessage = "MTU set to " + newMTU.ToString();
-            SetState(States.Subscribe, 2f);
+            ResetPM();
+
+            SetState(States.Subscribe, 3f);
         });
     }
 
-    private void WriteCharacteristic()
+    public void StartJustRow()
     {
-        //StatusMessage = "Writing characteristic...";
+        // Set Idle
+        byte[] data2 = { 0xF1, 0x82, 0x82, 0xF2 };
 
-        byte[] data = CSAFECommand.Write(new string[] { "CSAFE_STATUS_CMD" }).ToArray();
+        BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data2, data2.Length, true, (characteristicUUID2) => {
 
+            // Set HaveID
+            byte[] data3 = { 0xF1, 0x83, 0x83, 0xF2 };
+
+            BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data3, data3.Length, true, (characteristicUUID3) => {
+
+                // Set InUse
+                byte[] data4 = { 0xF1, 0x85, 0x85, 0xF2 };
+
+                BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data4, data4.Length, true, (characteristicUUID4) => {
+
+                    StatsManager.Instance.ResetStats();
+
+                    BluetoothLEHardwareInterface.Log("Write InUse Succeeded");
+
+                });
+
+                BluetoothLEHardwareInterface.Log("Write HaveID Succeeded");
+
+            });
+
+            BluetoothLEHardwareInterface.Log("Write Idle Succeeded");
+
+        });
+    }
+
+    public void EndJustRow()
+    {
+        // Set Finished
+        byte[] data4 = { 0xF1, 0x86, 0x86, 0xF2 };
+
+        BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data4, data4.Length, true, (characteristicUUID4) => {
+
+            StatsManager.Instance.SetDebugDisplay("E");
+
+            BluetoothLEHardwareInterface.Log("Write Succeeded");
+
+        });
+    }
+
+    public void ResetPM()
+    {
+        // Reset
+        byte[] data1 = CSAFECommand.Write(new string[] { "CSAFE_RESET_CMD" }).ToArray();
+
+        BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data1, data1.Length, true, (characteristicUUID1) => {
+
+            ClearJustRow();
+
+            BluetoothLEHardwareInterface.Log("Write Succeeded");
+
+        });
+    }
+
+    IEnumerator ClearJustRow()
+    {
+        EndJustRow();
+
+        yield return new WaitForSeconds(2);
+
+        StartJustRow();
+    }
+
+    public void WriteCharacteristic(byte[] data)
+    {
         BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data, data.Length, true, (characteristicUUID1) => {
 
             BluetoothLEHardwareInterface.Log("Write Succeeded");
 
-            //StatusMessage = "Write Succeeded";
-
-            SetState(States.Write, 1f);
         });
     }
 
     private void ReadCharacteristic()
     {
-        //StatusMessage = "Reading characteristics...";
-
         BluetoothLEHardwareInterface.ReadCharacteristic(DeviceAddress, PMDictionary.RowingServiceUUID, PMDictionary.GeneralRowingStatusCharacteristicUUID, (characteristicUUID, rawBytes) => {
 
             BluetoothLEHardwareInterface.Log("Read Succeeded");
-
-            //StatusMessage = "Read Succeeded";
 
             SetState(States.Read, 1f);
         });
@@ -269,8 +335,6 @@ public class BluetoothManager : MonoBehaviour
 
     private void SubscribeCharacteristic()
     {
-        //StatusMessage = "Subscribe characteristics...";
-
         BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMTransmitCharacteristic, (action1) =>
         {
             BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.RowingServiceUUID, PMDictionary.MultiplexedInformationCharacteristic, (action2) =>

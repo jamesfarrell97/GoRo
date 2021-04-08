@@ -55,11 +55,15 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] TMP_Text notificationText;
 
     [SerializeField] GameObject eventNotificationPanel;
+    [SerializeField] GameObject eventProgressPanel;
     [SerializeField] GameObject eventInformationPanel;
     [SerializeField] GameObject eventPositionPanel;
+
     [SerializeField] TMP_Text eventTimeText;
-    [SerializeField] TMP_Text eventLapText;
     [SerializeField] TMP_Text eventPositionText;
+    [SerializeField] TMP_Text eventDistanceText;
+    [SerializeField] TMP_Text eventStrokeRateText;
+    [SerializeField] TMP_Text eventSpeedText;
 
     [SerializeField] GameObject confirmationText;
 
@@ -563,7 +567,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             routeFollower.route = routeFollower.routes[0];
 
             // Hide time and lap info
-            HideEventInformationPanel();
+            HideEventPanel();
 
             // Update menu buttons
             UpdateMenuButtons(true, false, true);
@@ -614,25 +618,22 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void InstantiateGhostTracker(GhostController ghost)
     {
         ghost.progressBar = Instantiate(otherProgressBar, localProgressBar.transform.parent) as Slider;
-        ghost.progressBar.handleRect.GetComponent<Image>().color = Color.yellow;
         ghost.progressBar.gameObject.SetActive(true);
+
+        // Update color
+        ghost.progressBar.handleRect.GetComponent<Image>().color = Color.yellow;
     }
 
     public void DestroyGhostTracker(GhostController ghost)
     {
         if (ghost != null)
-        {
-            //ghost.progressBar.gameObject.SetActive(false);
             Destroy(ghost.progressBar.gameObject);
-        }
     }
 
     public void InstantiatePlayerTracker(PlayerController player)
     {
-        Slider progressBar = Instantiate(otherProgressBar, localProgressBar.transform.parent) as Slider;
-        progressBar.gameObject.SetActive(true);
-
-        player.progressBar = progressBar;
+        player.progressBar = Instantiate(otherProgressBar, localProgressBar.transform.parent) as Slider; ;
+        player.progressBar.gameObject.SetActive(true);
 
         // Update color
         player.progressBar.handleRect.GetComponent<Image>().color =
@@ -646,7 +647,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void DestroyPlayerTracker(PlayerController player)
     {
         if (player != null)
-            Destroy(player.progressBar);
+            Destroy(player.progressBar.gameObject);
     }
 
     public void UpdateGhostTracker(Route route, GhostController ghost, int numberOfLaps)
@@ -668,6 +669,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         // Calculate distance as a percentage of the total number of laps
         var distance = playerProgress / (routeLength * numberOfLaps);
+
         // If local view
         if (player.photonView.IsMine)
         {
@@ -908,12 +910,15 @@ public class GameManager : MonoBehaviourPunCallbacks
         panels[2].gameObject.SetActive(state2);
     }
 
-    public void DisplayEventPanel(string time, string lap, string position = null)
+    public void DisplayEventPanel(string time, string distance, string speed, string strokeRate, string position = null)
     {
+        eventProgressPanel.SetActive(true);
         eventInformationPanel.SetActive(true);
 
         eventTimeText.text = time;
-        eventLapText.text = lap;
+        eventDistanceText.text = distance;
+        eventSpeedText.text = speed;
+        eventStrokeRateText.text = strokeRate;
 
         if (position != null)
         {
@@ -926,8 +931,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public void HideEventInformationPanel()
+    public void HideEventPanel()
     {
+        eventProgressPanel.SetActive(false);
         eventInformationPanel.SetActive(false);
     }
 
@@ -939,7 +945,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void ResetEventPanel()
     {
         eventTimeText.text = "00:00";
-        eventLapText.text = "0";
+        eventDistanceText.text = "0";
         eventPositionText.text = "0";
     }
 
@@ -956,7 +962,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void HideAllPanels()
     {
         HideEventNotificationPanel();
-        HideEventInformationPanel();
+        HideEventPanel();
         HideNotificationPanel();
         HideCountdownPanel();
     }

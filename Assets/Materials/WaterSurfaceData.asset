@@ -120,14 +120,14 @@ MonoBehaviour:
     numWaves: 10
     amplitude: 0.1
     direction: -177
-    wavelength: 1
+    wavelength: 3.71
   _foamSettings:
     foamType: 1
     basicFoam:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.47917175
+        time: 0.14999771
         value: 0
         inSlope: 0
         outSlope: 0

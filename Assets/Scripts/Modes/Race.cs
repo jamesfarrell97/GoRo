@@ -159,8 +159,6 @@ public class Race : MonoBehaviour
             // Skip networked players
             if (!player.photonView.IsMine) continue;
 
-
-
             // Update duration
             raceDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - (raceStartTime + pauseDuration));
 
@@ -171,10 +169,17 @@ public class Race : MonoBehaviour
             int playerPosition = position.IndexOf(localPlayerProgress) + 1; // 0 indexed
             int playerCount = players.Count();
 
+            // Retrieve stats
+            string distance = StatsManager.Instance.GetMetersRowed().ToString();
+            string speed = StatsManager.Instance.GetSpeed().ToString();
+            string strokeRate = StatsManager.Instance.GetStrokeRate().ToString();
+
             // Display event panel
             GameManager.Instance.DisplayEventPanel(
                 raceDuration.ToString(@"mm\:ss"), 
-                $"{currentLap}/{numberOfLaps}", 
+                distance,
+                speed,
+                strokeRate,
                 playerPosition.ToString() + "/" + playerCount.ToString()
             );
 
@@ -351,7 +356,7 @@ public class Race : MonoBehaviour
         if (!player.photonView.IsMine) GameManager.Instance.InstantiatePlayerTracker(player);
 
         // Display event information panel
-        if (player.photonView.IsMine) GameManager.Instance.DisplayEventPanel("00:00", $"{0}/{numberOfLaps}", players.Count.ToString());
+        if (player.photonView.IsMine) GameManager.Instance.DisplayEventPanel("00:00", "0", "0", "0", players.Count.ToString());
     }
 
     public void RemovePlayerFromRace(PlayerController player)

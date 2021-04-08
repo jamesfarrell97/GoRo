@@ -177,8 +177,11 @@ public class Trial : MonoBehaviour
 
     private void DisplayDataToParticipants(string time)
     {
-        int currentLap = player.GetComponent<RouteFollower>().currentLap;
-        GameManager.Instance.DisplayEventPanel(time, $"{currentLap}/{numberOfLaps}");
+        string distance = StatsManager.Instance.GetMetersRowed().ToString();
+        string speed = StatsManager.Instance.GetSpeed().ToString();
+        string strokeRate = StatsManager.Instance.GetStrokeRate().ToString();
+
+        GameManager.Instance.DisplayEventPanel(time, distance, speed, strokeRate);
     }
 
     public void FormTrial(PlayerController player, string route)
@@ -211,7 +214,7 @@ public class Trial : MonoBehaviour
         this.player.UpdateTrial(this);
         
         // Display event information panel
-        GameManager.Instance.DisplayEventPanel("00:00", $"{0}/{numberOfLaps}");
+        GameManager.Instance.DisplayEventPanel("00:00", "0", "0", "0");
 
         // Pause player movement
         player.Pause();

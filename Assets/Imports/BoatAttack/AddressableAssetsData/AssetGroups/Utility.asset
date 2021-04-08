@@ -287,12 +287,6 @@ MonoBehaviour:
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
-  - m_GUID: ff89b8c057bd88b419f6b51bdd764da3
-    m_Address: Assets/Scenes/Game Scene/LightingData.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    m_MainAsset: {fileID: 0}
-    m_TargetAsset: {fileID: 0}
   - m_GUID: 218367fd729b40340a5506b7efa30ebf
     m_Address: Assets/Scenes/Main Menu/ReflectionProbe-0.exr
     m_ReadOnly: 0

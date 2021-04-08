@@ -321,6 +321,9 @@ public class PlayerController : MonoBehaviour
 
     public void ERGUpdateDistance(float distance)
     {
+
+#if !UNITY_EDITOR
+
         // Don't execute if paused
         if (paused) return;
 
@@ -332,6 +335,9 @@ public class PlayerController : MonoBehaviour
 
         //// Update debug display
         //StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
+    
+#endif
+
     }
 
     private void Animate()

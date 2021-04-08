@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Collections.Generic;
 
 // Direct translation of the PyRow Python library: https://github.com/wemakewaves/PyRow
 // Permission to use this code acquired from James Dowell: https://github.com/james-dowell

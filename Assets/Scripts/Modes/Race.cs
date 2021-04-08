@@ -137,7 +137,7 @@ public class Race : MonoBehaviour
         foreach (PlayerController player in players)
         {
             // Store progress
-            float progress = player.GetProgress();
+            float progress = player.GetRouteDistance();
 
             // Add progress to dictionary
             currentDistances.Add(player, progress);
@@ -332,6 +332,9 @@ public class Race : MonoBehaviour
             // Update route
             routeFollower.UpdateRoute(route, numberOfLaps);
 
+            // Reset progress
+            player.ResetProgress();
+
             // Update player race
             player.UpdateRace(this);
 
@@ -388,14 +391,8 @@ public class Race : MonoBehaviour
         // Remove player from race
         players.Remove(player);
 
-        // Reduce player velocity to 0
-        if (player.photonView.IsMine) player.ReduceVelocity();
-
         // Destroy tracker for networked payers
         if (!player.photonView.IsMine) GameManager.Instance.DestroyPlayerTracker(player);
-
-        // Unpause game
-        GameManager.Instance.UnpauseGame();
 
         // Start just row
         GameManager.Instance.StartJustRow();
@@ -513,6 +510,16 @@ public class Race : MonoBehaviour
 
     IEnumerator StartCountdown()
     {
+        // End Just Row
+        //
+        if (players.Count > 0) BluetoothManager.Instance.EndJustRow();
+
+        // Reset stats
+        //
+        StatsManager.Instance.ResetStats();
+
+        yield return new WaitForSeconds(2);
+
         // Display countdown 3
         //
         if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("3", 1));
@@ -522,6 +529,10 @@ public class Race : MonoBehaviour
         // Display countdown 2
         //
         if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
+
+        // Start Just Row
+        //
+        if (players.Count > 0) BluetoothManager.Instance.StartJustRow();
 
         yield return new WaitForSeconds(1);
 
@@ -536,6 +547,7 @@ public class Race : MonoBehaviour
         if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
 
         // Start race
+        //
         if (players.Count > 0) StartRace();
     }
 
@@ -556,7 +568,7 @@ public class Race : MonoBehaviour
                 toastPanel.gameObject.SetActive(true);
                 toastPanel.GetComponentInChildren<TMP_Text>().text = "";
             }
-
+            
             // Resume player movement
             player.Resume();
 

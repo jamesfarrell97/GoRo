@@ -16,7 +16,7 @@ public class GhostController : MonoBehaviour
 
     private RouteFollower routeFollower;
 
-    private float[] speedSamples;
+    private float[] samples;
     private int sampleIndex;
 
     private bool paused;
@@ -30,7 +30,8 @@ public class GhostController : MonoBehaviour
     private void Start()
     {
         Reset();
-        InvokeRepeating("UpdateSpeed", 0, 0.5f);
+
+        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.MOVE_SAMPLE_RATE));
     }
 
     private void Reset()
@@ -44,29 +45,29 @@ public class GhostController : MonoBehaviour
         this.trial = trial;
     }
 
-    public void InstantiateGhostSamples(float[] speedSamples)
+    public void InstantiateGhostSamples(float[] samples)
     {
-        this.speedSamples = speedSamples;
+        this.samples = samples;
 
-        routeFollower.UpdateVelocity(speedSamples[++sampleIndex]);
+        routeFollower.UpdateDistance(0);
     }
 
-    private void UpdateSpeed()
+    public float routeDistance = 0;
+
+    private void UpdateMovement()
     {
         if (paused) return;
-        
-        // Update velocity
-        routeFollower.UpdateVelocity(speedSamples[sampleIndex]);
 
+        // Update distance
+        routeDistance = samples[sampleIndex];
+
+        // Move
+        routeFollower.UpdateDistance(routeDistance);
+        
         // Select next sample in the speed samples array
-        sampleIndex = (sampleIndex < speedSamples.Length - 1) 
+        sampleIndex = (sampleIndex < samples.Length - 1) 
             ? sampleIndex + 1 
             : 0;
-    }
-
-    public void UpdateProgress(float progressAlongRoute)
-    {
-        this.progressAlongRoute = progressAlongRoute;
     }
 
     public void Pause()
@@ -99,13 +100,13 @@ public class GhostController : MonoBehaviour
         }
     }
 
+    public float GetRouteDistance()
+    {
+        return routeDistance;
+    }
+
     public bool Paused()
     {
         return this.paused;
-    }
-
-    public float GetProgress()
-    {
-        return progressAlongRoute;
     }
 }

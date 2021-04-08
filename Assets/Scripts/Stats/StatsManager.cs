@@ -13,8 +13,9 @@ public class StatsManager : MonoBehaviour
     public static readonly int[] SplitDistances = { 100, 500, 1000, 1500, 5000 };
     public static readonly float KILOMETERS_METER = 1000;
     public static readonly float SECS_MINUTE = 60;
-    
-    public static readonly float SAMPLE_RATE = 4;  // Number of movement data samples per second
+
+    public static readonly float SAMPLE_RATE = 5;       // Number of data samples per second
+    public static readonly float MOVE_SAMPLE_RATE = 1;  // Number of movement data samples per second
     public static readonly float SAMPLE_MINS = 120;     // Maximum minutes worth of data samples to store
 
     // Maximum samples to store
@@ -109,7 +110,10 @@ public class StatsManager : MonoBehaviour
         Reset();
         ResetDisplay();
         BuildDataStores();
-        
+
+        // Update player distance MOVE_SAMPLE_RATE times per second
+        InvokeRepeating("UpdatePlayerDistance", 0f, (1f / MOVE_SAMPLE_RATE));
+
         // Update stats SAMPLE_RATE times per second
         InvokeRepeating("UpdateStats", 0f, (1f / SAMPLE_RATE));
     }
@@ -151,6 +155,23 @@ public class StatsManager : MonoBehaviour
         DragFactorData = new Queue<float>();
     }
 
+    private void UpdatePlayerDistance()
+    {        
+        // Player must be assigned (by a local PlayerController) 
+        // before this operation can take place
+        // 
+        // See PlayerController.Start();
+        //
+        if (Player != null)
+        {
+            // Sample player stats
+            Player.SampleStats();
+
+            // Update player
+            Player.ERGUpdateDistance(Distance);
+        }
+    }
+    
     private void UpdateStrokeState()
     {
         // Update often to sync rowing animation with user stroke state
@@ -294,7 +315,7 @@ public class StatsManager : MonoBehaviour
                   + (SplitTimeH * SPLIT_INT_TIME_H_S_VALUE);
 
         // Pace Time 
-        PaceL = BluetoothManager.RowingStatusData1[7];
+        PaceL = BluetoothManager.RowingStatusData1[7]; 
         PaceH = BluetoothManager.RowingStatusData1[8];
 
         Pace = (PaceL * PACE_L_S_VALUE)

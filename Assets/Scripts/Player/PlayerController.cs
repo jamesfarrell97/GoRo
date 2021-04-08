@@ -1,10 +1,11 @@
-﻿using UnityStandardAssets.Utility;
+﻿using System.Collections.Generic;
+
+using UnityStandardAssets.Utility;
 using UnityEngine.UI;
 using UnityEngine;
 
 using Photon.Pun;
 using TMPro;
-using System.Collections;
 
 // Code referenced: https://www.youtube.com/watch?v=7bevpWbHKe4&t=315s
 //
@@ -62,9 +63,6 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public PhotonView photonView { get; private set; }
     [HideInInspector] public PlayerState state;
 
-    private Rigidbody rigidBody;
-    private BoxCollider boxCollider;
-
     private AchievementTracker achievementTracker;
     private RouteFollower routeFollower;
     
@@ -76,14 +74,21 @@ public class PlayerController : MonoBehaviour
     private float rowingSpeed = 0;
     private float playerVelocity = 0;
 
+    public List<float> DistanceSample { get; private set; }
+    public List<float> PowerSample { get; private set; }
+    public List<float> StrokeRateSample { get; private set; }
+    public List<float> PaceSample { get; private set; }
+    public List<float> SpeedSample { get; private set; }
+
     private int playerCount = 0;
-    private float progressAlongRoute;
 
     private void Awake()
     {
         achievementTracker = GetComponent<AchievementTracker>();
         routeFollower = GetComponent<RouteFollower>();
         photonView = GetComponent<PhotonView>();
+
+        StatsManager.Instance.SetPlayerController(this);
     }
 
     private void Start()
@@ -91,7 +96,6 @@ public class PlayerController : MonoBehaviour
         if (photonView.IsMine)
         {
             AssignMenuCamera();
-            AssignRigidbody();
             UpdatePlayerTag();
             UpdateBoat();
         }
@@ -104,22 +108,24 @@ public class PlayerController : MonoBehaviour
             UpdateMinimapIcon();
             UpdateOffset();
         }
+
+        ResetSamples();
+        UpdatePosition();
+
+        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.MOVE_SAMPLE_RATE));
+    }
+
+    private void UpdatePosition()
+    {
+        routeFollower.SetPosition();
     }
 
     private void FixedUpdate()
     {
         if (!photonView.IsMine) return;
 
-        if (paused)
+        if (!paused)
         {
-            if (PhotonNetwork.OfflineMode)
-            {
-                routeFollower.UpdateVelocity(0);
-            }
-        }
-        else
-        {
-            UpdateSpeed();
             Animate();
         }
     }
@@ -129,13 +135,8 @@ public class PlayerController : MonoBehaviour
     private void AssignMenuCamera()
     {
         MenuManager.Instance.GetComponentInParent<Canvas>().worldCamera = mainCamera;
-        
-        MenuManager.Instance.OpenMenu("HUD");
-    }
 
-    private void AssignRigidbody()
-    {
-        rigidBody = GameObject.Find("Rigidbody").GetComponent<Rigidbody>();
+        MenuManager.Instance.OpenMenu("HUD");
     }
 
     private void UpdatePlayerTag()
@@ -222,32 +223,83 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void UpdateProgress(float progressAlongRoute)
+    public void UpdateRouteDistance(float routeDistance)
     {
-        photonView.RPC("RPC_UpdateProgress", RpcTarget.AllBuffered, progressAlongRoute);
+        photonView.RPC("RPC_UpdateRouteDistance", RpcTarget.AllBuffered, routeDistance);
     }
 
     [PunRPC]
-    public void RPC_UpdateProgress(float progressAlongRoute)
+    public void RPC_UpdateRouteDistance(float routeDistance)
     {
-        this.progressAlongRoute = progressAlongRoute;
+        this.routeDistance = routeDistance;
     }
 
     #endregion
 
-    private void UpdateSpeed()
+    public float routeDistance = 0;
+
+    public void SampleStats()
     {
 
 #if UNITY_EDITOR
-        
+
+        // Sample distance
+        DistanceSample.Add(routeDistance);
+
+#else
+
+        // Sample distance
+        DistanceSample.Add(StatsManager.Instance.GetDistance());
+
+        // Sample stroke power
+        PowerSample.Add(StatsManager.Instance.GetStrokePower());
+
+        // Sample stroke rate
+        StrokeRateSample.Add(StatsManager.Instance.GetStrokeRate());
+
+        // Sample pace
+        PaceSample.Add(StatsManager.Instance.GetPace());
+
+        // Sample speed
+        SpeedSample.Add(StatsManager.Instance.GetSpeed());
+
+#endif
+
+    }
+
+    public void ResetSamples()
+    {
+        DistanceSample = new List<float>();
+        PowerSample = new List<float>();
+        StrokeRateSample = new List<float>();
+        PaceSample = new List<float>();
+        SpeedSample = new List<float>();
+    }
+
+    private void UpdateMovement()
+    {
+
+#if UNITY_EDITOR
+
         // If debug 'move' button pressed
         if (move || Input.GetKey(KeyCode.W))
         {
-            // Apply force to the rigibody
-            rigidBody.AddForce(transform.forward * 5 * Time.fixedDeltaTime);
-            
+            float x = Random.Range(15f, 20f);
+
+            // Update distance
+            routeDistance += x;
+
             // Update stroke state
             strokeState = StrokeState.Driving;
+
+            // Update distance
+            routeFollower.UpdateDistance(routeDistance);
+
+            // Update debug display
+            StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
+
+            // Sample stats
+            SampleStats();
         }
         else if (Input.GetKey(KeyCode.S))
         {
@@ -260,39 +312,50 @@ public class PlayerController : MonoBehaviour
             strokeState = StrokeState.WaitingForWheelToAccelerate;
         }
 
-#else
-
-        // Get speed from erg
-        rowingSpeed = StatsManager.Instance.GetSpeed();
-
-        // Get stroke state from erg
-        strokeState = (StrokeState) StatsManager.Instance.GetStrokeState();
-
-        // If the user is currently driving
-        if (strokeState == StrokeState.Driving)
-        {
-            // Apply force to the rigidbody
-            rigidBody.AddForce(transform.forward * rowingSpeed * Time.fixedDeltaTime);
-        }
-
 #endif
 
-        // Calculate velocity based on rigibody current speed
-        playerVelocity = rigidBody.velocity.magnitude * boatSpeed;
-        
-        // Update velocity
-        routeFollower.UpdateVelocity(playerVelocity);
+    }
+
+    public float range = 0;
+    private float delta;
+
+    public void ERGUpdateDistance(float distance)
+    {
+        // Don't execute if paused
+        if (paused) return;
+
+        // Update distance
+        routeDistance = distance;
+
+        // Update distance
+        routeFollower.UpdateDistance(routeDistance);
+
+        //// Update debug display
+        //StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
     }
 
     private void Animate()
     {
+
+#if UNITY_EDITOR
+
         foreach (Animator animator in rowingAnimators)
         {
             animator.SetInteger("State", (int) strokeState);
         }
+
+#else
+
+        foreach (Animator animator in rowingAnimators)
+        {
+            animator.SetInteger("State", StatsManager.Instance.GetStrokeState());
+        }
+
+#endif
+
     }
 
-    #region Accessors & Mutators
+#region Accessors & Mutators
 
     public void Go()
     {
@@ -329,14 +392,14 @@ public class PlayerController : MonoBehaviour
         return routeFollower.currentLap;
     }
 
-    public float GetProgress()
+    public float GetRouteDistance()
     {
-        return progressAlongRoute;
+        return routeDistance;
     }
 
-    public void ReduceVelocity()
+    public void ResetProgress()
     {
-        rigidBody.velocity = Vector3.zero;
+        routeDistance = 0;
     }
 
     public void UpdateRace(Race race)
@@ -349,7 +412,7 @@ public class PlayerController : MonoBehaviour
         this.trial = trial;
     }
 
-    #endregion
+#endregion
 
     public void ChangeCameraPosition()
     {

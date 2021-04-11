@@ -452,6 +452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5cb22d331ef7d64796f917c6a455a32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultRoute: {fileID: 0}
   route: {fileID: 0}
   routes: []
   target: {fileID: 4206319365989272668}
@@ -534,7 +535,7 @@ GameObject:
   - component: {fileID: 5440168089556550580}
   - component: {fileID: 7627725524392622711}
   - component: {fileID: 4914729006049150572}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -713,7 +714,7 @@ GameObject:
   - component: {fileID: 4165701621986092174}
   - component: {fileID: 4432461821153006181}
   - component: {fileID: 1123713264267961771}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Tag
   m_TagString: Untagged
   m_Icon: {fileID: 0}

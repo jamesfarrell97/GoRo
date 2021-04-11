@@ -49,7 +49,6 @@ public class Trial : MonoBehaviour
         state = TrialState.Inactive;
         player = null;
 
-        pauseDuration = 0;
         trialDuration = TimeSpan.Zero;
         trialStartTime = 0;
     }
@@ -86,28 +85,14 @@ public class Trial : MonoBehaviour
         CheckIfComplete();
     }
 
-    private float pauseDuration = 0;
     private void UpdateStopWatch()
     {
-        if (GameManager.State.Equals(GameManager.GameState.Paused))
-        {
-            if (PhotonNetwork.OfflineMode)
-            {
-                pauseDuration += Time.fixedDeltaTime;
-            }
-
-            return;
-        }
-
-        trialDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - (trialStartTime + pauseDuration));
+        trialDuration = TimeSpan.FromSeconds(PhotonNetwork.Time - trialStartTime);
         DisplayDataToParticipants(trialDuration.ToString(@"mm\:ss"));
     }
 
     private void UpdateDistanceSlider()
     {
-        // Don't execute if game paused
-        if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
-
         // Update distance slider
         GameManager.Instance.UpdatePlayerProgress(route, player, numberOfLaps);
 
@@ -126,9 +111,6 @@ public class Trial : MonoBehaviour
         // If player has completed time trial
         if (player.state == PlayerState.CompletedTimeTrial)
         {
-            // Pause game
-            GameManager.Instance.PauseGame();
-
             // Display trial stats to participants
             StartCoroutine(DisplayEndOfTrialStats());
 
@@ -143,7 +125,7 @@ public class Trial : MonoBehaviour
     private void DisplayDataToParticipants(string time)
     {
         string distance = StatsManager.Instance.GetMetersRowed().ToString();
-        string speed = StatsManager.Instance.GetSpeed().ToString();
+        string speed = string.Format("{0:0.00}", StatsManager.Instance.GetSpeed());
         string strokeRate = StatsManager.Instance.GetStrokeRate().ToString();
 
         GameManager.Instance.DisplayEventPanel(time, distance, speed, strokeRate);
@@ -189,9 +171,6 @@ public class Trial : MonoBehaviour
 
         // Display event information panel
         GameManager.Instance.DisplayEventPanel("00:00", "0", "0", "0");
-
-        // Pause player movement
-        player.Pause();
     }
 
     private const string TRIAL_GHOST_FILEPATH = "trial-ghost-data";
@@ -243,6 +222,7 @@ public class Trial : MonoBehaviour
     }
 
     GameObject spawnedGhost;
+
     private void LoadGhost(float[] speedSamples)
     {
         // Instantiate prefab
@@ -268,7 +248,7 @@ public class Trial : MonoBehaviour
         routeFollower.UpdateRoute(route, numberOfLaps);
 
         // Reset progress
-        player.ResetProgress();
+        ghost.ResetDistance();
 
         // Instantiate tracker
         GameManager.Instance.InstantiateGhostTracker(ghost);
@@ -344,14 +324,6 @@ public class Trial : MonoBehaviour
 
     IEnumerator StartCountdown()
     {
-        // End Just Row
-        //
-        if (player != null) BluetoothManager.Instance.EndJustRow();
-
-        // Reset stats
-        //
-        StatsManager.Instance.ResetStats();
-
         yield return new WaitForSeconds(2);
 
         // Display countdown 3
@@ -363,10 +335,6 @@ public class Trial : MonoBehaviour
         // Display countdown 2
         //
         if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
-
-        // Start Just Row
-        //
-        if (player != null) BluetoothManager.Instance.StartJustRow();
 
         yield return new WaitForSeconds(1);
 
@@ -380,6 +348,9 @@ public class Trial : MonoBehaviour
         //
         if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
 
+        // Start just row
+        if (player != null) BluetoothManager.Instance.StartJustRow();
+
         // Start trial
         //
         if (player != null) StartTrial();
@@ -387,11 +358,14 @@ public class Trial : MonoBehaviour
 
     private void StartTrial()
     {
-        // Unpause game
-        GameManager.Instance.UnpauseGame();
-
         // Set start time
         trialStartTime = (float) PhotonNetwork.Time;
+
+        // Unpause player
+        if (player != null) player.Resume();
+
+        // Unpause ghost
+        if (ghost != null) ghost.Resume();
 
         // Update state
         SetState(TrialState.InProgress);
@@ -428,7 +402,13 @@ public class Trial : MonoBehaviour
 
     IEnumerator DisplayEndOfTrialStats()
     {
-        // Display player position
+        BluetoothManager.Instance.StartJustRow();
+
+        if (player != null) player.Pause();
+
+        if (ghost != null) ghost.Pause();
+
+        // Display information
         StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("Time: " + trialDuration.ToString(@"mm\:ss"), 3));
 
         // Display stats for resolve timeout seconds

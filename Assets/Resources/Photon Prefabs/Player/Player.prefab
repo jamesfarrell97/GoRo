@@ -2528,6 +2528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5cb22d331ef7d64796f917c6a455a32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultRoute: {fileID: 0}
   route: {fileID: 0}
   routes: []
   target: {fileID: 4206319365989272668}

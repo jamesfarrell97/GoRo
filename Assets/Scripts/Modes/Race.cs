@@ -101,17 +101,6 @@ public class Race : MonoBehaviour
 
     private void MonitorRace()
     {
-        // Don't execute if paused
-        if (GameManager.State.Equals(GameManager.GameState.Paused))
-        {
-            if (PhotonNetwork.OfflineMode)
-            {
-                pauseDuration += Time.fixedDeltaTime;
-            }
-
-            return;
-        }
-
         UpdateEventPanel();
     }
 
@@ -171,7 +160,7 @@ public class Race : MonoBehaviour
 
             // Retrieve stats
             string distance = StatsManager.Instance.GetMetersRowed().ToString();
-            string speed = StatsManager.Instance.GetSpeed().ToString();
+            string speed = string.Format("{0:0.00}", StatsManager.Instance.GetSpeed());
             string strokeRate = StatsManager.Instance.GetStrokeRate().ToString();
 
             // Display event panel
@@ -190,9 +179,6 @@ public class Race : MonoBehaviour
 
     private void ResetDistanceSlider()
     {
-        // Don't execute if game paused
-        if (GameManager.State.Equals(GameManager.GameState.Paused)) return;
-
         // For each player in race
         foreach (PlayerController player in players)
         {
@@ -230,9 +216,9 @@ public class Race : MonoBehaviour
         // Assign player to position
         positions.Add(player, position);
 
-        // Pause game
-        GameManager.Instance.PauseGame();
-
+        // Pause player
+        player.Pause();
+        
         // If all players have finished the race
         if (positions.Count.Equals(players.Count))
         {
@@ -291,6 +277,9 @@ public class Race : MonoBehaviour
             // Only display on our view
             if (!player.photonView.IsMine) continue;
 
+            // Reset
+            BluetoothManager.Instance.StartJustRow();
+
             // If player finished the race
             if (positions.ContainsKey(player))
             {
@@ -335,11 +324,17 @@ public class Race : MonoBehaviour
             // Reset progress
             player.ResetProgress();
 
+            // Reset samples
+            player.ResetSamples();
+
             // Update player race
             player.UpdateRace(this);
 
             // Pause player movement
             player.Pause();
+
+            // Display event information panel
+            GameManager.Instance.DisplayEventPanel("00:00", "0", "0", "0");
         }
     }
 
@@ -391,8 +386,21 @@ public class Race : MonoBehaviour
         // Remove player from race
         players.Remove(player);
 
+        // IF local player
+        if (player.photonView.IsMine)
+        {
+            // Start just row
+            BluetoothManager.Instance.StartJustRow();
+
+            // Pause movement
+            player.Pause();
+        }
+
         // Destroy tracker for networked payers
-        if (!player.photonView.IsMine) GameManager.Instance.DestroyPlayerTracker(player);
+        else
+        {
+            GameManager.Instance.DestroyPlayerTracker(player);
+        }
 
         // Start just row
         GameManager.Instance.StartJustRow();
@@ -510,14 +518,6 @@ public class Race : MonoBehaviour
 
     IEnumerator StartCountdown()
     {
-        // End Just Row
-        //
-        if (players.Count > 0) BluetoothManager.Instance.EndJustRow();
-
-        // Reset stats
-        //
-        StatsManager.Instance.ResetStats();
-
         yield return new WaitForSeconds(2);
 
         // Display countdown 3
@@ -529,11 +529,7 @@ public class Race : MonoBehaviour
         // Display countdown 2
         //
         if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
-
-        // Start Just Row
-        //
-        if (players.Count > 0) BluetoothManager.Instance.StartJustRow();
-
+        
         yield return new WaitForSeconds(1);
 
         // Display countdown 1
@@ -545,6 +541,9 @@ public class Race : MonoBehaviour
         // Display start!
         //
         if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
+        
+        // Start just row
+        if (players.Count > 0) BluetoothManager.Instance.StartJustRow();
 
         // Start race
         //
@@ -553,6 +552,9 @@ public class Race : MonoBehaviour
 
     public void StartRace()
     {
+        // Set race start time
+        SetRaceStartTime();
+
         // For each player in the race
         foreach (PlayerController player in players)
         {
@@ -562,7 +564,7 @@ public class Race : MonoBehaviour
             // Retrieve toast panel
             Transform toastPanel = GameManager.Instance.transform.Find("HUD/Toast Panel");
 
-            // Activate component if not current active
+            // Activate component if not currently active
             if (!toastPanel.gameObject.activeSelf)
             {
                 toastPanel.gameObject.SetActive(true);
@@ -574,9 +576,6 @@ public class Race : MonoBehaviour
 
             break;
         }
-
-        // Set race start time
-        SetRaceStartTime();
 
         // Update race state
         SetState(RaceState.InProgress);

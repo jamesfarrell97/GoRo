@@ -119,7 +119,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        UpdateState();
         SetSleepTimeout();
         ShowConnectionMenu();
         LoadPlayerSettings();
@@ -148,11 +147,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             Application.Quit();
         }
-    }
-
-    private void UpdateState()
-    {
-        State = GameState.Playing;
     }
 
     private void SetSleepTimeout()
@@ -429,6 +423,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     #region Game Modes
+
     public void StartRace(string route)
     {
         // Retrieve all players
@@ -459,12 +454,15 @@ public class GameManager : MonoBehaviourPunCallbacks
                     return;
                 }
 
+                // Start just row
+                BluetoothManager.Instance.StartJustRow();
+
                 // Update player state
                 player.state = PlayerState.ParticipatingInRace;
 
                 // Reset track distance
-                player.GetComponent<RouteFollower>().progressAlongRoute = 0;
-
+                player.GetComponent<RouteFollower>().Reset();
+                
                 // Update menu buttons
                 UpdateMenuButtons(false, true, false);
 
@@ -513,6 +511,9 @@ public class GameManager : MonoBehaviourPunCallbacks
                     return;
                 }
 
+                // Start just row
+                BluetoothManager.Instance.StartJustRow();
+
                 // Update player state
                 player.state = PlayerState.ParticipatingInTrial;
 
@@ -550,37 +551,41 @@ public class GameManager : MonoBehaviourPunCallbacks
             // If not our view, skip rest of loop
             if (!photonView.IsMine) continue;
 
+            // Retrieve route follower
+            RouteFollower routeFollower = player.GetComponent<RouteFollower>();
+
+            // Update route
+            routeFollower.UpdateRoute(routeFollower.defaultRoute, 0);
+
+            // Reset progress
+            player.ResetProgress();
+
+            // Reset samples
+            player.ResetSamples();
+
+            // Clear player tracks
+            player.ClearTracks();
+
+            // Resume player movement
+            player.Resume();
+
+            // Start just row
+            BluetoothManager.Instance.StartJustRow();
+            
             // Update player state
             player.state = PlayerState.JustRowing;
 
-            // Clear player tracks
-            player.trial = null;
-            player.race = null;
-
-#if !UNITY_EDITOR
-
             // Reset track distance
-            StartCoroutine(ResetTrackDistance());
-
-#endif
-
-            // Retrieve progress tracker
-            RouteFollower routeFollower = player.GetComponent<RouteFollower>();
-
-            // Reset track distance
-            routeFollower.Reset();
-
-            // Reset track
-            routeFollower.route = routeFollower.routes[0];
-
-            // Hide time and lap info
-            HideEventPanel();
+            player.GetComponent<RouteFollower>().Reset();
 
             // Update menu buttons
             UpdateMenuButtons(true, false, true);
 
             // Reset UI state
             SwitchUIState(true, true, true);
+
+            // Hide time and lap info
+            HideEventPanel();
 
             // Enable UI toggle
             EnableUIToggle();
@@ -591,19 +596,6 @@ public class GameManager : MonoBehaviourPunCallbacks
             // No need to check any more views, so break
             break;
         }
-    }
-
-    IEnumerator ResetTrackDistance()
-    {
-        BluetoothManager.Instance.EndJustRow();
-
-        yield return new WaitForSeconds(0.25f);
-
-        BluetoothManager.Instance.StartJustRow();
-
-        yield return new WaitForSeconds(0.25f);
-
-        UnpauseGame();
     }
 
     public void ExitEvent()
@@ -632,7 +624,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void EnableUIToggle(bool enable = true)
     {
-        toggleUIButton.interactable = enable;
+        toggleUIButton.gameObject.SetActive(enable);
     }
 
     public void InstantiateGhostTracker(GhostController ghost)
@@ -777,98 +769,6 @@ public class GameManager : MonoBehaviourPunCallbacks
             waitingToConfirmLeaveRoom = false;
             waitingToConfirmExitGame = false;
         }
-    }
-
-    public void PauseGame()
-    {
-        if (!PhotonNetwork.OfflineMode) return;
-
-        // Retrieve all players
-        PlayerController[] players = FindObjectsOfType<PlayerController>();
-
-        // Retrieve all ghosts
-        GhostController[] ghosts = FindObjectsOfType<GhostController>();
-
-        // For each loaded player
-        foreach (PlayerController player in players)
-        {
-            // Retrieve player view
-            PhotonView photonView = player.GetComponent<PhotonView>();
-
-            // If not our view, skip rest of loop
-            if (!photonView.IsMine) continue;
-
-            // Pause movement
-            player.Pause();
-
-            // No need to check any more views, so break
-            break;
-        }
-
-        // For each loaded ghost
-        foreach (GhostController ghost in ghosts)
-        {
-            // Retrieve player view
-            PhotonView photonView = ghost.GetComponent<PhotonView>();
-
-            // If not our view, skip rest of loop
-            if (!photonView.IsMine) continue;
-
-            // Pause movement
-            ghost.Pause();
-
-            // No need to check any more views, so break
-            break;
-        }
-
-        // Update game state
-        State = GameState.Paused;
-    }
-
-    public void UnpauseGame()
-    {
-        if (!PhotonNetwork.OfflineMode) return;
-
-        // Retrieve all loaded players
-        PlayerController[] players = FindObjectsOfType<PlayerController>();
-
-        // Retrieve all loaded ghosts
-        GhostController[] ghosts = FindObjectsOfType<GhostController>();
-
-        // For each loaded player
-        foreach (PlayerController player in players)
-        {
-            // Retrieve player view
-            PhotonView photonView = player.GetComponent<PhotonView>();
-
-            // If not our view, skip rest of loop
-            if (!photonView.IsMine) continue;
-
-            // Resume movement
-            player.Resume();
-
-            // No need to check any more views, so break
-            break;
-        }
-
-        // For each loaded ghost
-        foreach (GhostController ghost in ghosts)
-        {
-            // Retrieve player view
-            PhotonView photonView = ghost.GetComponent<PhotonView>();
-
-            // If not our view, skip rest of loop
-            if (!photonView.IsMine) continue;
-
-            // Resume movement
-            ghost.Resume();
-
-            // No need to check any more views, so break
-            break;
-        }
-
-        // Update game state
-        State = GameState.Playing;
     }
 
     private bool mute = false;

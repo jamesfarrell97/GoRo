@@ -116,9 +116,9 @@ public class StatsGraph : MonoBehaviour
 
     public void UpdateGraph()
     {
-        count1 = (MAX_POINTS < StatsManager.DragFactorData.Count) ? MAX_POINTS : StatsManager.DragFactorData.Count;
-        data1 = StatsManager.DragFactorData.ToList().GetRange(
-            StatsManager.DragFactorData.Count - count1,
+        count1 = (MAX_POINTS < StatsManager.AvgForceData.Count) ? MAX_POINTS : StatsManager.AvgForceData.Count;
+        data1 = StatsManager.AvgForceData.ToList().GetRange(
+            StatsManager.AvgForceData.Count - count1,
             count1
         );
 

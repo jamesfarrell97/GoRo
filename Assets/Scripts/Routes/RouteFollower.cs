@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 using static PlayerController;
@@ -7,6 +9,8 @@ namespace UnityStandardAssets.Utility
 {
     public class RouteFollower : MonoBehaviour
     {
+        [HideInInspector] public Route defaultRoute;
+
         [HideInInspector] public Route route;
         [HideInInspector] public Route[] routes;
 
@@ -40,6 +44,7 @@ namespace UnityStandardAssets.Utility
         {
             routes = FindObjectsOfType<Route>();
             route = FindRoute("Cliffs");
+            defaultRoute = FindRoute("Cliffs");
         }
         
         private Route FindRoute(string name)
@@ -129,7 +134,7 @@ namespace UnityStandardAssets.Utility
 
         public void UpdateDistance(float distance)
         {
-            // Subtract deleta form distance to calculate progress
+            // Subtract pause distance from distance to calculate progress
             progressAlongRoute = distance;
 
             // Set start position
@@ -157,7 +162,9 @@ namespace UnityStandardAssets.Utility
 
             this.progressAlongRoute = 0;
 
-            Reset();
+            if (player != null) this.player.ResetPauseDistance();
+
+            SetPosition();
         }
 
         public Vector3 startPosition;
@@ -173,7 +180,7 @@ namespace UnityStandardAssets.Utility
 #if UNITY_EDITOR
 
             // Calculate lerp time based on sample rate
-            lerpTime += Time.fixedDeltaTime / (1f / StatsManager.MOVE_SAMPLE_RATE);
+            lerpTime += Time.fixedDeltaTime / (1f / StatsManager.STATS_SAMPLE_RATE);
 
 #else
 

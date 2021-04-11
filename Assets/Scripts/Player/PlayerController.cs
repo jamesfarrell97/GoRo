@@ -38,7 +38,6 @@ public class PlayerController : MonoBehaviour
         Recovery
     }
 
-    private StrokeState currentState;
     private StrokeState strokeState;
 
     [SerializeField] [Range(0, 3)] public float boatSpeed = 1f;
@@ -66,21 +65,23 @@ public class PlayerController : MonoBehaviour
     private AchievementTracker achievementTracker;
     private RouteFollower routeFollower;
     
+    private float routeDistance = 0;
+
+    private float pauseStartDistance;
+    private float pauseEndDistance;
+    private float pauseDistance;
+
     private bool paused = false;
     private bool move = false;
 
     private int cameraIndex = 0;
-
-    private float rowingSpeed = 0;
-    private float playerVelocity = 0;
+    private int playerCount = 0;
 
     public List<float> DistanceSample { get; private set; }
     public List<float> PowerSample { get; private set; }
     public List<float> StrokeRateSample { get; private set; }
     public List<float> PaceSample { get; private set; }
     public List<float> SpeedSample { get; private set; }
-
-    private int playerCount = 0;
 
     private void Awake()
     {
@@ -112,22 +113,12 @@ public class PlayerController : MonoBehaviour
         ResetSamples();
         UpdatePosition();
 
-        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.MOVE_SAMPLE_RATE));
+        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.STATS_SAMPLE_RATE));
     }
 
     private void UpdatePosition()
     {
         routeFollower.SetPosition();
-    }
-
-    private void FixedUpdate()
-    {
-        if (!photonView.IsMine) return;
-
-        if (!paused)
-        {
-            Animate();
-        }
     }
 
     #region Local Player
@@ -236,8 +227,6 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    public float routeDistance = 0;
-
     public void SampleStats()
     {
 
@@ -281,19 +270,19 @@ public class PlayerController : MonoBehaviour
 
 #if UNITY_EDITOR
 
-        // If debug 'move' button pressed
-        if (move || Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.W))
         {
-            float x = Random.Range(15f, 20f);
+            // Generate random distance to move this frame
+            float randomDistance = UnityEngine.Random.Range(2f, 4f);
 
             // Update distance
-            routeDistance += x;
+            routeDistance += randomDistance;
 
+            // Update route follower
+            routeFollower.UpdateDistance(routeDistance);
+            
             // Update stroke state
             strokeState = StrokeState.Driving;
-
-            // Update distance
-            routeFollower.UpdateDistance(routeDistance);
 
             // Update debug display
             StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
@@ -316,9 +305,6 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public float range = 0;
-    private float delta;
-
     public void ERGUpdateDistance(float distance)
     {
 
@@ -332,33 +318,17 @@ public class PlayerController : MonoBehaviour
 
         // Update distance
         routeFollower.UpdateDistance(routeDistance);
-
-        //// Update debug display
-        //StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
     
 #endif
 
     }
 
-    private void Animate()
+    public void Animate(float strokeState)
     {
-
-#if UNITY_EDITOR
-
         foreach (Animator animator in rowingAnimators)
         {
-            animator.SetInteger("State", (int) strokeState);
+            animator.SetInteger("State", (int)strokeState);
         }
-
-#else
-
-        foreach (Animator animator in rowingAnimators)
-        {
-            animator.SetInteger("State", StatsManager.Instance.GetStrokeState());
-        }
-
-#endif
-
     }
 
 #region Accessors & Mutators
@@ -376,26 +346,35 @@ public class PlayerController : MonoBehaviour
     public void Pause()
     {
         this.paused = true;
+        this.pauseStartDistance = StatsManager.Instance.GetDistance();
     }
 
     public void Resume()
     {
         this.paused = false;
+        this.pauseEndDistance = StatsManager.Instance.GetDistance();
+
+        this.pauseDistance = pauseEndDistance - pauseStartDistance;
     }
 
     public bool Paused()
     {
         return this.paused;
     }
-
-    public float GetVelocity()
-    {
-        return playerVelocity;
-    }
-
+    
     public int GetCurrentLap()
     {
         return routeFollower.currentLap;
+    }
+
+    public void ResetPauseDistance()
+    {
+        this.pauseDistance = 0;
+    }
+
+    public float GetPauseDistance()
+    {
+        return pauseDistance;
     }
 
     public float GetRouteDistance()
@@ -431,5 +410,11 @@ public class PlayerController : MonoBehaviour
             mainCamera.transform.SetPositionAndRotation(cameraPositions[cameraIndex].transform.position, cameraPositions[cameraIndex].transform.rotation);
             cullCamera.transform.SetPositionAndRotation(cameraPositions[cameraIndex].transform.position, cameraPositions[cameraIndex].transform.rotation);
         }
+    }
+
+    public void ClearTracks()
+    {
+        trial = null;
+        race = null;
     }
 }

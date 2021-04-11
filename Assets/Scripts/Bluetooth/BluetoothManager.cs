@@ -131,10 +131,6 @@ public class BluetoothManager : MonoBehaviour
                         RequestMTU();
                         break;
 
-                    //case States.Reset:
-                    //    Reset();
-                    //    break;
-
                     case States.Write:
                         WriteCharacteristic(CSAFECommand.Write(new string[] { "CSAFE_STATUS_CMD" }).ToArray());
                         break;
@@ -237,20 +233,20 @@ public class BluetoothManager : MonoBehaviour
 
         BluetoothLEHardwareInterface.RequestMtu(DeviceAddress, 247, (address, newMTU) => {
 
-            StartJustRow();
+            ResetPM();
 
             SetState(States.Subscribe, 3f);
         });
     }
 
-    public void StartJustRow()
+    public void ResetPM()
     {
         // Set Idle
         byte[] data2 = { 0xF1, 0x82, 0x82, 0xF2 };
 
         BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data2, data2.Length, true, (characteristicUUID2) => {
             
-            // Start JustRow
+            // Reset
             byte[] data5 = { 0x01, 0xF1, 0x76, 0x04, 0x13, 0x02, 0x01, 0x02, 0x60, 0xF2 };
                     
             BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data5, data5.Length, true, (characteristicUUID5) => {
@@ -258,35 +254,11 @@ public class BluetoothManager : MonoBehaviour
                 // Reset stats
                 StatsManager.Instance.ResetStats();
 
-                BluetoothLEHardwareInterface.Log("Write Succeeded");
+                BluetoothLEHardwareInterface.Log("Write Reset Succeeded");
 
             });
 
-            BluetoothLEHardwareInterface.Log("Write Idle Succeeded");
-
-        });
-    }
-
-    public void EndJustRow()
-    {
-        // Set Finished
-        byte[] data4 = { 0xF1, 0x86, 0x86, 0xF2 };
-
-        BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data4, data4.Length, true, (characteristicUUID4) => {
-
-            BluetoothLEHardwareInterface.Log("Write Succeeded");
-
-        });
-    }
-
-    public void ResetPM()
-    {
-        // Reset
-        byte[] data1 = CSAFECommand.Write(new string[] { "CSAFE_RESET_CMD" }).ToArray();
-
-        BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data1, data1.Length, true, (characteristicUUID1) => {
-
-            BluetoothLEHardwareInterface.Log("Write Succeeded");
+            BluetoothLEHardwareInterface.Log("Write Set Idle Succeeded");
 
         });
     }

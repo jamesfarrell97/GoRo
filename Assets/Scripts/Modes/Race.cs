@@ -278,7 +278,7 @@ public class Race : MonoBehaviour
             if (!player.photonView.IsMine) continue;
 
             // Reset
-            BluetoothManager.Instance.StartJustRow();
+            BluetoothManager.Instance.ResetPM();
 
             // If player finished the race
             if (positions.ContainsKey(player))
@@ -390,7 +390,7 @@ public class Race : MonoBehaviour
         if (player.photonView.IsMine)
         {
             // Start just row
-            BluetoothManager.Instance.StartJustRow();
+            BluetoothManager.Instance.ResetPM();
 
             // Pause movement
             player.Pause();
@@ -543,7 +543,7 @@ public class Race : MonoBehaviour
         if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
         
         // Start just row
-        if (players.Count > 0) BluetoothManager.Instance.StartJustRow();
+        if (players.Count > 0) BluetoothManager.Instance.ResetPM();
 
         // Start race
         //

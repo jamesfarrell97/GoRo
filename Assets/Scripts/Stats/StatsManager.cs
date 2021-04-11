@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-
 using UnityEngine;
 using TMPro;
 
@@ -28,28 +27,30 @@ public class StatsManager : MonoBehaviour
     [SerializeField] private TMP_Text PaceDisplay;
 
     // Split Data
-    // [SerializeField] private TMP_Text SplitTimeDisplay;
-    // [SerializeField] private TMP_Text SplitAvgPowerDisplay;
-    // [SerializeField] private TMP_Text SplitAvgPaceDisplay;
-
     [SerializeField] private TMP_Text[] SplitDistDisplays;
-
-    // Projection Data
-    // [SerializeField] private TMP_Text ProjectedWorkTimeDisplay;
-    // [SerializeField] private TMP_Text ProjectedWorkDistanceDisplay;
 
     // Stroke Data
     [SerializeField] private TMP_Text StrokesPerMinDisplay;
     [SerializeField] private TMP_Text StrokePowerDisplay;
     [SerializeField] private TMP_Text AvgForceDisplay;
 
+    // Debug
+    [SerializeField] private TMP_Text DebugDisplay;
+
+    // Split Data
+    // [SerializeField] private TMP_Text SplitTimeDisplay;
+    // [SerializeField] private TMP_Text SplitAvgPowerDisplay;
+    // [SerializeField] private TMP_Text SplitAvgPaceDisplay;
+    
+    // Projection Data
+    // [SerializeField] private TMP_Text ProjectedWorkTimeDisplay;
+    // [SerializeField] private TMP_Text ProjectedWorkDistanceDisplay;
+
+    // Stroke Data
     // [SerializeField] private TMP_Text DriveLengthDisplay;
 
     // Drag Data
     // [SerializeField] private TMP_Text DragFactorDisplay;
-
-    // Debug
-    [SerializeField] private TMP_Text DebugDisplay;
 
     // Live Data
     private float Distance;
@@ -111,7 +112,6 @@ public class StatsManager : MonoBehaviour
     private void Start()
     {
         Reset();
-        ResetDisplay();
         BuildDataStores();
 
         // Update player distance MOVE_SAMPLE_RATE times per second
@@ -127,11 +127,6 @@ public class StatsManager : MonoBehaviour
     }
 
     private void Reset()
-    {
-        Player = null;
-    }
-
-    private void ResetDisplay()
     {
         ResetStats();
         UpdateDisplay();

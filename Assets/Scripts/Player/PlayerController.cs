@@ -116,11 +116,6 @@ public class PlayerController : MonoBehaviour
         InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.STATS_SAMPLE_RATE));
     }
 
-    private void UpdatePosition()
-    {
-        routeFollower.SetPosition();
-    }
-
     #region Local Player
 
     private void AssignMenuCamera()
@@ -188,7 +183,7 @@ public class PlayerController : MonoBehaviour
         playerCount++;
 
         // Calculate offset
-        Vector3 offset = ((playerCount % 2 == 0) ? -transform.right * (playerCount * 5) : transform.right * (playerCount * 5));
+        Vector3 offset = ((playerCount % 2 == 0) ? -transform.right * (playerCount * 6) : transform.right * (playerCount * 6));
 
         // Update offsets
         minimapIcon.transform.position += offset;
@@ -267,16 +262,18 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateMovement()
     {
+        // Only execute locally
+        if (!photonView.IsMine) return;
 
 #if UNITY_EDITOR
 
         if (Input.GetKey(KeyCode.W))
         {
             // Generate random distance to move this frame
-            float randomDistance = UnityEngine.Random.Range(2f, 4f);
+            float randomDistance = Random.Range(2f, 4f);
 
             // Update distance
-            routeDistance += randomDistance;
+            UpdateRouteDistance(routeDistance + randomDistance);
 
             // Update route follower
             routeFollower.UpdateDistance(routeDistance);
@@ -289,16 +286,25 @@ public class PlayerController : MonoBehaviour
 
             // Sample stats
             SampleStats();
+
+            // Animate
+            Animate((int) strokeState);
         }
         else if (Input.GetKey(KeyCode.S))
         {
             // Update stroke state
             strokeState = StrokeState.Recovery;
+
+            // Animate
+            Animate((int) strokeState);
         }
         else if (Input.GetKey(KeyCode.Q))
         {
             // Update stroke state
             strokeState = StrokeState.WaitingForWheelToAccelerate;
+
+            // Animate
+            Animate((int)strokeState);
         }
 
 #endif
@@ -307,14 +313,16 @@ public class PlayerController : MonoBehaviour
 
     public void ERGUpdateDistance(float distance)
     {
+        // Only execute locally
+        if (!photonView.IsMine) return;
 
 #if !UNITY_EDITOR
 
         // Don't execute if paused
         if (paused) return;
-
+        
         // Update distance
-        routeDistance = distance;
+        UpdateRouteDistance(distance);
 
         // Update distance
         routeFollower.UpdateDistance(routeDistance);
@@ -323,15 +331,12 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void Animate(float strokeState)
-    {
-        foreach (Animator animator in rowingAnimators)
-        {
-            animator.SetInteger("State", (int)strokeState);
-        }
-    }
+    #region Accessors & Mutators
 
-#region Accessors & Mutators
+    private void UpdatePosition()
+    {
+        routeFollower.SetPosition();
+    }
 
     public void Go()
     {
@@ -397,7 +402,15 @@ public class PlayerController : MonoBehaviour
         this.trial = trial;
     }
 
-#endregion
+    public void Animate(float strokeState)
+    {
+        if (!photonView.IsMine) return;
+
+        foreach (Animator animator in rowingAnimators)
+        {
+            animator.SetInteger("State", (int) strokeState);
+        }
+    }
 
     public void ChangeCameraPosition()
     {
@@ -417,4 +430,7 @@ public class PlayerController : MonoBehaviour
         trial = null;
         race = null;
     }
+
+#endregion
+
 }

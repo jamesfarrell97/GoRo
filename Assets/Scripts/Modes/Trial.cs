@@ -349,7 +349,7 @@ public class Trial : MonoBehaviour
         if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
 
         // Start just row
-        if (player != null) BluetoothManager.Instance.StartJustRow();
+        if (player != null) BluetoothManager.Instance.ResetPM();
 
         // Start trial
         //
@@ -402,7 +402,7 @@ public class Trial : MonoBehaviour
 
     IEnumerator DisplayEndOfTrialStats()
     {
-        BluetoothManager.Instance.StartJustRow();
+        BluetoothManager.Instance.ResetPM();
 
         if (player != null) player.Pause();
 

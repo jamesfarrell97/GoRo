@@ -2514,8 +2514,6 @@ MonoBehaviour:
   race: {fileID: 0}
   progressBar: {fileID: 0}
   state: 0
-  routeDistance: 0
-  range: 0
 --- !u!114 &271775186333819703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4736,7 +4734,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1628480189179528079
 Transform:
   m_ObjectHideFlags: 0

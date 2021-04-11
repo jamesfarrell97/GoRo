@@ -455,7 +455,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 }
 
                 // Start just row
-                BluetoothManager.Instance.StartJustRow();
+                BluetoothManager.Instance.ResetPM();
 
                 // Update player state
                 player.state = PlayerState.ParticipatingInRace;
@@ -512,7 +512,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 }
 
                 // Start just row
-                BluetoothManager.Instance.StartJustRow();
+                BluetoothManager.Instance.ResetPM();
 
                 // Update player state
                 player.state = PlayerState.ParticipatingInTrial;
@@ -570,7 +570,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             player.Resume();
 
             // Start just row
-            BluetoothManager.Instance.StartJustRow();
+            BluetoothManager.Instance.ResetPM();
             
             // Update player state
             player.state = PlayerState.JustRowing;

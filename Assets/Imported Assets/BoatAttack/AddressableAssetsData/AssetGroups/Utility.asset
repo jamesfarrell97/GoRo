@@ -425,12 +425,6 @@ MonoBehaviour:
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
-  - m_GUID: f6f110ad2e93ff04aa209415661809ed
-    m_Address: Assets/Models/Environment/Buildings/Boathouse.FBX
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    m_MainAsset: {fileID: 0}
-    m_TargetAsset: {fileID: 0}
   - m_GUID: 41a41850b9a6a364baaef701b99e65f3
     m_Address: Assets/Models/Environment/Buildings/Racing Port.FBX
     m_ReadOnly: 0

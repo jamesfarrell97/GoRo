@@ -2928,7 +2928,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4454633847788323257}
   m_Layer: 8
-  m_Name: Jetty's
+  m_Name: Jettys
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3529,7 +3529,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4454633848856294228}
   m_Layer: 0
-  m_Name: Objects
+  m_Name: Main Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

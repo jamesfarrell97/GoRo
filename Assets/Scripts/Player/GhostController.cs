@@ -51,7 +51,7 @@ public class GhostController : MonoBehaviour
     }
 
     public float routeDistance = 0;
-
+    
     private void UpdateMovement()
     {
         if (paused) return;

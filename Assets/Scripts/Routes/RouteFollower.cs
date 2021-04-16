@@ -9,6 +9,9 @@ namespace UnityStandardAssets.Utility
 {
     public class RouteFollower : MonoBehaviour
     {
+        [SerializeField] private Route assignedRoute;
+        [SerializeField] private float assignedSpeed;
+
         [HideInInspector] public Route defaultRoute;
 
         [HideInInspector] public Route route;
@@ -132,11 +135,23 @@ namespace UnityStandardAssets.Utility
 
         public int delta = 0;
 
+        private void Update()
+        {
+            if (assignedRoute != null)
+            {
+                // Calculate distance
+                float updatedDistance = progressAlongRoute + assignedSpeed;
+
+                // Update distance
+                UpdateDistance(updatedDistance);
+            }
+        }
+
         public void UpdateDistance(float distance)
         {
-            // Subtract pause distance from distance to calculate progress
+            // Calculate progress
             progressAlongRoute = distance;
-
+         
             // Set start position
             startPosition = target.position;
 

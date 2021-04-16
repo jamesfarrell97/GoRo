@@ -622,9 +622,13 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    #endregion
+
+    #region HUD
+
     private void EnableUIToggle(bool enable = true)
     {
-        toggleUIButton.gameObject.SetActive(enable);
+        toggleUIButton.interactable = enable;
     }
 
     public void InstantiateGhostTracker(GhostController ghost)
@@ -699,7 +703,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         localProgressBar.value = 0;
     }
-
     private void UpdateMenuButtons(bool showStartEvent, bool showLeaveEvent, bool showLeaveRoom)
     {
         startRaceButton.SetActive(showStartEvent);
@@ -707,9 +710,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         exitEventButton.SetActive(showLeaveEvent);
         leaveRoomButton.SetActive(showLeaveRoom);
     }
-#endregion
 
-#region HUD
     public void ConfirmLeaveRoom()
     {
         RequestConfirmPlayersChoice("leaveRoom");
@@ -921,5 +922,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         eventNotificationPanel.SetActive(false);
     }
+
 #endregion
 }

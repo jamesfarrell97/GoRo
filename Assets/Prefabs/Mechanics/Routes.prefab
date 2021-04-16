@@ -285,8 +285,8 @@ GameObject:
   - component: {fileID: 1689824302000365488}
   - component: {fileID: 1689824302000365500}
   - component: {fileID: 1689824302000365491}
-  - component: {fileID: 1689824302000365490}
   - component: {fileID: 1689824302000365489}
+  - component: {fileID: 6680957029571554647}
   m_Layer: 0
   m_Name: Beach Long
   m_TagString: Untagged
@@ -368,24 +368,6 @@ MonoBehaviour:
   smoothRoute: 1
   editorVisualisationSubsteps: 500
   routeDistance: 2000.2047
---- !u!114 &1689824302000365490
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1689824302000365495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30ae7aae5e13a3a4e93b3f3f30fec818, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  state: 0
-  numberOfLaps: 1
-  startTimeoutDuration: 10
-  positionTimeoutDuration: 10
-  resolveTimeoutDuration: 5
-  opponentSlider: {fileID: 0}
 --- !u!114 &1689824302000365489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -403,6 +385,24 @@ MonoBehaviour:
   resolveTimeoutDuration: 10
   trialGhost: {fileID: 3128037215741786078, guid: 50eaad33eb632574599abb702f6cb308,
     type: 3}
+--- !u!114 &6680957029571554647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1689824302000365495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae7aae5e13a3a4e93b3f3f30fec818, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  state: 0
+  numberOfLaps: 1
+  startTimeoutDuration: 10
+  positionTimeoutDuration: 10
+  resolveTimeoutDuration: 5
+  opponentSlider: {fileID: 0}
 --- !u!1 &1689824302007913147
 GameObject:
   m_ObjectHideFlags: 0

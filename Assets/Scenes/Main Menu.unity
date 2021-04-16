@@ -135,25 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!224 &896342032 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 3187904776695940190, guid: 6049396f71e769048b758724a50f5965,
-    type: 3}
-  m_PrefabInstance: {fileID: 3187904777050037326}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1369858542 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3187904778368777632, guid: 6049396f71e769048b758724a50f5965,
-    type: 3}
-  m_PrefabInstance: {fileID: 3187904777050037326}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!84 &1521942623
+--- !u!84 &543774014
 RenderTexture:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -188,6 +170,24 @@ RenderTexture:
     m_WrapW: 1
   m_Dimension: 2
   m_VolumeDepth: 1
+--- !u!224 &896342032 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3187904776695940190, guid: 6049396f71e769048b758724a50f5965,
+    type: 3}
+  m_PrefabInstance: {fileID: 3187904777050037326}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1369858542 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3187904778368777632, guid: 6049396f71e769048b758724a50f5965,
+    type: 3}
+  m_PrefabInstance: {fileID: 3187904777050037326}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3187904777050037326
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -314,6 +314,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2093015357758763115, guid: 4c05b222f88fd584fbd9f0a39e7b5bfc,
+        type: 3}
+      propertyPath: surfaceData
+      value: 
+      objectReference: {fileID: 11400000, guid: 9e1c83d2d3fac4b94b91c7b3a80ce964,
+        type: 2}
+    - target: {fileID: 2093015357758763115, guid: 4c05b222f88fd584fbd9f0a39e7b5bfc,
+        type: 3}
+      propertyPath: _depthTex
+      value: 
+      objectReference: {fileID: 543774014}
     - target: {fileID: 4454633848856294228, guid: 4c05b222f88fd584fbd9f0a39e7b5bfc,
         type: 3}
       propertyPath: m_LocalPosition.x

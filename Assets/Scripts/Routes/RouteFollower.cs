@@ -9,15 +9,12 @@ namespace UnityStandardAssets.Utility
 {
     public class RouteFollower : MonoBehaviour
     {
-        [SerializeField] private Route assignedRoute;
-        [SerializeField] private float assignedSpeed;
+        [SerializeField] private Transform target;
 
         [HideInInspector] public Route defaultRoute;
 
         [HideInInspector] public Route route;
         [HideInInspector] public Route[] routes;
-
-        [SerializeField] private Transform target;
 
         [HideInInspector] public float progressAlongRoute;
         [HideInInspector] public int numberOfLaps;
@@ -31,7 +28,13 @@ namespace UnityStandardAssets.Utility
 
         private PlayerController player;
         private GhostController ghost;
-        private Vector3 previousPosition;
+
+        private Vector3 startPosition;
+        private Quaternion startRotation;
+        private Vector3 targetPosition;
+        private Quaternion targetRotation;
+
+        private float lerpTime = 0f;
 
         private float translationalVelocity = 5f;
         private float translationVelocityFactor = .1f;
@@ -71,8 +74,6 @@ namespace UnityStandardAssets.Utility
             {
                 ghost = GetComponent<GhostController>();
             }
-
-            previousPosition = transform.position;
 
             // we use a transform to represent the point to aim for, and the point which
             // is considered for upcoming changes-of-speed. This allows this component
@@ -129,24 +130,7 @@ namespace UnityStandardAssets.Utility
 
             SetPosition();
         }
-
-        public float range = 0;
-        public float totalDistance = 0;
-
-        public int delta = 0;
-
-        private void Update()
-        {
-            if (assignedRoute != null)
-            {
-                // Calculate distance
-                float updatedDistance = progressAlongRoute + assignedSpeed;
-
-                // Update distance
-                UpdateDistance(updatedDistance);
-            }
-        }
-
+        
         public void UpdateDistance(float distance)
         {
             // Calculate progress
@@ -181,13 +165,6 @@ namespace UnityStandardAssets.Utility
 
             SetPosition();
         }
-
-        public Vector3 startPosition;
-        public Quaternion startRotation;
-        public Vector3 targetPosition;
-        public Quaternion targetRotation;
-
-        public float lerpTime = 0;
 
         public void UpdatePosition()
         {

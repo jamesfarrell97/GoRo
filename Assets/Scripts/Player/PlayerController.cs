@@ -270,7 +270,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.W))
         {
             // Generate random distance to move this frame
-            float randomDistance = Random.Range(2f, 4f);
+            float randomDistance = Random.Range(0.5f, 0.9f);
 
             // Update distance
             UpdateRouteDistance(routeDistance + randomDistance);

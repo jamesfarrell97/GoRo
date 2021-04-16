@@ -452,23 +452,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5cb22d331ef7d64796f917c6a455a32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  assignedRoute: {fileID: 0}
-  assignedSpeed: 0
+  target: {fileID: 4206319365989272668}
   defaultRoute: {fileID: 0}
   route: {fileID: 0}
   routes: []
-  target: {fileID: 4206319365989272668}
   progressAlongRoute: 2.547436
   numberOfLaps: 1
   currentLap: 1
-  range: 0
-  totalDistance: 0
-  delta: 0
-  startPosition: {x: 0, y: 0, z: 0}
-  startRotation: {x: 0, y: 0, z: 0, w: 0}
-  targetPosition: {x: 0, y: 0, z: 0}
-  targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  lerpTime: 0
 --- !u!114 &325384146144076460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -537,7 +527,7 @@ GameObject:
   - component: {fileID: 5440168089556550580}
   - component: {fileID: 7627725524392622711}
   - component: {fileID: 4914729006049150572}
-  m_Layer: 15
+  m_Layer: 16
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -716,7 +706,7 @@ GameObject:
   - component: {fileID: 4165701621986092174}
   - component: {fileID: 4432461821153006181}
   - component: {fileID: 1123713264267961771}
-  m_Layer: 15
+  m_Layer: 16
   m_Name: Tag
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -85,7 +85,6 @@ namespace UnityStandardAssets.Utility
             {
                 // smooth catmull-rom calculation between the two relevant points
 
-
                 // get indices for the surrounding 2 points, because
                 // four points are required by the catmull-rom function
                 p0n = ((point - 2) + numPoints)%numPoints;
@@ -114,7 +113,6 @@ namespace UnityStandardAssets.Utility
             }
         }
 
-
         private Vector3 CatmullRom(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float i)
         {
             // comments are no use here... it's the catmull-rom equation.
@@ -123,7 +121,6 @@ namespace UnityStandardAssets.Utility
                    ((2*p1) + (-p0 + p2)*i + (2*p0 - 5*p1 + 4*p2 - p3)*i*i +
                     (-p0 + 3*p1 - 3*p2 + p3)*i*i*i);
         }
-
 
         private void CachePositionsAndDistances()
         {
@@ -153,22 +150,20 @@ namespace UnityStandardAssets.Utility
             }
         }
 
-
         private void OnDrawGizmos()
         {
             DrawGizmos(false);
         }
-
 
         private void OnDrawGizmosSelected()
         {
             DrawGizmos(true);
         }
 
-
         private void DrawGizmos(bool selected)
         {
             waypointList.circuit = this;
+
             if (Waypoints.Length > 1)
             {
                 numPoints = Waypoints.Length;
@@ -199,7 +194,6 @@ namespace UnityStandardAssets.Utility
                 }
             }
         }
-
 
         [Serializable]
         public class WaypointList

@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1652413137834809143}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: -1}
-  m_LocalPosition: {x: 0, y: 20, z: 0}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1161307997334124168}
@@ -96,7 +96,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackedObject: {fileID: 8569736625666101000}
   pivotPoint: {fileID: 4680764757843982284}
-  rowing: 0
 --- !u!65 &1740870018763854173
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -174,7 +173,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackedObject: {fileID: 893812682407196298}
   pivotPoint: {fileID: 2536388327708493659}
-  rowing: 0
 --- !u!65 &1633499004974325123
 BoxCollider:
   m_ObjectHideFlags: 0

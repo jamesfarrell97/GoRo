@@ -387,6 +387,11 @@ public class PlayerController : MonoBehaviour
         return routeDistance;
     }
 
+    public int GetStrokeState()
+    {
+        return (int) strokeState;
+    }
+
     public void ResetProgress()
     {
         routeDistance = 0;

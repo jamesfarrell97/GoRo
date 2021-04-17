@@ -520,34 +520,64 @@ public class Race : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
 
+        if (players.Count <= 0)
+        {
+            EndRace();
+            yield break;
+        }
+
         // Display countdown 3
         //
-        if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("3", 1));
+        StartCoroutine(GameManager.Instance.DisplayCountdown("3", 1));
 
         yield return new WaitForSeconds(1);
+
+        if (players.Count <= 0)
+        {
+            EndRace();
+            yield break;
+        }
 
         // Display countdown 2
         //
-        if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
-        
+        StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
+
         yield return new WaitForSeconds(1);
+
+        if (players.Count <= 0)
+        {
+            EndRace();
+            yield break;
+        }
 
         // Display countdown 1
         //
-        if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("1", 1));
+        StartCoroutine(GameManager.Instance.DisplayCountdown("1", 1));
 
         yield return new WaitForSeconds(1);
 
+        if (players.Count <= 0)
+        {
+            EndRace();
+            yield break;
+        }
+
         // Display start!
         //
-        if (players.Count > 0) StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
-        
+        StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
+
+        // Display false start
+        //
+        if (StatsManager.Instance.GetDistance() > 0)
+            StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("False Start!", 2));
+
         // Start just row
-        if (players.Count > 0) BluetoothManager.Instance.ResetPM();
+        //
+        BluetoothManager.Instance.ResetPM();
 
         // Start race
         //
-        if (players.Count > 0) StartRace();
+        StartRace();
     }
 
     public void StartRace()

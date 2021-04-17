@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6686443505467144472}
   - component: {fileID: 7384882222841223900}
   m_Layer: 0
-  m_Name: Audio Manager 1
+  m_Name: Audio Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -74,8 +74,8 @@ MonoBehaviour:
     source: {fileID: 0}
     loop: 0
   - name: Theme
-    clip: {fileID: 8300000, guid: 8f57c74ce63b76d4a8d00ca0db249e87, type: 3}
-    volume: 0.1
+    clip: {fileID: 8300000, guid: fa923cb567f63944d82c246c98b13ccf, type: 3}
+    volume: 0.3
     pitch: 1
     source: {fileID: 0}
     loop: 1
@@ -86,32 +86,20 @@ MonoBehaviour:
     source: {fileID: 0}
     loop: 1
   - name: Rowing1
-    clip: {fileID: 8300000, guid: 020009c5e1a9f93499ec4b0e321f1902, type: 3}
-    volume: 0.3
-    pitch: 1.15
+    clip: {fileID: 8300000, guid: 2d98f4fb2fdbc8942b9847e62e6165bc, type: 3}
+    volume: 0.075
+    pitch: 1
     source: {fileID: 0}
     loop: 0
   - name: Rowing2
     clip: {fileID: 8300000, guid: 020009c5e1a9f93499ec4b0e321f1902, type: 3}
-    volume: 0.3
-    pitch: 1.15
+    volume: 0.075
+    pitch: 1
     source: {fileID: 0}
     loop: 0
   - name: Rowing3
-    clip: {fileID: 8300000, guid: 020009c5e1a9f93499ec4b0e321f1902, type: 3}
-    volume: 0.3
-    pitch: 1.15
-    source: {fileID: 0}
-    loop: 0
-  - name: Rowing4
-    clip: {fileID: 8300000, guid: 020009c5e1a9f93499ec4b0e321f1902, type: 3}
-    volume: 0.3
-    pitch: 1.15
-    source: {fileID: 0}
-    loop: 0
-  - name: Rowing5
-    clip: {fileID: 8300000, guid: 020009c5e1a9f93499ec4b0e321f1902, type: 3}
-    volume: 0.3
-    pitch: 1.15
+    clip: {fileID: 8300000, guid: 96954c720b361ba42a0e3c7364eb6635, type: 3}
+    volume: 0.075
+    pitch: 1
     source: {fileID: 0}
     loop: 0

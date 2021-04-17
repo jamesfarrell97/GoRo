@@ -111,11 +111,11 @@ public class Trial : MonoBehaviour
         // If player has completed time trial
         if (player.state == PlayerState.CompletedTimeTrial)
         {
-            // Display trial stats to participants
-            StartCoroutine(DisplayEndOfTrialStats());
-
             // Record trial information
             RecordTrialInformation(name, trialDuration.TotalSeconds);
+            
+            // Display trial stats to participants
+            StartCoroutine(DisplayEndOfTrialStats());
 
             // Resolve trial
             SetState(TrialState.Inactive);
@@ -254,6 +254,8 @@ public class Trial : MonoBehaviour
         GameManager.Instance.InstantiateGhostTracker(ghost);
     }
 
+    private float storedTime;
+
     // Record Best time
     private void RecordTrialInformation(string route, double time)
     {
@@ -282,7 +284,7 @@ public class Trial : MonoBehaviour
                 if (name.Equals(route))
                 {
                     // Extract the stored time
-                    float storedTime = float.Parse(data[1]);
+                    storedTime = float.Parse(data[1]);
 
                     // If player time is less than the stored time
                     if (time < storedTime)
@@ -326,34 +328,64 @@ public class Trial : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
 
+        if (player == null)
+        {
+            EndTrial();
+            yield break;
+        }
+
         // Display countdown 3
         //
-        if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("3", 1));
+        StartCoroutine(GameManager.Instance.DisplayCountdown("3", 1));
 
         yield return new WaitForSeconds(1);
 
+        if (player == null)
+        {
+            EndTrial();
+            yield break;
+        }
+        
         // Display countdown 2
         //
-        if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
+        StartCoroutine(GameManager.Instance.DisplayCountdown("2", 1));
 
         yield return new WaitForSeconds(1);
+
+        if (player == null)
+        {
+            EndTrial();
+            yield break;
+        }
 
         // Display countdown 1
         //
-        if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("1", 1));
+        StartCoroutine(GameManager.Instance.DisplayCountdown("1", 1));
 
         yield return new WaitForSeconds(1);
 
+        if (player == null)
+        {
+            EndTrial();
+            yield break;
+        }
+
         // Display start!
         //
-        if (player != null) StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
+        StartCoroutine(GameManager.Instance.DisplayCountdown("Start!", 1));
+
+        // Display false start
+        //
+        if (StatsManager.Instance.GetDistance() > 0)
+            StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("False Start!", 2));
 
         // Start just row
-        if (player != null) BluetoothManager.Instance.ResetPM();
+        //
+        BluetoothManager.Instance.ResetPM();
 
         // Start trial
         //
-        if (player != null) StartTrial();
+        StartTrial();
     }
 
     private void StartTrial()
@@ -409,7 +441,23 @@ public class Trial : MonoBehaviour
         if (ghost != null) ghost.Pause();
 
         // Display information
-        StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("Time: " + trialDuration.ToString(@"mm\:ss"), 3));
+        StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("Time: " + trialDuration.ToString(@"mm\:ss"), 2));
+
+        // If stored time present
+        if (storedTime > 0)
+        {
+            yield return new WaitForSeconds(2);
+
+            // Cacluate delta
+            int[] delta = HelperFunctions.SecondsToHMS((int) (storedTime - (float) trialDuration.TotalSeconds));
+
+            // Display delta
+            StartCoroutine(GameManager.Instance.DisplayQuickNotificationText(
+                (delta[2] > 0) 
+                    ? "-" + Mathf.Abs(delta[1]).ToString("D2") + ":" + Mathf.Abs(delta[2]).ToString("D2")
+                    : "+" + Mathf.Abs(delta[1]).ToString("D2") + ":" + Mathf.Abs(delta[2]).ToString("D2")
+            , 2));
+        }
 
         // Display stats for resolve timeout seconds
         yield return new WaitForSeconds(resolveTimeoutDuration);

@@ -2,17 +2,17 @@
 
 public class Oar : MonoBehaviour
 {
-    [SerializeField] Transform trackedObject;
-    [SerializeField] Transform pivotPoint;
-
-    public bool rowing;
+    [SerializeField] private Transform trackedObject;
+    [SerializeField] private Transform pivotPoint;
 
     private Vector3 offset;
-    private bool playCollisionSound;
+    
+    private PlayerController player;
 
     private void Start()
     {
         offset = pivotPoint.position - trackedObject.position;
+        player = gameObject.GetComponentInParent<PlayerController>();
     }
 
     private void FixedUpdate()
@@ -21,24 +21,43 @@ public class Oar : MonoBehaviour
         
         transform.Rotate(new Vector3(0, 0, trackedObject.eulerAngles.x));
         transform.position = pivotPoint.position;
+
+        PlayAudio();
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!rowing) return;
+    bool play = true;
 
-        if (other.tag.Equals("Water") && playCollisionSound)
-        {
-            FindObjectOfType<AudioManager>().Play("Rowing" + Random.Range(1, 5));
-            playCollisionSound = false;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
+    private void PlayAudio()
     {
-        if (other.tag.Equals("Water"))
+
+#if UNITY_EDITOR
+
+        if (player == null) return;
+
+        switch (player.GetStrokeState())
+
+#else
+
+        switch (StatsManager.Instance.GetStrokeState())
+
+#endif
         {
-            playCollisionSound = true;
+            case (int) PlayerController.StrokeState.Driving:
+
+                if (play) FindObjectOfType<AudioManager>().Play("Rowing" + Random.Range(1, 3));
+
+                play = false;
+                break;
+
+            case (int) PlayerController.StrokeState.Recovery:
+
+                play = true;
+                break;
+
+            case (int)PlayerController.StrokeState.WaitingForWheelToAccelerate:
+
+                play = true;
+                break;
         }
     }
 }

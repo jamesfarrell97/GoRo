@@ -11,7 +11,7 @@ Notes and other additional information relevant to this project's development
 
 ### Contributing
 
-Please refer to the [CONTRIBUTING.md](https://github.com/DkITJamesFarrell/GoRow/blob/documents/CONTRIBUTING.md) file for a list of contribution guidelines.
+Please refer to the [CONTRIBUTING.md](https://github.com/DkITJamesFarrell/GoRo/blob/master/CONTRIBUTING.md) file for a list of contribution guidelines.
 
 ### Acknowledgements
 

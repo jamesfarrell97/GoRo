@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 using System;
 
 using UnityStandardAssets.Utility;
@@ -8,7 +9,6 @@ using Photon.Pun;
 using TMPro;
 
 using static EventNotification;
-using System.Linq;
 
 public class Race : MonoBehaviour
 {

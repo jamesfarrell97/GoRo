@@ -893,12 +893,6 @@ MonoBehaviour:
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
-  - m_GUID: d2ca33bc320e0524d9cac9ee5f276b19
-    m_Address: Assets/Textures/Brand/GORO Icon New.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    m_MainAsset: {fileID: 0}
-    m_TargetAsset: {fileID: 0}
   - m_GUID: d615e0293e556ca49aecc5b8d63e39d8
     m_Address: Assets/Textures/Environment/Ground/RockBedBase.tif
     m_ReadOnly: 0

@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject networkedBoat;
     [SerializeField] private GameObject minimapIcon;
     [SerializeField] private GameObject playerTag;
+    [SerializeField] private GameObject boatTrail;
 
     [HideInInspector] public Trial trial;
     [HideInInspector] public Race race;
@@ -186,9 +187,11 @@ public class PlayerController : MonoBehaviour
         Vector3 offset = ((playerCount % 2 == 0) ? -transform.right * (playerCount * 6) : transform.right * (playerCount * 6));
 
         // Update offsets
+        rower.transform.position += offset;
         minimapIcon.transform.position += offset;
         networkedBoat.transform.position += offset;
         playerTag.transform.position += offset;
+        boatTrail.transform.position += offset;
     }
 
     private void UpdateLayers()

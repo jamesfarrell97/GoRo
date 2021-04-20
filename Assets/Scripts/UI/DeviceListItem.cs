@@ -11,13 +11,9 @@ public class DeviceListItem : MonoBehaviour
     public TMP_Text DeviceName;
     public TMP_Text DeviceAddress;
     public bool Connected;
-
-    private BluetoothManager BluetoothManager;
-
+    
     public void SetUp(DeviceObject device)
     {
-        BluetoothManager = FindObjectOfType<BluetoothManager>();
-
         DeviceID = DeviceListItemID;
 
         DeviceName.text = device.Name;
@@ -25,12 +21,12 @@ public class DeviceListItem : MonoBehaviour
 
         Connected = false;
 
-        DeviceListItemID++; 
+        DeviceListItemID++;
     }
 
     public void OnConnectClick(DeviceListItem deviceListItem)
     {
-        BluetoothManager.OnConnectClick(deviceListItem);
+        BluetoothManager.Instance.OnConnectClick(deviceListItem);
     }
 
     public void Connect()

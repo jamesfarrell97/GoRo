@@ -186,11 +186,11 @@ public class BluetoothManager : MonoBehaviour
 
         BluetoothLEHardwareInterface.ScanForPeripheralsWithServices(Concept2UUID, (address, name) => {
 
-            DeviceObject dObj = new DeviceObject(address, name);
+            DeviceObject deviceObject = new DeviceObject(address, name);
 
-            FoundDeviceListScript.DeviceAddressList.Add(dObj);
+            FoundDeviceListScript.DeviceAddressList.Add(deviceObject);
 
-            UpdateDeviceList(dObj);
+            UpdateDeviceList(deviceObject);
 
         }, null);
     }
@@ -207,10 +207,7 @@ public class BluetoothManager : MonoBehaviour
 
             DeviceListItem.Connect();
 
-            if (IsEqual(serviceUUID, PMDictionary.RowingServiceUUID))
-            {
-                SetState(States.RequestMTU, 2f);
-            }
+            SetState(States.Subscribe, 3f);
 
         }, null);
     }
@@ -348,9 +345,9 @@ public class BluetoothManager : MonoBehaviour
         Timeout = timeout;
     }
 
-    private void UpdateDeviceList(DeviceObject dObj)
+    private void UpdateDeviceList(DeviceObject deviceObject)
     {
-        Instantiate(DeviceListItemPrefab, DeviceListContent).GetComponent<DeviceListItem>().SetUp(dObj);
+        Instantiate(DeviceListItemPrefab, DeviceListContent).GetComponent<DeviceListItem>().SetUp(deviceObject);
     }
 
     private void ResetList()

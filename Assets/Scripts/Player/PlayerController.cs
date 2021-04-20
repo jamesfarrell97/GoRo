@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject networkedBoat;
     [SerializeField] private GameObject minimapIcon;
     [SerializeField] private GameObject playerTag;
+    [SerializeField] private GameObject boatTrail;
 
     [HideInInspector] public Trial trial;
     [HideInInspector] public Race race;
@@ -182,18 +183,23 @@ public class PlayerController : MonoBehaviour
         // Update player count
         playerCount++;
 
+        // Calculate offfset
+        float offset = (playerCount % 2) * 6;
+
         // Calculate offset
-        Vector3 offset = ((playerCount % 2 == 0) ? -transform.right * (playerCount * 6) : transform.right * (playerCount * 6));
+        Vector3 translation = (playerCount % 2 == 0) ? -transform.right * offset : transform.right * offset;
 
         // Update offsets
-        minimapIcon.transform.position += offset;
-        networkedBoat.transform.position += offset;
-        playerTag.transform.position += offset;
+        rower.transform.position += translation;
+        minimapIcon.transform.position += translation;
+        networkedBoat.transform.position += translation;
+        playerTag.transform.position += translation;
+        boatTrail.transform.position += translation;
     }
 
     private void UpdateLayers()
     {
-        HelperFunctions.SetLayerRecursively(rower, CULL_VISIBLE_LAYER);
+        HelperFunctions.SetLayerRecursively(rower, ROWER_LAYER);
         HelperFunctions.SetLayerRecursively(playerTag, CULL_VISIBLE_LAYER);
     }
 
@@ -419,6 +425,8 @@ public class PlayerController : MonoBehaviour
 
     public void ChangeCameraPosition()
     {
+        if (!photonView.IsMine) return;
+
         cameraIndex = (cameraIndex < cameraPositions.Length - 1) ? cameraIndex + 1 : 0;
 
         HelperFunctions.SetLayerRecursively(rower, (cameraIndex != 0) ? ROWER_LAYER : CULL_HIDDEN_LAYER);

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 using System;
 
 using UnityStandardAssets.Utility;
@@ -8,7 +9,6 @@ using Photon.Pun;
 using TMPro;
 
 using static EventNotification;
-using System.Linq;
 
 public class Race : MonoBehaviour
 {
@@ -386,30 +386,29 @@ public class Race : MonoBehaviour
         // Remove player from race
         players.Remove(player);
 
-        // IF local player
+        // If local player
         if (player.photonView.IsMine)
         {
+            // Pause movement
+            player.Pause();
+
             // Start just row
             BluetoothManager.Instance.ResetPM();
 
-            // Pause movement
-            player.Pause();
-        }
+            // Start just row
+            GameManager.Instance.StartJustRow();
 
-        // Destroy tracker for networked payers
+            // Hide all panels
+            GameManager.Instance.HideAllPanels();
+
+            // Reset event panel
+            GameManager.Instance.ResetEventPanel();
+        }
         else
         {
+            // Destroy tracker for networked payers
             GameManager.Instance.DestroyPlayerTracker(player);
         }
-
-        // Start just row
-        GameManager.Instance.StartJustRow();
-
-        // Hide all panels
-        GameManager.Instance.HideAllPanels();
-
-        // Reset event panel
-        GameManager.Instance.ResetEventPanel();
 
         // Reset if the race is now empty
         if (players.Count <= 0) Reset();
@@ -479,7 +478,7 @@ public class Race : MonoBehaviour
             if (players.Contains(player)) continue;
 
             // Send race notification
-            StartCoroutine(GameManager.Instance.SendEventNotification(EventCategory.Race, "Join Race", name, numberOfLaps.ToString(), players.Count.ToString(), startTimeoutDuration));
+            StartCoroutine(GameManager.Instance.SendEventNotification(EventCategory.Race, "Join Race", name, (int) route.routeDistance + " m", players.Count.ToString(), startTimeoutDuration));
 
             break;
         }

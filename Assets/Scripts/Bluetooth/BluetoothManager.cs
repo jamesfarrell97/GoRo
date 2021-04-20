@@ -48,16 +48,6 @@ public class BluetoothManager : MonoBehaviour
         }
     }
 
-    [SerializeField] TMP_Text InfoText;
-    private string InfoMessage
-    {
-        set
-        {
-            BluetoothLEHardwareInterface.Log(value);
-            InfoText.text = value;
-        }
-    }
-
     private enum States
     {
         None,
@@ -155,8 +145,6 @@ public class BluetoothManager : MonoBehaviour
 
     public void OnConnectClick(DeviceListItem deviceListItem)
     {
-        InfoMessage = "Please wait...";
-
         DeviceObject device = FoundDeviceListScript.DeviceAddressList[deviceListItem.DeviceID];
 
         if (device != null)
@@ -169,7 +157,7 @@ public class BluetoothManager : MonoBehaviour
         }
         else
         {
-            InfoMessage = "Error: Device not found!";
+            StatusMessage = "Error: Device not found!";
         }
     }
 
@@ -181,7 +169,7 @@ public class BluetoothManager : MonoBehaviour
 
         }, (error) => {
 
-            InfoMessage = "Initialize Error: " + error;
+            StatusMessage = "Error: " + error;
         });
     }
 

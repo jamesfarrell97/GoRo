@@ -913,10 +913,10 @@ public class GameManager : MonoBehaviourPunCallbacks
         countdownPanel.SetActive(false);
     }
 
-    public IEnumerator SendEventNotification(EventCategory category, string title, string route, string laps, string participants, int duration)
+    public IEnumerator SendEventNotification(EventCategory category, string title, string distance, string laps, string participants, int duration)
     {
         eventNotificationPanel.SetActive(true);
-        eventNotificationPanel.GetComponent<EventNotification>().Setup(category, title, route, laps, participants);
+        eventNotificationPanel.GetComponent<EventNotification>().Setup(category, title, distance, laps, participants);
 
         yield return new WaitForSeconds(duration);
 

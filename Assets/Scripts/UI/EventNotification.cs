@@ -5,7 +5,7 @@ public class EventNotification : MonoBehaviour
 {
     [SerializeField] TMP_Text titleText;
     [SerializeField] TMP_Text routeText;
-    [SerializeField] TMP_Text lapText;
+    [SerializeField] TMP_Text distanceText;
     [SerializeField] TMP_Text participantText;
 
 
@@ -25,13 +25,13 @@ public class EventNotification : MonoBehaviour
 
     private NotificationState state;
 
-    public void Setup(EventCategory category, string title, string route, string laps, string participants)
+    public void Setup(EventCategory category, string title, string route, string distance, string participants)
     {
         eventCategory = category;
 
         titleText.text = title;
         routeText.text = route;
-        lapText.text = laps;
+        distanceText.text = distance;
         participantText.text = participants;
 
         state = NotificationState.Active;

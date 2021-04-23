@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     public static GameState State;
-    
+
     [SerializeField] TMP_Text errorText;
     [SerializeField] TMP_Text roomNameText;
     [SerializeField] TMP_Text playerNameText;
@@ -86,6 +86,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] GameObject audioManager;
     [SerializeField] GameObject roomManager;
 
+    public PlayerController player;
+
     private void Awake()
     {
         if (Instance)
@@ -96,7 +98,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         DontDestroyOnLoad(gameObject);
         Instance = this;
-        
+
         InstantiateManagers();
         CheckConnection();
         CheckState();
@@ -280,7 +282,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             MenuManager.Instance.OpenMenu("Multiplayer");
         }
     }
-    
+
     public void CreateRoom()
     {
         if (string.IsNullOrEmpty(roomNameInputField.text))
@@ -311,7 +313,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     public void Go()
-    {        
+    {
         // Retrieve all players
         PlayerController[] players = FindObjectsOfType<PlayerController>();
 
@@ -376,7 +378,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         if (SceneManager.GetActiveScene().buildIndex == 1) return;
-        
+
         MenuManager.Instance.OpenMenu("Room");
         roomNameText.text = PhotonNetwork.CurrentRoom.Name;
 
@@ -462,15 +464,15 @@ public class GameManager : MonoBehaviourPunCallbacks
 
                 // Reset track distance
                 player.GetComponent<RouteFollower>().Reset();
-                
+
                 // Update menu buttons
                 UpdateMenuButtons(false, true, false);
 
                 // Hide non-race ui panels
                 SwitchUIState(false, false, false);
 
-                // Disable ui toggle button
-                EnableUIToggle(false);
+                // Display event panel
+                DisplayEventPanel(true);
 
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
@@ -526,8 +528,8 @@ public class GameManager : MonoBehaviourPunCallbacks
                 // Hide non-race ui panels
                 SwitchUIState(false, false, false);
 
-                // Disable ui toggle button
-                EnableUIToggle(false);
+                // Display event panel
+                DisplayEventPanel(true);
 
                 // Open HUD
                 MenuManager.Instance.OpenMenu("HUD");
@@ -571,7 +573,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
             // Start just row
             BluetoothManager.Instance.ResetPM();
-            
+
             // Update player state
             player.state = PlayerState.JustRowing;
 
@@ -587,8 +589,8 @@ public class GameManager : MonoBehaviourPunCallbacks
             // Hide time and lap info
             HideEventPanel();
 
-            // Enable UI toggle
-            EnableUIToggle();
+            // Hide event panel
+            DisplayEventPanel(true);
 
             // Open HUD
             MenuManager.Instance.OpenMenu("HUD");
@@ -657,7 +659,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 Random.Range(0f, 1f),
                 0,
                 0
-            ); 
+            );
     }
 
     public void DestroyPlayerTracker(PlayerController player)
@@ -786,42 +788,61 @@ public class GameManager : MonoBehaviourPunCallbacks
     private const int MAX_UI_STATES = 6;
     public void ToggleUI()
     {
-        UIState = (UIState < MAX_UI_STATES - 1) 
-            ? UIState + 1 
+        if (player.state.Equals(PlayerState.ParticipatingInRace) || player.state.Equals(PlayerState.ParticipatingInTrial))
+        {
+            ToggleEventInformationUI();
+            UIState = 3;
+        }
+        else
+        {
+            UIState = (UIState < MAX_UI_STATES - 1)
+            ? UIState + 1
             : 0;
 
-        switch (UIState)
-        {
-            case 0:
+            switch (UIState)
+            {
+                case 0:
 
-                SwitchUIState(false, false, false);
-                break;
+                    SwitchUIState(false, false, false);
+                    break;
 
-            case 1:
+                case 1:
 
-                SwitchUIState(true, false, false);
-                break;
+                    SwitchUIState(true, false, false);
+                    break;
 
-            case 2:
+                case 2:
 
-                SwitchUIState(true, true, false);
-                break;
+                    SwitchUIState(true, true, false);
+                    break;
 
-            case 3:
+                case 3:
 
-                SwitchUIState(true, true, true);
-                break;
+                    SwitchUIState(true, true, true);
+                    break;
 
-            case 4:
+                case 4:
 
-                SwitchUIState(true, false, true);
-                break;
+                    SwitchUIState(true, false, true);
+                    break;
 
-            case 5:
+                case 5:
 
-                SwitchUIState(false, false, true);
-                break;
+                    SwitchUIState(false, false, true);
+                    break;
+            }
         }
+    }
+
+    public void DisplayEventPanel(bool state)
+    {
+        eventProgressPanel.SetActive(state);
+        eventInformationPanel.SetActive(state);
+    }
+
+    public void ToggleEventInformationUI()
+    {
+        eventInformationPanel.SetActive(!eventInformationPanel.activeSelf);
     }
 
     public void SwitchUIState(bool state0, bool state1, bool state2)
@@ -833,9 +854,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void DisplayEventPanel(string time, string distance, string speed, string strokeRate, string position = null)
     {
-        eventProgressPanel.SetActive(true);
-        eventInformationPanel.SetActive(true);
-
         eventTimeText.text = time;
         eventDistanceText.text = distance;
         eventSpeedText.text = speed;

@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     private static readonly int ROWER_LAYER = 14;
     private static readonly int CULL_HIDDEN_LAYER = 15;
     private static readonly int CULL_VISIBLE_LAYER = 16;
-    
+
     public enum PlayerState
     {
         JustRowing,
@@ -29,6 +29,8 @@ public class PlayerController : MonoBehaviour
         AtBoathouse
     }
 
+    public PlayerState state;
+
     public enum StrokeState
     {
         WaitingForWheelToReachMinSpeed,
@@ -38,7 +40,7 @@ public class PlayerController : MonoBehaviour
         Recovery
     }
 
-    private StrokeState strokeState;
+    public StrokeState strokeState;
 
     [SerializeField] [Range(0, 3)] public float boatSpeed = 1f;
 
@@ -61,11 +63,10 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public Slider progressBar;
 
     [HideInInspector] public PhotonView photonView { get; private set; }
-    [HideInInspector] public PlayerState state;
 
     private AchievementTracker achievementTracker;
     private RouteFollower routeFollower;
-    
+
     private float routeDistance = 0;
 
     private float pauseStartDistance;
@@ -97,6 +98,7 @@ public class PlayerController : MonoBehaviour
     {
         if (photonView.IsMine)
         {
+            AssignPlayer();
             AssignMenuCamera();
             UpdatePlayerTag();
             UpdateBoat();
@@ -118,6 +120,11 @@ public class PlayerController : MonoBehaviour
     }
 
     #region Local Player
+
+    private void AssignPlayer()
+    {
+        GameManager.Instance.player = this;
+    }
 
     private void AssignMenuCamera()
     {

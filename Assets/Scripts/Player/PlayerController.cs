@@ -273,6 +273,12 @@ public class PlayerController : MonoBehaviour
         SpeedSample = new List<float>();
     }
 
+    private float timeDriving = 0;
+    private float driveTime = 0.625f;
+
+    private float timeRecovering = 0;
+    private float recoverTime = 0.95f;
+
     private void UpdateMovement()
     {
         // Only execute locally
@@ -283,41 +289,64 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.W))
         {
             // Generate random distance to move this frame
-            float randomDistance = Random.Range(0.5f, 0.9f);
+            float randomDistance = Random.Range(0.3f, 0.4f);
 
             // Update distance
             UpdateRouteDistance(routeDistance + randomDistance);
 
             // Update route follower
             routeFollower.UpdateDistance(routeDistance);
-            
+
             // Update stroke state
-            strokeState = StrokeState.Driving;
+            if (timeDriving < driveTime)
+            {
+                strokeState = StrokeState.Driving;
+                timeDriving += (1f / StatsManager.STATS_SAMPLE_RATE);
+
+                // Animate
+                Animate((int)strokeState);
+            }
+            else if (timeRecovering < recoverTime)
+            {
+                strokeState = StrokeState.Recovery;
+                timeRecovering += (1f / StatsManager.STATS_SAMPLE_RATE);
+
+                // Animate
+                Animate((int)strokeState);
+            }
+            else
+            {
+                timeDriving = 0;
+                timeRecovering = 0;
+            }
 
             // Update debug display
             StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
 
             // Sample stats
             SampleStats();
-
-            // Animate
-            Animate((int) strokeState);
         }
         else if (Input.GetKey(KeyCode.S))
-        {
-            // Update stroke state
-            strokeState = StrokeState.Recovery;
-
-            // Animate
-            Animate((int) strokeState);
-        }
-        else if (Input.GetKey(KeyCode.Q))
         {
             // Update stroke state
             strokeState = StrokeState.WaitingForWheelToAccelerate;
 
             // Animate
             Animate((int)strokeState);
+
+            timeDriving = 0;
+            timeRecovering = 0;
+        }
+        else
+        {
+            // Update stroke state
+            strokeState = StrokeState.Recovery;
+
+            // Animate
+            Animate((int)strokeState);
+
+            timeDriving = 0;
+            timeRecovering = 0;
         }
 
 #endif
@@ -379,7 +408,7 @@ public class PlayerController : MonoBehaviour
     {
         return this.paused;
     }
-    
+
     public int GetCurrentLap()
     {
         return routeFollower.currentLap;
@@ -402,7 +431,7 @@ public class PlayerController : MonoBehaviour
 
     public int GetStrokeState()
     {
-        return (int) strokeState;
+        return (int)strokeState;
     }
 
     public void ResetProgress()
@@ -426,7 +455,7 @@ public class PlayerController : MonoBehaviour
 
         foreach (Animator animator in rowingAnimators)
         {
-            animator.SetInteger("State", (int) strokeState);
+            animator.SetInteger("State", (int)strokeState);
         }
     }
 
@@ -451,6 +480,6 @@ public class PlayerController : MonoBehaviour
         race = null;
     }
 
-#endregion
+    #endregion
 
 }

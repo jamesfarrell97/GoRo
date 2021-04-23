@@ -246,6 +246,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 473406582f7f8f64b9966c13496da4ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
+  strokeState: 0
   boatSpeed: 1
   rowingAnimators:
   - {fileID: 7180173777177699787}
@@ -264,7 +266,6 @@ MonoBehaviour:
   trial: {fileID: 0}
   race: {fileID: 0}
   progressBar: {fileID: 0}
-  state: 0
 --- !u!114 &271775186333819703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -884,16 +885,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Networked Boat
       objectReference: {fileID: 0}
-    - target: {fileID: 3178786869655999226, guid: 5fc21ac17b631bc48804a8d9d8065dae,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.85
-      objectReference: {fileID: 0}
-    - target: {fileID: 4283712960910273804, guid: 5fc21ac17b631bc48804a8d9d8065dae,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.85
-      objectReference: {fileID: 0}
     - target: {fileID: 4786210325732914082, guid: 5fc21ac17b631bc48804a8d9d8065dae,
         type: 3}
       propertyPath: trackedObject
@@ -1267,16 +1258,6 @@ PrefabInstance:
       propertyPath: trackedObject
       value: 
       objectReference: {fileID: 6086686999969014246}
-    - target: {fileID: 5070029099243097935, guid: 4278bbb7d159eff43a8e98b3953b47f2,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.85
-      objectReference: {fileID: 0}
-    - target: {fileID: 5851235259052060857, guid: 4278bbb7d159eff43a8e98b3953b47f2,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.85
-      objectReference: {fileID: 0}
     - target: {fileID: 7100163391955738591, guid: 4278bbb7d159eff43a8e98b3953b47f2,
         type: 3}
       propertyPath: m_Name

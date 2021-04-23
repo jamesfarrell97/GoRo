@@ -2649,69 +2649,6 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: -0.84625286, y: -0.04518931, z: -0.04484413, w: 0.52896416}
-        inSlope: {x: -0, y: -0, z: -0, w: -0}
-        outSlope: {x: -0.039577484, y: -0.091701746, z: 0.09843707, w: -0.062465668}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-      - serializedVersion: 3
-        time: 0.125
-        value: {x: -0.8446449, y: -0.022239, z: -0.08626068, w: 0.5278632}
-        inSlope: {x: 0.013828278, y: 0.17356873, z: -0.45746565, w: -0.044822693}
-        outSlope: {x: 0.012159348, y: 0.24189056, z: -0.41458014, w: -0.038266186}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-      - serializedVersion: 3
-        time: 0.29166666
-        value: {x: -0.84498, y: -0.0011791959, z: -0.090436324, w: 0.5270947}
-        inSlope: {x: -0.037908558, y: 0.06884337, z: 0.42848292, w: 0.013232232}
-        outSlope: {x: -0.03671646, y: 0.06914139, z: 0.42951107, w: 0.01335144}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-      - serializedVersion: 3
-        time: 0.41666666
-        value: {x: -0.84867406, y: 0.008569359, z: -0.0063261036, w: 0.52880895}
-        inSlope: {x: -0.08869171, y: -0.033915043, z: 1.0072515, w: -0.1282692}
-        outSlope: {x: -0.08583068, y: 0.0033751125, z: 0.9739659, w: -0.125885}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-      - serializedVersion: 3
-        time: 0.5
-        value: {x: -0.8585554, y: -0.02719742, z: 0.11204101, w: 0.49958968}
-        inSlope: {x: -0.21171567, y: -0.737518, z: 1.4502703, w: -0.72777265}
-        outSlope: {x: -0.19550323, y: -0.7880926, z: 1.4776587, w: -0.71263313}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-      - serializedVersion: 3
-        time: 0.625
-        value: {x: -0.8924025, y: -0.23998433, z: 0.00055770576, w: 0.38213217}
-        inSlope: {x: -0.0743866, y: -0.36799908, z: 0.34821033, w: -0.40459633}
-        outSlope: {x: 0, y: 0, z: 0, w: 0}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
-      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
-      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
         value: {x: 0.84626347, y: 0.045096282, z: -0.044807065, w: 0.5289581}
         inSlope: {x: -0, y: -0, z: -0, w: -0}
         outSlope: {x: 0.039577484, y: 0.09796023, z: 0.09551644, w: -0.062465668}
@@ -2750,15 +2687,15 @@ AnimationClip:
         time: 0.5
         value: {x: 0.85806394, y: 0.035559095, z: 0.111616276, w: 0.5000036}
         inSlope: {x: 0.20670888, y: 0.81726897, z: 1.4314054, w: -0.73170656}
-        outSlope: {x: 0.19264221, y: 0.8561015, z: 1.4643073, w: -0.7183552}
+        outSlope: {x: 0.1912117, y: 0.8509159, z: 1.4670491, w: -0.7157326}
         tangentMode: 0
         weightedMode: 0
         inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
       - serializedVersion: 3
         time: 0.625
-        value: {x: 0.89027953, y: 0.25341028, z: -0.00031682104, w: 0.37839848}
-        inSlope: {x: 0.06580353, y: 0.38790703, z: 0.33694506, w: -0.41484833}
+        value: {x: 0.858064, y: 0.035558812, z: 0.1116163, w: 0.5000035}
+        inSlope: {x: 0.19931793, y: 0.35053492, z: 0.22161007, w: -0.415802}
         outSlope: {x: 0, y: 0, z: 0, w: 0}
         tangentMode: 0
         weightedMode: 0
@@ -2770,6 +2707,69 @@ AnimationClip:
     path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
       HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
       HumanRForearm1/Base HumanRForearm2/Base HumanRPalm
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -0.84625286, y: -0.04518931, z: -0.04484413, w: 0.52896416}
+        inSlope: {x: -0, y: -0, z: -0, w: -0}
+        outSlope: {x: -0.039577484, y: -0.091701746, z: 0.09843707, w: -0.062465668}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+      - serializedVersion: 3
+        time: 0.125
+        value: {x: -0.8446449, y: -0.022239, z: -0.08626068, w: 0.5278632}
+        inSlope: {x: 0.013828278, y: 0.17356873, z: -0.45746565, w: -0.044822693}
+        outSlope: {x: 0.012159348, y: 0.24189056, z: -0.41458014, w: -0.038266186}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+      - serializedVersion: 3
+        time: 0.29166666
+        value: {x: -0.84498, y: -0.0011791959, z: -0.090436324, w: 0.5270947}
+        inSlope: {x: -0.037908558, y: 0.06884337, z: 0.42848292, w: 0.013232232}
+        outSlope: {x: -0.03671646, y: 0.06914139, z: 0.42951107, w: 0.01335144}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+      - serializedVersion: 3
+        time: 0.41666666
+        value: {x: -0.84867406, y: 0.008569359, z: -0.0063261036, w: 0.52880895}
+        inSlope: {x: -0.08869171, y: -0.033915043, z: 1.0072515, w: -0.1282692}
+        outSlope: {x: -0.08583068, y: 0.0033751125, z: 0.9739659, w: -0.125885}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+      - serializedVersion: 3
+        time: 0.5
+        value: {x: -0.8585554, y: -0.02719742, z: 0.11204101, w: 0.49958968}
+        inSlope: {x: -0.21171567, y: -0.737518, z: 1.4502703, w: -0.72777265}
+        outSlope: {x: -0.19454956, y: -0.7831454, z: 1.480341, w: -0.7100105}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+      - serializedVersion: 3
+        time: 0.625
+        value: {x: -0.8585554, y: -0.027197786, z: 0.11204075, w: 0.49958974}
+        inSlope: {x: -0.19836426, y: -0.3248453, z: 0.2362132, w: -0.41103363}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
   m_CompressedRotationCurves: []
   m_EulerCurves: []
   m_PositionCurves:
@@ -11162,14 +11162,14 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 2356348657
+      path: 4152626928
       attribute: 2
       script: {fileID: 0}
       typeID: 4
       customType: 0
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 4152626928
+      path: 2356348657
       attribute: 2
       script: {fileID: 0}
       typeID: 4
@@ -47999,270 +47999,6 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -0.84625286
-        inSlope: -0
-        outSlope: -0.039577484
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.125
-        value: -0.8446449
-        inSlope: 0.013828278
-        outSlope: 0.012159348
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.29166666
-        value: -0.84498
-        inSlope: -0.037908558
-        outSlope: -0.03671646
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.41666666
-        value: -0.84867406
-        inSlope: -0.08869171
-        outSlope: -0.08583068
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.5
-        value: -0.8585554
-        inSlope: -0.21171567
-        outSlope: -0.19550323
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.625
-        value: -0.8924025
-        inSlope: -0.0743866
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalRotation.x
-    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
-      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
-      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: -0.04518931
-        inSlope: -0
-        outSlope: -0.091701746
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.125
-        value: -0.022239
-        inSlope: 0.17356873
-        outSlope: 0.24189056
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.29166666
-        value: -0.0011791959
-        inSlope: 0.06884337
-        outSlope: 0.06914139
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.41666666
-        value: 0.008569359
-        inSlope: -0.033915043
-        outSlope: 0.0033751125
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.5
-        value: -0.02719742
-        inSlope: -0.737518
-        outSlope: -0.7880926
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.625
-        value: -0.23998433
-        inSlope: -0.36799908
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalRotation.y
-    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
-      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
-      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: -0.04484413
-        inSlope: -0
-        outSlope: 0.09843707
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.125
-        value: -0.08626068
-        inSlope: -0.45746565
-        outSlope: -0.41458014
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.29166666
-        value: -0.090436324
-        inSlope: 0.42848292
-        outSlope: 0.42951107
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.41666666
-        value: -0.0063261036
-        inSlope: 1.0072515
-        outSlope: 0.9739659
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.5
-        value: 0.11204101
-        inSlope: 1.4502703
-        outSlope: 1.4776587
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.625
-        value: 0.00055770576
-        inSlope: 0.34821033
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalRotation.z
-    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
-      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
-      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0.52896416
-        inSlope: -0
-        outSlope: -0.062465668
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.125
-        value: 0.5278632
-        inSlope: -0.044822693
-        outSlope: -0.038266186
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.29166666
-        value: 0.5270947
-        inSlope: 0.013232232
-        outSlope: 0.01335144
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.41666666
-        value: 0.52880895
-        inSlope: -0.1282692
-        outSlope: -0.125885
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.5
-        value: 0.49958968
-        inSlope: -0.72777265
-        outSlope: -0.71263313
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.625
-        value: 0.38213217
-        inSlope: -0.40459633
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalRotation.w
-    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
-      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
-      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
         value: 0.84626347
         inSlope: -0
         outSlope: 0.039577484
@@ -48301,15 +48037,15 @@ AnimationClip:
         time: 0.5
         value: 0.85806394
         inSlope: 0.20670888
-        outSlope: 0.19264221
+        outSlope: 0.1912117
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: 0.89027953
-        inSlope: 0.06580353
+        value: 0.858064
+        inSlope: 0.19931793
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
@@ -48367,15 +48103,15 @@ AnimationClip:
         time: 0.5
         value: 0.035559095
         inSlope: 0.81726897
-        outSlope: 0.8561015
+        outSlope: 0.8509159
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: 0.25341028
-        inSlope: 0.38790703
+        value: 0.035558812
+        inSlope: 0.35053492
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
@@ -48433,15 +48169,15 @@ AnimationClip:
         time: 0.5
         value: 0.111616276
         inSlope: 1.4314054
-        outSlope: 1.4643073
+        outSlope: 1.4670491
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: -0.00031682104
-        inSlope: 0.33694506
+        value: 0.1116163
+        inSlope: 0.22161007
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
@@ -48499,15 +48235,15 @@ AnimationClip:
         time: 0.5
         value: 0.5000036
         inSlope: -0.73170656
-        outSlope: -0.7183552
+        outSlope: -0.7157326
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: 0.37839848
-        inSlope: -0.41484833
+        value: 0.5000035
+        inSlope: -0.415802
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
@@ -48520,6 +48256,270 @@ AnimationClip:
     path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
       HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
       HumanRForearm1/Base HumanRForearm2/Base HumanRPalm
+    classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -0.84625286
+        inSlope: -0
+        outSlope: -0.039577484
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.125
+        value: -0.8446449
+        inSlope: 0.013828278
+        outSlope: 0.012159348
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.29166666
+        value: -0.84498
+        inSlope: -0.037908558
+        outSlope: -0.03671646
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.41666666
+        value: -0.84867406
+        inSlope: -0.08869171
+        outSlope: -0.08583068
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5
+        value: -0.8585554
+        inSlope: -0.21171567
+        outSlope: -0.19454956
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.625
+        value: -0.8585554
+        inSlope: -0.19836426
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalRotation.x
+    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
+    classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -0.04518931
+        inSlope: -0
+        outSlope: -0.091701746
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.125
+        value: -0.022239
+        inSlope: 0.17356873
+        outSlope: 0.24189056
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.29166666
+        value: -0.0011791959
+        inSlope: 0.06884337
+        outSlope: 0.06914139
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.41666666
+        value: 0.008569359
+        inSlope: -0.033915043
+        outSlope: 0.0033751125
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5
+        value: -0.02719742
+        inSlope: -0.737518
+        outSlope: -0.7831454
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.625
+        value: -0.027197786
+        inSlope: -0.3248453
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalRotation.y
+    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
+    classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -0.04484413
+        inSlope: -0
+        outSlope: 0.09843707
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.125
+        value: -0.08626068
+        inSlope: -0.45746565
+        outSlope: -0.41458014
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.29166666
+        value: -0.090436324
+        inSlope: 0.42848292
+        outSlope: 0.42951107
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.41666666
+        value: -0.0063261036
+        inSlope: 1.0072515
+        outSlope: 0.9739659
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5
+        value: 0.11204101
+        inSlope: 1.4502703
+        outSlope: 1.480341
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.625
+        value: 0.11204075
+        inSlope: 0.2362132
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalRotation.z
+    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
+    classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.52896416
+        inSlope: -0
+        outSlope: -0.062465668
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.125
+        value: 0.5278632
+        inSlope: -0.044822693
+        outSlope: -0.038266186
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.29166666
+        value: 0.5270947
+        inSlope: 0.013232232
+        outSlope: 0.01335144
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.41666666
+        value: 0.52880895
+        inSlope: -0.1282692
+        outSlope: -0.125885
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5
+        value: 0.49958968
+        inSlope: -0.72777265
+        outSlope: -0.7100105
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.625
+        value: 0.49958974
+        inSlope: -0.41103363
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalRotation.w
+    path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm1/Base HumanLForearm2/Base HumanLPalm
     classID: 4
     script: {fileID: 0}
   m_EulerEditorCurves:
@@ -52686,7 +52686,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: -42.981613
+        value: -58.40321
         inSlope: 65.19293
         outSlope: 65.19293
         tangentMode: 0
@@ -52752,7 +52752,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: -165.4
+        value: -155.2247
         inSlope: 42.12382
         outSlope: 42.12382
         tangentMode: 0
@@ -52818,7 +52818,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: 144.12149
+        value: 162.3739
         inSlope: -48.553024
         outSlope: -48.553024
         tangentMode: 0
@@ -55149,7 +55149,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: 42.370445
+        value: 58.22604
         inSlope: -66.5437
         outSlope: -66.5437
         tangentMode: 0
@@ -55215,7 +55215,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: 165
+        value: 154.4502
         inSlope: -39.217934
         outSlope: -39.217934
         tangentMode: 0
@@ -55281,7 +55281,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.625
-        value: 142.38087
+        value: 160.8611
         inSlope: -49.017746
         outSlope: -49.017746
         tangentMode: 0

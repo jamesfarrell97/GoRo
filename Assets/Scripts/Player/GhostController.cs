@@ -30,12 +30,21 @@ public class GhostController : MonoBehaviour
     {
         Reset();
 
+#if UNITY_EDITOR
+
+        InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.STATS_SAMPLE_RATE));
+
+#else
+
         InvokeRepeating("UpdateMovement", 0f, (1f / StatsManager.MOVE_SAMPLE_RATE));
+
+#endif
+
     }
 
     private void Reset()
     {
-        sampleIndex = 0;
+        sampleIndex = 4;
         paused = true;
     }
 

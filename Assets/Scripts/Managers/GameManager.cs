@@ -101,16 +101,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         InstantiateManagers();
         CheckConnection();
-        CheckState();
-    }
-
-    private void CheckState()
-    {
-#if !UNITY_EDITOR
-    
-        goButton.transform.parent.gameObject.SetActive(false);
-
-#endif
     }
 
     private void InstantiateManagers()
@@ -129,12 +119,17 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void LoadPlayerSettings()
     {
-        PLAYER_SETTINGS = HelperFunctions.ReadArrayFromFile("player_settings", '\n');
+        PLAYER_SETTINGS = HelperFunctions.ReadArrayFromFile("player-settings", '\n');
 
         if (PLAYER_SETTINGS != null)
         {
             LoadNickname();
         }
+    }
+
+    public void SetPlayerController(PlayerController playerController)
+    {
+        player = playerController;
     }
 
     private void LoadNickname()
@@ -433,11 +428,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         foreach (PlayerController player in players)
         {
-            // Retrieve player view
-            PhotonView photonView = player.GetComponent<PhotonView>();
-
             // If not our view, skip rest of loop
-            if (!photonView.IsMine) continue;
+            if (!player.photonView.IsMine) continue;
 
             // If player not currently participating in event
             if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
@@ -457,7 +449,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 }
 
                 // Start just row
-                BluetoothManager.Instance.ResetPM();
+                PerformanceMonitorManager.Instance.ResetPM();
 
                 // Update player state
                 player.state = PlayerState.ParticipatingInRace;
@@ -490,11 +482,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         foreach (PlayerController player in players)
         {
-            // Retrieve player view
-            PhotonView photonView = player.GetComponent<PhotonView>();
-
             // If not our view, skip rest of loop
-            if (!photonView.IsMine) continue;
+            if (!player.photonView.IsMine) continue;
 
             // If player not currently participating in event
             if (player.state != PlayerState.ParticipatingInRace && player.state != PlayerState.ParticipatingInTrial)
@@ -514,7 +503,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 }
 
                 // Start just row
-                BluetoothManager.Instance.ResetPM();
+                PerformanceMonitorManager.Instance.ResetPM();
 
                 // Update player state
                 player.state = PlayerState.ParticipatingInTrial;
@@ -547,11 +536,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         foreach (PlayerController player in players)
         {
-            // Retrieve player view
-            PhotonView photonView = player.GetComponent<PhotonView>();
-
             // If not our view, skip rest of loop
-            if (!photonView.IsMine) continue;
+            if (!player.photonView.IsMine) continue;
 
             // Retrieve route follower
             RouteFollower routeFollower = player.GetComponent<RouteFollower>();
@@ -572,7 +558,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             player.Resume();
 
             // Start just row
-            BluetoothManager.Instance.ResetPM();
+            PerformanceMonitorManager.Instance.ResetPM();
 
             // Update player state
             player.state = PlayerState.JustRowing;

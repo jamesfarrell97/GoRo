@@ -13,12 +13,13 @@ public class StatsManager : MonoBehaviour
     public static readonly float KILOMETERS_METER = 1000;
     public static readonly float SECS_MINUTE = 60;
 
-    public static readonly float STATS_SAMPLE_RATE = 10;     // Number of stats samples per second
-    public static readonly float MOVE_SAMPLE_RATE = 1;   // Number of movement samples per second
+    public static readonly float STATS_SAMPLE_RATE = 10;    // Number of stats samples per second
+    public static readonly float GRAPH_UPDATE_RATE = 2;     // Number of graph updates per second
+    public static readonly float MOVE_SAMPLE_RATE = 1;      // Number of movement samples per second
     public static readonly float SAMPLE_MINS = 60;          // Maximum minutes worth of data samples to store
 
     // Maximum samples to store
-    private readonly int MAX_DATA_POINTS = (int)(SECS_MINUTE * SAMPLE_MINS * STATS_SAMPLE_RATE);
+    private readonly int MAX_DATA_POINTS = (int) (SECS_MINUTE * SAMPLE_MINS * STATS_SAMPLE_RATE);
 
     // Basic Data
     [SerializeField] private TMP_Text TimeDisplay;
@@ -119,6 +120,9 @@ public class StatsManager : MonoBehaviour
 
         // Update stats STATS_SAMPLE_RATE times per second
         InvokeRepeating("UpdateStats", 0f, (1f / STATS_SAMPLE_RATE));
+
+        // Update graph GRAPH_UPDATE_RATE times per second
+        // InvokeRepeating("UpdateGraph", 0f, (1f / GRAPH_UPDATE_RATE));
     }
 
     private void Update()
@@ -128,6 +132,8 @@ public class StatsManager : MonoBehaviour
 
     private void Reset()
     {
+        PerformanceMonitorManager.Instance.ResetPM();
+
         ResetStats();
         UpdateDisplay();
     }
@@ -174,7 +180,7 @@ public class StatsManager : MonoBehaviour
     private void UpdateStrokeState()
     {
         // Update often to sync rowing animation with user stroke state
-        StrokeState = BluetoothManager.RowingStatusData[10];
+        StrokeState = PerformanceMonitorManager.RowingStatusData[10];
 
         if (Player != null)
         {
@@ -285,13 +291,13 @@ public class StatsManager : MonoBehaviour
 
     private void UpdateStats()
     {
-        Distance = (BluetoothManager.RowingStatusData[3] * DISTANCE_L_METER_VALUE)  // Distance Lo
-                 + (BluetoothManager.RowingStatusData[4] * DISTANCE_M_METER_VALUE)  // Distance Mid
-                 + (BluetoothManager.RowingStatusData[5] * DISTANCE_H_METER_VALUE); // Distance Hi
+        Distance = (PerformanceMonitorManager.RowingStatusData[3] * DISTANCE_L_METER_VALUE)  // Distance Lo
+                 + (PerformanceMonitorManager.RowingStatusData[4] * DISTANCE_M_METER_VALUE)  // Distance Mid
+                 + (PerformanceMonitorManager.RowingStatusData[5] * DISTANCE_H_METER_VALUE); // Distance Hi
 
-        Time = (BluetoothManager.RowingStatusData[0] * ELAPSED_TIME_L_S_VALUE)      // Elapsed Time Lo
-             + (BluetoothManager.RowingStatusData[1] * ELAPSED_TIME_M_S_VALUE)      // Elapsed Time Mid
-             + (BluetoothManager.RowingStatusData[2] * ELAPSED_TIME_H_S_VALUE);     // Elapsed Time Hi
+        Time = (PerformanceMonitorManager.RowingStatusData[0] * ELAPSED_TIME_L_S_VALUE)      // Elapsed Time Lo
+             + (PerformanceMonitorManager.RowingStatusData[1] * ELAPSED_TIME_M_S_VALUE)      // Elapsed Time Mid
+             + (PerformanceMonitorManager.RowingStatusData[2] * ELAPSED_TIME_H_S_VALUE);     // Elapsed Time Hi
 
 #if !UNITY_EDITOR
 
@@ -306,92 +312,90 @@ public class StatsManager : MonoBehaviour
         PreviousTime = Time;
 
         // Speed (m/s)
-        SpeedL = BluetoothManager.RowingStatusData1[3];              // Speed Lo
-        SpeedH = BluetoothManager.RowingStatusData1[4];              // Speed Hi
+        SpeedL = PerformanceMonitorManager.RowingStatusData1[3];              // Speed Lo
+        SpeedH = PerformanceMonitorManager.RowingStatusData1[4];              // Speed Hi
 
         Speed = (SpeedL * SPEED_L_MPS_VALUE)
               + (SpeedH * SPEED_H_MPS_VALUE);
 
         // Power (w)
-        PowerL = BluetoothManager.StrokeData1[3];                   // Stroke Power Lo
-        PowerH = BluetoothManager.StrokeData1[4];                   // Stroke Power Hi
+        PowerL = PerformanceMonitorManager.StrokeData1[3];                   // Stroke Power Lo
+        PowerH = PerformanceMonitorManager.StrokeData1[4];                   // Stroke Power Hi
 
         StrokePower = (PowerL * POWER_L_W_VALUE)
                     + (PowerH * POWER_H_W_VALUE);
 
         // Split Time
-        SplitTimeL = BluetoothManager.SplitIntervalData[6];
-        SplitTimeM = BluetoothManager.SplitIntervalData[7];
-        SplitTimeH = BluetoothManager.SplitIntervalData[8];
+        SplitTimeL = PerformanceMonitorManager.SplitIntervalData[6];
+        SplitTimeM = PerformanceMonitorManager.SplitIntervalData[7];
+        SplitTimeH = PerformanceMonitorManager.SplitIntervalData[8];
 
         SplitTime = (SplitTimeL * SPLIT_INT_TIME_L_S_VALUE)
                   + (SplitTimeM * SPLIT_INT_TIME_M_S_VALUE)
                   + (SplitTimeH * SPLIT_INT_TIME_H_S_VALUE);
 
         // Pace
-        PaceL = BluetoothManager.RowingStatusData1[7]; 
-        PaceH = BluetoothManager.RowingStatusData1[8];
+        PaceL = PerformanceMonitorManager.RowingStatusData1[7]; 
+        PaceH = PerformanceMonitorManager.RowingStatusData1[8];
 
         Pace = (PaceL * PACE_L_S_VALUE)
              + (PaceH * PACE_H_S_VALUE);
 
         // Avg Force
-        AvgForceL = BluetoothManager.StrokeData[14];
-        AvgForceH = BluetoothManager.StrokeData[15];
+        AvgForceL = PerformanceMonitorManager.StrokeData[14];
+        AvgForceH = PerformanceMonitorManager.StrokeData[15];
  
         AvgForce = (AvgForceL * AVG_FORCE_L_LB_VALUE)
                  + (AvgForceH * AVG_FORCE_H_LB_VALUE);
 
         // Split Distance
-        SplitDistL = BluetoothManager.SplitIntervalData[9];
-        SplitDistM = BluetoothManager.SplitIntervalData[10];
-        SplitDistH = BluetoothManager.SplitIntervalData[11];
+        SplitDistL = PerformanceMonitorManager.SplitIntervalData[9];
+        SplitDistM = PerformanceMonitorManager.SplitIntervalData[10];
+        SplitDistH = PerformanceMonitorManager.SplitIntervalData[11];
 
         SplitDist = (SplitDistL * SPLIT_INT_DISTANCE_L_M_VALUE)
                   + (SplitDistM * SPLIT_INT_DISTANCE_M_M_VALUE)
                   + (SplitDistH * SPLIT_INT_DISTANCE_H_M_VALUE);
 
         // Avg Split Pace
-        SplitAvgPaceL = BluetoothManager.RowingStatusData2[6];
-        SplitAvgPaceH = BluetoothManager.RowingStatusData2[7];
+        SplitAvgPaceL = PerformanceMonitorManager.RowingStatusData2[6];
+        SplitAvgPaceH = PerformanceMonitorManager.RowingStatusData2[7];
 
         SplitAvgPace = (SplitAvgPaceL * SPLIT_INT_AVG_PACE_L_S_VALUE)
                      + (SplitAvgPaceH * SPLIT_INT_AVG_PACE_H_S_VALUE);
 
         // Average Split Power
-        SplitIntAvgPowerL = BluetoothManager.RowingStatusData2[8];
-        SplitIntAvgPowerH = BluetoothManager.RowingStatusData2[9];
+        SplitIntAvgPowerL = PerformanceMonitorManager.RowingStatusData2[8];
+        SplitIntAvgPowerH = PerformanceMonitorManager.RowingStatusData2[9];
 
         SplitAvgPower = (SplitIntAvgPowerL * SPLIT_INT_AVG_POWER_L_W_VALUE)
                       + (SplitIntAvgPowerH * SPLIT_INT_AVG_POWER_H_W_VALUE);
 
         // Projected Workout Time
-        ProjectedWorkTimeL = BluetoothManager.StrokeData1[9];
-        ProjectedWorkTimeM = BluetoothManager.StrokeData1[10];
-        ProjectedWorkTimeH = BluetoothManager.StrokeData1[11];
+        ProjectedWorkTimeL = PerformanceMonitorManager.StrokeData1[9];
+        ProjectedWorkTimeM = PerformanceMonitorManager.StrokeData1[10];
+        ProjectedWorkTimeH = PerformanceMonitorManager.StrokeData1[11];
 
         ProjectedWorkTime = (ProjectedWorkTimeL * PROJECTED_WORK_TIME_L_S_VALUE)
                           + (ProjectedWorkTimeM * PROJECTED_WORK_TIME_M_S_VALUE)
                           + (ProjectedWorkTimeH * PROJECTED_WORK_TIME_H_S_VALUE);
 
         // Projected Workout Distance
-        ProjectedWorkDistanceL = BluetoothManager.StrokeData1[12];
-        ProjectedWorkDistanceM = BluetoothManager.StrokeData1[13];
-        ProjectedWorkDistanceH = BluetoothManager.StrokeData1[14];
+        ProjectedWorkDistanceL = PerformanceMonitorManager.StrokeData1[12];
+        ProjectedWorkDistanceM = PerformanceMonitorManager.StrokeData1[13];
+        ProjectedWorkDistanceH = PerformanceMonitorManager.StrokeData1[14];
 
         ProjectedWorkDistance = (ProjectedWorkDistanceL * PROJECTED_WORK_DISTANCE_L_M_VALUE)
                               + (ProjectedWorkDistanceM * PROJECTED_WORK_DISTANCE_M_M_VALUE)
                               + (ProjectedWorkDistanceH * PROJECTED_WORK_DISTANCE_H_M_VALUE);
 
         // Stroke data
-        DragFactor = BluetoothManager.RowingStatusData[18];         // Drag Factor
-        StrokesPerMin = BluetoothManager.RowingStatusData1[5];      // Stroke Rate
-        DriveLength = BluetoothManager.StrokeData[6];               // Drive Length
-
-        SampleCount++;
+        DragFactor = PerformanceMonitorManager.RowingStatusData[18];         // Drag Factor
+        StrokesPerMin = PerformanceMonitorManager.RowingStatusData1[5];      // Stroke Rate
+        DriveLength = PerformanceMonitorManager.StrokeData[6];               // Drive Length
 
         // Update graph every 0.5 seconds
-        if ((SampleCount / STATS_SAMPLE_RATE) >= 0.5f)
+        if (SampleCount > 5)
         {
             // Reset sample count
             SampleCount = 0;
@@ -399,8 +403,18 @@ public class StatsManager : MonoBehaviour
             // Record graph data
             RecordGraphData();
         }
+        else
+        {
+            SampleCount++;
+        }
 
         UpdateDisplay();
+    }
+
+    private void UpdateGraph()
+    {
+        // Record graph data
+        RecordGraphData();
     }
 
     public void ResetStats()
@@ -658,7 +672,6 @@ public class StatsManager : MonoBehaviour
     {
         return SplitAvgPace;
     }
-
 
     public void SetDebugDisplay(string value)
     {

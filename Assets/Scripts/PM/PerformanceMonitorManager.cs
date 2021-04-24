@@ -3,9 +3,8 @@ using System;
 
 using UnityEngine;
 using TMPro;
-using System.Collections;
 
-public class PMDictionary
+public class PerformanceMonitorDictionary
 {
     public static string DeviceUUID = "ce060000-43e5-11e4-916c-0800200c9a66";
 
@@ -25,7 +24,7 @@ public class PMDictionary
     public static string C2PMTransmitCharacteristic = "ce060022-43e5-11e4-916c-0800200c9a66";
 }
 
-public class BluetoothManager : MonoBehaviour
+public class PerformanceMonitorManager : MonoBehaviour
 {
     [SerializeField] Transform DeviceListContent;
     [SerializeField] GameObject DeviceListItemPrefab;
@@ -67,7 +66,7 @@ public class BluetoothManager : MonoBehaviour
 
     private States State;
 
-    public static BluetoothManager Instance;
+    public static PerformanceMonitorManager Instance;
 
     private void Awake()
     {
@@ -182,7 +181,7 @@ public class BluetoothManager : MonoBehaviour
     {
         FoundDeviceListScript.DeviceAddressList = new List<DeviceObject>();
 
-        string[] Concept2UUID = new string[] { PMDictionary.DeviceUUID };
+        string[] Concept2UUID = new string[] { PerformanceMonitorDictionary.DeviceUUID };
 
         BluetoothLEHardwareInterface.ScanForPeripheralsWithServices(Concept2UUID, (address, name) => {
 
@@ -207,7 +206,7 @@ public class BluetoothManager : MonoBehaviour
 
             DeviceListItem.Connect();
 
-            SetState(States.Subscribe, 3f);
+            SetState(States.RequestMTU, 3f);
 
         }, null);
     }
@@ -229,12 +228,12 @@ public class BluetoothManager : MonoBehaviour
         // Set Idle
         byte[] data2 = { 0xF1, 0x82, 0x82, 0xF2 };
 
-        BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data2, data2.Length, true, (characteristicUUID2) => {
+        BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PerformanceMonitorDictionary.C2PMControlServiceUUID, PerformanceMonitorDictionary.C2PMReceiveCharacteristic, data2, data2.Length, true, (characteristicUUID2) => {
             
             // Reset
             byte[] data5 = { 0x01, 0xF1, 0x76, 0x04, 0x13, 0x02, 0x01, 0x02, 0x60, 0xF2 };
                     
-            BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data5, data5.Length, true, (characteristicUUID5) => {
+            BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PerformanceMonitorDictionary.C2PMControlServiceUUID, PerformanceMonitorDictionary.C2PMReceiveCharacteristic, data5, data5.Length, true, (characteristicUUID5) => {
 
                 // Reset stats
                 StatsManager.Instance.ResetStats();
@@ -250,7 +249,7 @@ public class BluetoothManager : MonoBehaviour
 
     public void WriteCharacteristic(byte[] data)
     {
-        BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMReceiveCharacteristic, data, data.Length, true, (characteristicUUID1) => {
+        BluetoothLEHardwareInterface.WriteCharacteristic(DeviceAddress, PerformanceMonitorDictionary.C2PMControlServiceUUID, PerformanceMonitorDictionary.C2PMReceiveCharacteristic, data, data.Length, true, (characteristicUUID1) => {
 
             BluetoothLEHardwareInterface.Log("Write Succeeded");
 
@@ -259,7 +258,7 @@ public class BluetoothManager : MonoBehaviour
 
     private void ReadCharacteristic()
     {
-        BluetoothLEHardwareInterface.ReadCharacteristic(DeviceAddress, PMDictionary.RowingServiceUUID, PMDictionary.GeneralRowingStatusCharacteristicUUID, (characteristicUUID, rawBytes) => {
+        BluetoothLEHardwareInterface.ReadCharacteristic(DeviceAddress, PerformanceMonitorDictionary.RowingServiceUUID, PerformanceMonitorDictionary.GeneralRowingStatusCharacteristicUUID, (characteristicUUID, rawBytes) => {
 
             BluetoothLEHardwareInterface.Log("Read Succeeded");
 
@@ -271,9 +270,9 @@ public class BluetoothManager : MonoBehaviour
 
     private void SubscribeCharacteristic()
     {
-        BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.C2PMControlServiceUUID, PMDictionary.C2PMTransmitCharacteristic, (action1) =>
+        BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PerformanceMonitorDictionary.C2PMControlServiceUUID, PerformanceMonitorDictionary.C2PMTransmitCharacteristic, (action1) =>
         {
-            BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PMDictionary.RowingServiceUUID, PMDictionary.MultiplexedInformationCharacteristic, (action2) =>
+            BluetoothLEHardwareInterface.SubscribeCharacteristic(DeviceAddress, PerformanceMonitorDictionary.RowingServiceUUID, PerformanceMonitorDictionary.MultiplexedInformationCharacteristic, (action2) =>
             {
                 // Successfully subscribed to updates
                 SetState(States.Subscribed, 1f);

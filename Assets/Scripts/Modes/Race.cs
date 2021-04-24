@@ -21,14 +21,14 @@ public class Race : MonoBehaviour
     }
 
     public RaceState state;
-    
+
     [SerializeField] [Range(0, 10)] public int numberOfLaps;
     [SerializeField] [Range(0, 30)] int startTimeoutDuration;
     [SerializeField] [Range(0, 30)] int positionTimeoutDuration;
     [SerializeField] [Range(0, 30)] int resolveTimeoutDuration;
 
     [SerializeField] GameObject opponentSlider;
-    
+
     public PhotonView photonView { get; private set; }
     public Route route { get; private set; }
 
@@ -130,7 +130,7 @@ public class Race : MonoBehaviour
 
             // Add progress to dictionary
             currentDistances.Add(player, progress);
-            
+
             // Store local player progress
             if (player.photonView.IsMine) localPlayerProgress = progress;
 
@@ -165,7 +165,7 @@ public class Race : MonoBehaviour
 
             // Display event panel
             GameManager.Instance.DisplayEventPanel(
-                raceDuration.ToString(@"mm\:ss"), 
+                raceDuration.ToString(@"mm\:ss"),
                 distance,
                 speed,
                 strokeRate,
@@ -218,7 +218,7 @@ public class Race : MonoBehaviour
 
         // Pause player
         player.Pause();
-        
+
         // If all players have finished the race
         if (positions.Count.Equals(players.Count))
         {
@@ -245,7 +245,7 @@ public class Race : MonoBehaviour
 
             // Don't display for finished players
             if (positions.ContainsKey(player)) continue;
-            
+
             // Display race ending message
             StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("Race ending!", 3));
         }
@@ -278,7 +278,7 @@ public class Race : MonoBehaviour
             if (!player.photonView.IsMine) continue;
 
             // Reset
-            BluetoothManager.Instance.ResetPM();
+            PerformanceMonitorManager.Instance.ResetPM();
 
             // If player finished the race
             if (positions.ContainsKey(player))
@@ -393,7 +393,7 @@ public class Race : MonoBehaviour
             player.Pause();
 
             // Start just row
-            BluetoothManager.Instance.ResetPM();
+            PerformanceMonitorManager.Instance.ResetPM();
 
             // Start just row
             GameManager.Instance.StartJustRow();
@@ -421,7 +421,7 @@ public class Race : MonoBehaviour
         {
             // Only execute for our player
             if (!player.photonView.IsMine) continue;
-            
+
             // Remove player from race
             RemovePlayerFromRace(player);
 
@@ -570,9 +570,9 @@ public class Race : MonoBehaviour
         if (StatsManager.Instance.GetDistance() > 0)
             StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("False Start!", 2));
 
-        // Start just row
+        // Reset PM
         //
-        BluetoothManager.Instance.ResetPM();
+        PerformanceMonitorManager.Instance.ResetPM();
 
         // Start race
         //
@@ -599,7 +599,7 @@ public class Race : MonoBehaviour
                 toastPanel.gameObject.SetActive(true);
                 toastPanel.GetComponentInChildren<TMP_Text>().text = "";
             }
-            
+
             // Resume player movement
             player.Resume();
 
@@ -631,7 +631,7 @@ public class Race : MonoBehaviour
     private void SetState(RaceState state)
     {
         // Update race state
-        photonView.RPC("RPC_SetState", RpcTarget.AllBufferedViaServer, (int) state );
+        photonView.RPC("RPC_SetState", RpcTarget.AllBufferedViaServer, (int) state);
     }
 
     [PunRPC]

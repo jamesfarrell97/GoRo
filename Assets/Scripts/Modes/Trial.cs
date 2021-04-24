@@ -379,9 +379,9 @@ public class Trial : MonoBehaviour
         if (StatsManager.Instance.GetDistance() > 0)
             StartCoroutine(GameManager.Instance.DisplayQuickNotificationText("False Start!", 2));
 
-        // Start just row
+        // Reset PM
         //
-        BluetoothManager.Instance.ResetPM();
+        PerformanceMonitorManager.Instance.ResetPM();
 
         // Start trial
         //
@@ -434,7 +434,7 @@ public class Trial : MonoBehaviour
 
     IEnumerator DisplayEndOfTrialStats()
     {
-        BluetoothManager.Instance.ResetPM();
+        PerformanceMonitorManager.Instance.ResetPM();
 
         if (player != null) player.Pause();
 

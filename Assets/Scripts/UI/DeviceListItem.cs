@@ -26,7 +26,7 @@ public class DeviceListItem : MonoBehaviour
 
     public void OnConnectClick(DeviceListItem deviceListItem)
     {
-        BluetoothManager.Instance.OnConnectClick(deviceListItem);
+        PerformanceMonitorManager.Instance.OnConnectClick(deviceListItem);
     }
 
     public void Connect()

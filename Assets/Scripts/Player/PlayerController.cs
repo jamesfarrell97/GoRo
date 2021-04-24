@@ -90,8 +90,6 @@ public class PlayerController : MonoBehaviour
         achievementTracker = GetComponent<AchievementTracker>();
         routeFollower = GetComponent<RouteFollower>();
         photonView = GetComponent<PhotonView>();
-
-        StatsManager.Instance.SetPlayerController(this);
     }
 
     private void Start()
@@ -123,7 +121,8 @@ public class PlayerController : MonoBehaviour
 
     private void AssignPlayer()
     {
-        GameManager.Instance.player = this;
+        GameManager.Instance.SetPlayerController(this);
+        StatsManager.Instance.SetPlayerController(this);
     }
 
     private void AssignMenuCamera()
@@ -289,7 +288,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.W))
         {
             // Generate random distance to move this frame
-            float randomDistance = Random.Range(0.3f, 0.4f);
+            float randomDistance = 0.35f;
 
             // Update distance
             UpdateRouteDistance(routeDistance + randomDistance);
@@ -304,7 +303,7 @@ public class PlayerController : MonoBehaviour
                 timeDriving += (1f / StatsManager.STATS_SAMPLE_RATE);
 
                 // Animate
-                Animate((int)strokeState);
+                Animate((int) strokeState);
             }
             else if (timeRecovering < recoverTime)
             {

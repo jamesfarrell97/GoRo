@@ -273,7 +273,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.NickName = playerNameInputField.text;
             playerNameText.text = PhotonNetwork.NickName;
-            HelperFunctions.WriteDatatoFile(PhotonNetwork.NickName, 0, '\n', "player_settings");
+            HelperFunctions.WriteDatatoFile(PhotonNetwork.NickName, 0, '\n', "player-settings");
             MenuManager.Instance.OpenMenu("Multiplayer");
         }
     }

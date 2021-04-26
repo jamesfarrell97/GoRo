@@ -127,8 +127,14 @@ public class StatsManager : MonoBehaviour
 
     private void Update()
     {
+
+#if !UNITY_EDITOR
+        
         UpdateStrokeState();
-    }
+    
+#endif
+
+        }
 
     private void Reset()
     {

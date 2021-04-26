@@ -236,6 +236,9 @@ public class PlayerController : MonoBehaviour
 
     public void SampleStats()
     {
+        if (trial == null) return;
+
+        if (!trial.state.Equals(Trial.TrialState.InProgress)) return;
 
 #if UNITY_EDITOR
 
@@ -285,10 +288,13 @@ public class PlayerController : MonoBehaviour
 
 #if UNITY_EDITOR
 
+        // Sample stats
+        SampleStats();
+
         if (Input.GetKey(KeyCode.W))
         {
             // Generate random distance to move this frame
-            float randomDistance = 0.35f;
+            float randomDistance = Random.Range(0.3f, 0.6f);
 
             // Update distance
             UpdateRouteDistance(routeDistance + randomDistance);
@@ -321,9 +327,6 @@ public class PlayerController : MonoBehaviour
 
             // Update debug display
             StatsManager.Instance.SetDebugDisplay(routeFollower.progressAlongRoute.ToString());
-
-            // Sample stats
-            SampleStats();
         }
         else if (Input.GetKey(KeyCode.S))
         {

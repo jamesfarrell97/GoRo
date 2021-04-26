@@ -167,7 +167,9 @@ public class StatsManager : MonoBehaviour
     }
 
     private void UpdatePlayerDistance()
-    {        
+    {
+#if !UNITY_EDITOR
+
         // Player must be assigned (by a local PlayerController) 
         // before this operation can take place
         // 
@@ -175,12 +177,19 @@ public class StatsManager : MonoBehaviour
         //
         if (Player != null)
         {
+
+        
             // Sample player stats
             Player.SampleStats();
-
+    
             // Update player
             Player.ERGUpdateDistance(Distance);
+
+
         }
+
+#endif
+
     }
     
     private void UpdateStrokeState()

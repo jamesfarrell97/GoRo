@@ -44,7 +44,7 @@ public class GhostController : MonoBehaviour
 
     private void Reset()
     {
-        sampleIndex = 4;
+        sampleIndex = 0;
         paused = true;
     }
 
@@ -66,8 +66,8 @@ public class GhostController : MonoBehaviour
         if (paused) return;
 
         // Select next sample in the speed samples array
-        sampleIndex = (sampleIndex < samples.Length - 1) 
-            ? sampleIndex + 1 
+        sampleIndex = (sampleIndex < samples.Length - 1)
+            ? sampleIndex + 1
             : 0;
 
         // Update distance
